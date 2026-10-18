@@ -1,0 +1,561 @@
+"""书艺 30 字种子。
+五类各 6 字：五常 / 伦理 / 修身 / 治学 / 哲学。
+每字含部件、本义、字源故事、4 选项、答案、关联经典 ref_id。
+"""
+from __future__ import annotations
+
+from sqlalchemy.orm import Session
+
+from .db import Base, SessionLocal, engine
+from .models import ShuCard
+
+# 造字法：xiangxing 象形 / zhishi 指事 / huiyi 会意 / xingsheng 形声 / zhuanzhu 转注 / jiajie 假借
+
+CARDS = [
+    # ─── 五常 ───────────────────────────────────────────
+    {
+        "char": "仁", "pinyin": "rén", "components": "亻+二",
+        "method": "huiyi",
+        "benyi": "两个人相处时所应有的爱与敬",
+        "jinyi": "仁爱、慈悲、宽厚",
+        "story": "「仁」从「人」从「二」，金文像两个人并立。古人认为：一个人独居无所谓「仁」，唯有人与人相处时，那份相待之心方为仁。孟子说「仁，人心也」，仁不是外在规范，而是人心本然之德。",
+        "options": [
+            {"key": "A", "text": "一个人独处时的清净"},
+            {"key": "B", "text": "两个人相处时所应有的爱与敬"},
+            {"key": "C", "text": "君主统治百姓的权术"},
+            {"key": "D", "text": "祭祀时的敬畏"},
+        ],
+        "answer_key": "B",
+        "refs": ["lunyu.yanyuan.12.1", "lunyu.yanyuan.12.2"],
+        "related_concepts": ["ren"],
+        "category": "wuchang", "difficulty": 1, "sort_order": 1,
+    },
+    {
+        "char": "义", "pinyin": "yì", "components": "羊+我",
+        "method": "huiyi",
+        "benyi": "合宜、应当；行事合于礼仪之正",
+        "jinyi": "正义、道义、义气",
+        "story": "繁体「義」从「羊」从「我」。「羊」古代为吉祥牺牲，「我」为兵器，合起来意为「我执兵器，护卫吉祥之礼」。引申为做事合宜、合于正道。孟子曰「义，人之正路也」。",
+        "options": [
+            {"key": "A", "text": "好处与利益"},
+            {"key": "B", "text": "合宜、应当；行事合于正道"},
+            {"key": "C", "text": "义气深重的兄弟情"},
+            {"key": "D", "text": "信守诺言"},
+        ],
+        "answer_key": "B",
+        "refs": ["lunyu.liren.4.16"],
+        "related_concepts": ["yi"],
+        "category": "wuchang", "difficulty": 1, "sort_order": 2,
+    },
+    {
+        "char": "礼", "pinyin": "lǐ", "components": "示+豊",
+        "method": "huiyi",
+        "benyi": "祭祀时的仪式；引申为人际交往的规范",
+        "jinyi": "礼貌、礼仪、典礼",
+        "story": "繁体「禮」从「示」从「豊」。「示」是祭祀；「豊」为盛祭品的礼器（甲骨文像供奉中的豆器盛玉）。本义是祭祀仪式。孔子将「礼」从祭祀扩展到一切人际规范——「不学礼，无以立」。",
+        "options": [
+            {"key": "A", "text": "送礼物的习俗"},
+            {"key": "B", "text": "君主的诏令"},
+            {"key": "C", "text": "祭祀时的仪式；引申为人际规范"},
+            {"key": "D", "text": "歌舞表演"},
+        ],
+        "answer_key": "C",
+        "refs": ["lunyu.bayi.3.4", "lunyu.yanyuan.12.1"],
+        "related_concepts": ["li"],
+        "category": "wuchang", "difficulty": 1, "sort_order": 3,
+    },
+    {
+        "char": "智", "pinyin": "zhì", "components": "知+日",
+        "method": "huiyi",
+        "benyi": "明察事理、辨别是非的能力",
+        "jinyi": "智慧、聪明",
+        "story": "「智」古作「知」，加「日」（太阳）以示明察、洞晓。本义为对事理的明辨之力。儒家所谓「智」非小聪明，而是「知人」「知言」「知命」之大智——「知者不惑」。",
+        "options": [
+            {"key": "A", "text": "明察事理、辨别是非的能力"},
+            {"key": "B", "text": "记忆力强、博闻强识"},
+            {"key": "C", "text": "口才好、善辩"},
+            {"key": "D", "text": "权谋、机变"},
+        ],
+        "answer_key": "A",
+        "refs": ["lunyu.zihan.9.29"],
+        "related_concepts": ["zhi"],
+        "category": "wuchang", "difficulty": 2, "sort_order": 4,
+    },
+    {
+        "char": "信", "pinyin": "xìn", "components": "亻+言",
+        "method": "huiyi",
+        "benyi": "人言为信——说话算话",
+        "jinyi": "信用、诚信、信任",
+        "story": "「信」从「人」从「言」，人之所言可凭可据即为信。孔子曰「人而无信，不知其可也」——一个人若不能让人相信，简直不知他还能成什么。信是社会关系的基本契约。",
+        "options": [
+            {"key": "A", "text": "写信、通信"},
+            {"key": "B", "text": "宗教信仰"},
+            {"key": "C", "text": "确信、坚信"},
+            {"key": "D", "text": "人言为信——说话算话"},
+        ],
+        "answer_key": "D",
+        "refs": ["lunyu.weizheng.2.22"],
+        "related_concepts": ["xin"],
+        "category": "wuchang", "difficulty": 1, "sort_order": 5,
+    },
+    {
+        "char": "德", "pinyin": "dé", "components": "彳+直+心",
+        "method": "huiyi",
+        "benyi": "心行端直、合乎大道的内在品性",
+        "jinyi": "道德、品德、恩德",
+        "story": "「德」从「彳」（行走）从「直」从「心」，意为「行而直其心」。本义为内心正直、行为端正所养成的品性。古人重「德」甚于「才」——「德者，本也；财者，末也」。",
+        "options": [
+            {"key": "A", "text": "得到好处或恩惠"},
+            {"key": "B", "text": "心行端直、合乎大道的内在品性"},
+            {"key": "C", "text": "国家的法律"},
+            {"key": "D", "text": "祖宗传下的家产"},
+        ],
+        "answer_key": "B",
+        "refs": [],
+        "related_concepts": ["de"],
+        "category": "wuchang", "difficulty": 2, "sort_order": 6,
+    },
+
+    # ─── 伦理 ───────────────────────────────────────────
+    {
+        "char": "孝", "pinyin": "xiào", "components": "耂+子",
+        "method": "huiyi",
+        "benyi": "子女背负 / 奉养老人",
+        "jinyi": "孝顺、孝敬",
+        "story": "「孝」上为「老」之省（白发苍苍的老人），下为「子」。甲骨文像孩子搀扶老人。本义是奉养、敬侍父母。《论语》「今之孝者，是谓能养」——只是能养不够，要敬之才算孝。",
+        "options": [
+            {"key": "A", "text": "穿丧服守孝"},
+            {"key": "B", "text": "子女背负 / 奉养老人"},
+            {"key": "C", "text": "继承父辈的事业"},
+            {"key": "D", "text": "祭祀祖宗"},
+        ],
+        "answer_key": "B",
+        "refs": ["lunyu.weizheng.2.7"],
+        "related_concepts": ["xiao"],
+        "category": "lunli", "difficulty": 1, "sort_order": 11,
+    },
+    {
+        "char": "悌", "pinyin": "tì", "components": "忄+弟",
+        "method": "xingsheng",
+        "benyi": "敬爱兄长",
+        "jinyi": "兄弟和睦",
+        "story": "「悌」从「心」从「弟」，弟亦表音。本义为弟弟对兄长的敬爱。儒家与「孝」并称「孝悌」——孝事父母、悌敬兄长，是仁的根本。「孝悌也者，其为仁之本与」。",
+        "options": [
+            {"key": "A", "text": "兄弟分家"},
+            {"key": "B", "text": "敬爱兄长"},
+            {"key": "C", "text": "替换、轮流"},
+            {"key": "D", "text": "弟子拜师"},
+        ],
+        "answer_key": "B",
+        "refs": [],
+        "related_concepts": ["xiao"],
+        "category": "lunli", "difficulty": 2, "sort_order": 12,
+    },
+    {
+        "char": "忠", "pinyin": "zhōng", "components": "中+心",
+        "method": "huiyi",
+        "benyi": "尽心竭力、心无偏私",
+        "jinyi": "忠诚、忠心",
+        "story": "「忠」从「中」从「心」。「中」非「中间」，而是「中正不偏」。本义是把心放正、尽心竭力地待人接物。曾子三省「为人谋而不忠乎？」——为人办事，是否尽了真心？这是「忠」的本义，并非专指忠君。",
+        "options": [
+            {"key": "A", "text": "尽心竭力、心无偏私"},
+            {"key": "B", "text": "对君主绝对服从"},
+            {"key": "C", "text": "忠厚老实"},
+            {"key": "D", "text": "心思集中、不分神"},
+        ],
+        "answer_key": "A",
+        "refs": ["lunyu.xueer.1.4"],
+        "related_concepts": ["zhong"],
+        "category": "lunli", "difficulty": 2, "sort_order": 13,
+    },
+    {
+        "char": "恕", "pinyin": "shù", "components": "如+心",
+        "method": "huiyi",
+        "benyi": "推己及人——己所不欲，勿施于人",
+        "jinyi": "宽恕、原谅",
+        "story": "「恕」从「如」从「心」，意为「如我心」——拿自己的心去比量别人的心。子贡问可终身奉行的一字，孔子答「其恕乎！己所不欲，勿施于人」——「恕」是儒家黄金律，影响后世两千年。",
+        "options": [
+            {"key": "A", "text": "原谅别人的过错"},
+            {"key": "B", "text": "推己及人——己所不欲，勿施于人"},
+            {"key": "C", "text": "为人宽厚"},
+            {"key": "D", "text": "请求宽恕"},
+        ],
+        "answer_key": "B",
+        "refs": ["lunyu.weilinggong.15.24"],
+        "related_concepts": ["shu"],
+        "category": "lunli", "difficulty": 2, "sort_order": 14,
+    },
+    {
+        "char": "君", "pinyin": "jūn", "components": "尹+口",
+        "method": "huiyi",
+        "benyi": "执笔（尹）发令（口）者——为政者",
+        "jinyi": "君主、君子、对人尊称",
+        "story": "「君」上「尹」（手持笔），下「口」（发令），本义为发号施令的统治者。孔子将「君子」一词从「贵族身份」转化为「德行修养」——不论出身贵贱，但凡仁德兼备者皆可为君子。",
+        "options": [
+            {"key": "A", "text": "夫人、配偶"},
+            {"key": "B", "text": "执笔发令者——为政者"},
+            {"key": "C", "text": "众人聚集"},
+            {"key": "D", "text": "敬称、先生"},
+        ],
+        "answer_key": "B",
+        "refs": ["lunyu.bayi.3.7"],
+        "related_concepts": ["junzi"],
+        "category": "lunli", "difficulty": 3, "sort_order": 15,
+    },
+    {
+        "char": "友", "pinyin": "yǒu", "components": "又+又",
+        "method": "huiyi",
+        "benyi": "两手相握——同志相亲为友",
+        "jinyi": "朋友、友爱",
+        "story": "「友」甲骨文像两只右手相握，本义是两人志同道合、互相扶助。古人择友极严——「无友不如己者」「益者三友：友直、友谅、友多闻」。",
+        "options": [
+            {"key": "A", "text": "有、拥有"},
+            {"key": "B", "text": "两手相握——同志相亲为友"},
+            {"key": "C", "text": "邻里互助"},
+            {"key": "D", "text": "兄弟"},
+        ],
+        "answer_key": "B",
+        "refs": ["lunyu.jishi.16.4"],
+        "related_concepts": [],
+        "category": "lunli", "difficulty": 2, "sort_order": 16,
+    },
+
+    # ─── 修身 ───────────────────────────────────────────
+    {
+        "char": "中", "pinyin": "zhōng", "components": "中",
+        "method": "xiangxing",
+        "benyi": "正中、不偏不倚",
+        "jinyi": "中间、中等、合适",
+        "story": "「中」甲骨文像旗杆贯穿物体正中。本义是不偏不倚、恰到好处。儒家「中庸」之「中」即此——非平均、非折中，而是「时中」（时时刻刻恰当）。喜怒哀乐发而皆中节，谓之和。",
+        "options": [
+            {"key": "A", "text": "中间位置"},
+            {"key": "B", "text": "正中、不偏不倚"},
+            {"key": "C", "text": "中国"},
+            {"key": "D", "text": "射中靶子"},
+        ],
+        "answer_key": "B",
+        "refs": [],
+        "related_concepts": ["zhongyong"],
+        "category": "xiushen", "difficulty": 3, "sort_order": 21,
+    },
+    {
+        "char": "和", "pinyin": "hé", "components": "禾+口",
+        "method": "xingsheng",
+        "benyi": "声音相应、协调一致",
+        "jinyi": "和谐、和平、温和",
+        "story": "「和」古字「龢」从「龠」（多管乐器）从「禾」，本义是多种声音相和谐。引申为协调一致、和睦相处。孔子说「君子和而不同」——和不是同，是差异中的协调。",
+        "options": [
+            {"key": "A", "text": "声音相应、协调一致"},
+            {"key": "B", "text": "和气生财"},
+            {"key": "C", "text": "求和、议和"},
+            {"key": "D", "text": "总和、相加"},
+        ],
+        "answer_key": "A",
+        "refs": ["lunyu.zilu.13.23"],
+        "related_concepts": ["he"],
+        "category": "xiushen", "difficulty": 2, "sort_order": 22,
+    },
+    {
+        "char": "敬", "pinyin": "jìng", "components": "苟+攴",
+        "method": "huiyi",
+        "benyi": "戒慎、专一、不敢轻慢",
+        "jinyi": "尊敬、恭敬",
+        "story": "「敬」本义为戒慎、专一不懈。朱熹释「敬」为「主一无适」——心专注于一事而不旁骛。「敬」是儒家修身工夫的总枢——「修己以敬」「行笃敬」「执事敬」。",
+        "options": [
+            {"key": "A", "text": "敬酒、致敬"},
+            {"key": "B", "text": "畏惧、害怕"},
+            {"key": "C", "text": "戒慎、专一、不敢轻慢"},
+            {"key": "D", "text": "尊老敬贤"},
+        ],
+        "answer_key": "C",
+        "refs": [],
+        "related_concepts": ["jing"],
+        "category": "xiushen", "difficulty": 3, "sort_order": 23,
+    },
+    {
+        "char": "诚", "pinyin": "chéng", "components": "讠+成",
+        "method": "xingsheng",
+        "benyi": "言而成之——真实无妄",
+        "jinyi": "诚实、真诚",
+        "story": "「诚」从「言」从「成」，言而成之、不虚不妄。《中庸》以「诚」为天道——「诚者，天之道也；诚之者，人之道也」。诚不仅是「不说谎」，更是内外如一、表里通透的存在状态。",
+        "options": [
+            {"key": "A", "text": "答应别人的承诺"},
+            {"key": "B", "text": "言而成之——真实无妄"},
+            {"key": "C", "text": "诚惶诚恐"},
+            {"key": "D", "text": "诚意金"},
+        ],
+        "answer_key": "B",
+        "refs": [],
+        "related_concepts": ["cheng"],
+        "category": "xiushen", "difficulty": 3, "sort_order": 24,
+    },
+    {
+        "char": "省", "pinyin": "xǐng/shěng", "components": "少+目",
+        "method": "huiyi",
+        "benyi": "细察、自我审视",
+        "jinyi": "反省、省略、行政区划「省」",
+        "story": "「省」从「目」表示察看，从「少」声。本义为仔细察看。引申为自我审视——曾子「吾日三省吾身」。读 xǐng 时是审视、反省；读 shěng 时是减省、节约（后起义）。",
+        "options": [
+            {"key": "A", "text": "节省、省钱"},
+            {"key": "B", "text": "省会、行政区划"},
+            {"key": "C", "text": "细察、自我审视"},
+            {"key": "D", "text": "省得、免得"},
+        ],
+        "answer_key": "C",
+        "refs": ["lunyu.xueer.1.4"],
+        "related_concepts": [],
+        "category": "xiushen", "difficulty": 2, "sort_order": 25,
+    },
+    {
+        "char": "勇", "pinyin": "yǒng", "components": "甬+力",
+        "method": "xingsheng",
+        "benyi": "有气力、敢作敢为",
+        "jinyi": "勇敢、勇气",
+        "story": "「勇」从「力」表示有气力，从「甬」声。儒家所讲「勇」分大勇小勇——「见义不为，无勇也」（合于义而后行）；「勇而无礼则乱」（勇要受礼的节制）。「仁者必有勇，勇者不必有仁」。",
+        "options": [
+            {"key": "A", "text": "有气力、敢作敢为"},
+            {"key": "B", "text": "急于求胜"},
+            {"key": "C", "text": "好勇斗狠"},
+            {"key": "D", "text": "出涌、涌出"},
+        ],
+        "answer_key": "A",
+        "refs": ["lunyu.weizheng.2.24"],
+        "related_concepts": [],
+        "category": "xiushen", "difficulty": 2, "sort_order": 26,
+    },
+
+    # ─── 治学 ───────────────────────────────────────────
+    {
+        "char": "学", "pinyin": "xué", "components": "子+冖+爻+臼",
+        "method": "huiyi",
+        "benyi": "孩子在屋中受教——学习、效法",
+        "jinyi": "学习、学问、学校",
+        "story": "繁体「學」上「爻」象算筹或文字，旁「臼」象双手捧持，下「冖」（屋顶）下有「子」（孩童），合起来意为「孩童在屋中由师长持物教导」。本义即学习、效法。「学而时习之，不亦说乎」是《论语》开篇。",
+        "options": [
+            {"key": "A", "text": "学校、学府"},
+            {"key": "B", "text": "孩子在屋中受教——学习、效法"},
+            {"key": "C", "text": "学问、知识"},
+            {"key": "D", "text": "模仿"},
+        ],
+        "answer_key": "B",
+        "refs": ["lunyu.xueer.1.1"],
+        "related_concepts": [],
+        "category": "zhixue", "difficulty": 2, "sort_order": 31,
+    },
+    {
+        "char": "习", "pinyin": "xí", "components": "羽+白",
+        "method": "huiyi",
+        "benyi": "雏鸟反复练飞——温习、实践",
+        "jinyi": "习惯、练习、学习",
+        "story": "繁体「習」上「羽」（翅膀），下「白」（一说为「日」）。本义是雏鸟在阳光下反复练飞。「学」是初知，「习」是反复练而熟之。孔子「学而时习之」——学到的要时时温习并实践。",
+        "options": [
+            {"key": "A", "text": "习惯成自然"},
+            {"key": "B", "text": "雏鸟反复练飞——温习、实践"},
+            {"key": "C", "text": "见习、实习"},
+            {"key": "D", "text": "羽毛"},
+        ],
+        "answer_key": "B",
+        "refs": ["lunyu.xueer.1.1"],
+        "related_concepts": [],
+        "category": "zhixue", "difficulty": 2, "sort_order": 32,
+    },
+    {
+        "char": "思", "pinyin": "sī", "components": "囟+心",
+        "method": "huiyi",
+        "benyi": "头脑（囟）与心合用——深虑",
+        "jinyi": "思考、思念",
+        "story": "「思」上为「囟」（头骨缝隙，代指脑），下为「心」。古人以为思维出自心，加上「囟」强调头脑参与。本义是深入思考。孔子「学而不思则罔，思而不学则殆」——思与学须并行。",
+        "options": [
+            {"key": "A", "text": "思念故人"},
+            {"key": "B", "text": "心思、心情"},
+            {"key": "C", "text": "头脑与心合用——深虑"},
+            {"key": "D", "text": "怀念过去"},
+        ],
+        "answer_key": "C",
+        "refs": ["lunyu.weizheng.2.15"],
+        "related_concepts": [],
+        "category": "zhixue", "difficulty": 2, "sort_order": 33,
+    },
+    {
+        "char": "问", "pinyin": "wèn", "components": "门+口",
+        "method": "xingsheng",
+        "benyi": "于门口张嘴询问",
+        "jinyi": "询问、问候",
+        "story": "繁体「問」从「口」从「門」（亦表音）。古人到陌生人家须先于门口开口询问。引申为一切询问、考求。「敏而好学，不耻下问」——孔子赞子贡是个不以请教为耻的好学者。",
+        "options": [
+            {"key": "A", "text": "于门口张嘴询问"},
+            {"key": "B", "text": "问候健康"},
+            {"key": "C", "text": "审问犯人"},
+            {"key": "D", "text": "听见、听闻"},
+        ],
+        "answer_key": "A",
+        "refs": ["lunyu.gongyechang.5.15"],
+        "related_concepts": [],
+        "category": "zhixue", "difficulty": 1, "sort_order": 34,
+    },
+    {
+        "char": "知", "pinyin": "zhī", "components": "矢+口",
+        "method": "huiyi",
+        "benyi": "出口如矢——所知能脱口而出",
+        "jinyi": "知道、知识、相知",
+        "story": "「知」从「矢」（箭）从「口」，意为出口如箭般迅疾——真知的人，无需迟疑，开口即中。古「知」与「智」相通。孔子说「知之为知之，不知为不知，是知也」——承认无知本身就是大智。",
+        "options": [
+            {"key": "A", "text": "知道、知识"},
+            {"key": "B", "text": "出口如矢——所知能脱口而出"},
+            {"key": "C", "text": "通知、告知"},
+            {"key": "D", "text": "知县"},
+        ],
+        "answer_key": "B",
+        "refs": ["lunyu.weizheng.2.17"],
+        "related_concepts": ["zhi"],
+        "category": "zhixue", "difficulty": 2, "sort_order": 35,
+    },
+    {
+        "char": "行", "pinyin": "xíng/háng", "components": "行",
+        "method": "xiangxing",
+        "benyi": "十字路口——道路、行走",
+        "jinyi": "行走、行为、可以",
+        "story": "「行」甲骨文像十字路口，本义为道路、行走。引申为行为、践行。儒家最重「知行」——「君子讷于言而敏于行」「言必信，行必果」。读 háng 时表示行列（道路引申）。",
+        "options": [
+            {"key": "A", "text": "行业"},
+            {"key": "B", "text": "可以、能行"},
+            {"key": "C", "text": "十字路口——道路、行走"},
+            {"key": "D", "text": "排成一行"},
+        ],
+        "answer_key": "C",
+        "refs": ["lunyu.liren.4.24"],
+        "related_concepts": [],
+        "category": "zhixue", "difficulty": 2, "sort_order": 36,
+    },
+
+    # ─── 哲学 ───────────────────────────────────────────
+    {
+        "char": "道", "pinyin": "dào", "components": "辶+首",
+        "method": "huiyi",
+        "benyi": "人首所朝向——道路、引申为根本道理",
+        "jinyi": "道路、道理、学说",
+        "story": "「道」从「辶」（走之）从「首」（头）。本义是人首所朝向的方向——道路。引申为做事的方法、根本道理、最高真理。儒家「吾道一以贯之」、道家「道可道，非常道」，「道」是中国哲学最高范畴。",
+        "options": [
+            {"key": "A", "text": "马路、街道"},
+            {"key": "B", "text": "人首所朝向——道路、引申为根本道理"},
+            {"key": "C", "text": "说话、述说"},
+            {"key": "D", "text": "道士、道教"},
+        ],
+        "answer_key": "B",
+        "refs": ["lunyu.liren.4.5"],
+        "related_concepts": ["dao"],
+        "category": "zhexue", "difficulty": 3, "sort_order": 41,
+    },
+    {
+        "char": "性", "pinyin": "xìng", "components": "忄+生",
+        "method": "huiyi",
+        "benyi": "人生而即有的——天赋本质",
+        "jinyi": "性格、性质、性别",
+        "story": "「性」从「心」从「生」，意为「人心生来即有的」。儒家由此发展「性善论」（孟子）与「性恶论」（荀子）之争。《中庸》「天命之谓性，率性之谓道，修道之谓教」——性是天赋的本然。",
+        "options": [
+            {"key": "A", "text": "脾气、性格"},
+            {"key": "B", "text": "性别"},
+            {"key": "C", "text": "人生而即有的——天赋本质"},
+            {"key": "D", "text": "事物的性质"},
+        ],
+        "answer_key": "C",
+        "refs": [],
+        "related_concepts": ["xing"],
+        "category": "zhexue", "difficulty": 3, "sort_order": 42,
+    },
+    {
+        "char": "命", "pinyin": "mìng", "components": "令+口",
+        "method": "huiyi",
+        "benyi": "上对下的指令——天命、命令",
+        "jinyi": "命令、生命、命运",
+        "story": "「命」从「口」从「令」（亦表音），本义为上对下的口头指令。引申为天给予的——天命、寿命、命运。「不知命，无以为君子」——知命非宿命，而是知所当为、所当止。",
+        "options": [
+            {"key": "A", "text": "上对下的指令——天命、命令"},
+            {"key": "B", "text": "性命、生命"},
+            {"key": "C", "text": "命名"},
+            {"key": "D", "text": "命运、运气"},
+        ],
+        "answer_key": "A",
+        "refs": ["lunyu.yaoyue.20.3"],
+        "related_concepts": [],
+        "category": "zhexue", "difficulty": 3, "sort_order": 43,
+    },
+    {
+        "char": "天", "pinyin": "tiān", "components": "一+大",
+        # 注：「天」字 = 一横（指头顶）+ 大人之形
+        "method": "zhishi",
+        "benyi": "人头之上至高之处",
+        "jinyi": "天空、自然、天命",
+        "story": "「天」甲骨文像正立人形，头上有一横指示头顶。本义是「人头之上」——至高的天空。引申为自然、天理、主宰。「天行健，君子以自强不息」——天的运行就是儒家修身的最高榜样。",
+        "options": [
+            {"key": "A", "text": "天空"},
+            {"key": "B", "text": "天气"},
+            {"key": "C", "text": "人头之上至高之处"},
+            {"key": "D", "text": "一天、日子"},
+        ],
+        "answer_key": "C",
+        "refs": [],
+        "related_concepts": ["tian"],
+        "category": "zhexue", "difficulty": 3, "sort_order": 44,
+    },
+    {
+        "char": "圣", "pinyin": "shèng", "components": "耳+口+土",
+        "method": "huiyi",
+        "benyi": "耳聪口达——闻而能解、说而能行者",
+        "jinyi": "圣人、神圣",
+        "story": "繁体「聖」从「耳」从「口」从「壬」（人挺立）。本义是耳聪能听、口能言（启发他人）、行为挺立的人——「圣人」。儒家所谓圣人非神，是「人之至者」——德、智、行皆至极。",
+        "options": [
+            {"key": "A", "text": "宗教中的神圣"},
+            {"key": "B", "text": "耳聪口达——闻而能解、说而能行者"},
+            {"key": "C", "text": "圣旨、皇帝的命令"},
+            {"key": "D", "text": "考试得高分"},
+        ],
+        "answer_key": "B",
+        "refs": [],
+        "related_concepts": [],
+        "category": "zhexue", "difficulty": 4, "sort_order": 45,
+    },
+    {
+        "char": "心", "pinyin": "xīn", "components": "心",
+        "method": "xiangxing",
+        "benyi": "象心脏之形",
+        "jinyi": "心脏、心思、中心",
+        "story": "「心」甲骨文象心脏之形。古人认为心是思维之器官，故「思」「想」「念」「恕」皆从心。儒家「四端之心」（恻隐、羞恶、辞让、是非）即仁义礼智的发端。",
+        "options": [
+            {"key": "A", "text": "中心、核心"},
+            {"key": "B", "text": "象心脏之形"},
+            {"key": "C", "text": "心情、情感"},
+            {"key": "D", "text": "用心、专心"},
+        ],
+        "answer_key": "B",
+        "refs": [],
+        "related_concepts": [],
+        "category": "zhexue", "difficulty": 2, "sort_order": 46,
+    },
+]
+
+
+def main() -> int:
+    Base.metadata.create_all(bind=engine)
+    db = SessionLocal()
+    try:
+        added = 0
+        for item in CARDS:
+            existing = db.query(ShuCard).filter(ShuCard.char == item["char"]).first()
+            if existing:
+                # 已存在则更新（方便迭代文案）
+                for k, v in item.items():
+                    setattr(existing, k, v)
+            else:
+                db.add(ShuCard(**item))
+                added += 1
+        db.commit()
+        total = db.query(ShuCard).count()
+        print(f"[seed-shu] added {added} new cards, total {total}")
+        return total
+    finally:
+        db.close()
+
+
+if __name__ == "__main__":
+    main()

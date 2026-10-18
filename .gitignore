@@ -1,0 +1,64 @@
+# ─── Python ───────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+*.egg-info/
+
+# ─── Node ────────────────────────────────────────────────
+node_modules/
+.next/
+.next.stale-*/
+out/
+.npm/
+.npm-cache/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.tsbuildinfo
+next-env.d.ts
+
+# ─── 项目数据 / 缓存（不进 git） ────────────────────────
+backend/kongzi.db
+backend/kongzi.db-journal
+backend/chroma/
+backend/hf_home/
+backend/data/
+
+# ─── 密钥 / 环境变量（绝对不能进 git）─────────────────
+backend/.env
+backend/.env.local
+backend/.env.*.local
+frontend/.env
+frontend/.env.local
+frontend/.env.*.local
+*.pem
+*.key
+
+# ─── IDE / OS ────────────────────────────────────────────
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# ─── Claude Code 个人偏好（每人不同，不进 git） ──────────
+.claude/settings.local.json
+
+# ─── 临时 / 编辑器 ───────────────────────────────────────
+*.bak
+*.tmp
+*.log
+*.orig
+.cache/
+
+# ─── 部署 / 构建 ─────────────────────────────────────────
+dist/
+build/
+.coverage
+htmlcov/
