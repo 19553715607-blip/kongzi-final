@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { getTopics, streamChat } from "@/lib/api";
 import { copyText } from "@/lib/ui";
 import { toast } from "@/components/Toast";
@@ -81,7 +81,7 @@ export default function ChatPage() {
       .then((d) => {
         if (alive) setTopics(d);
       })
-      .catch(() => {});
+      .catch(() => { });
     return () => {
       alive = false;
     };
@@ -232,11 +232,10 @@ export default function ChatPage() {
           <span className="shrink-0 text-xs text-faint">{t("chat.topicPrefix", lang)}</span>
           <button
             onClick={() => setTopicHint(null)}
-            className={`shrink-0 rounded-full px-2.5 py-1 text-xs ${
-              topicHint === null
-                ? "bg-accent text-white"
-                : "border border-line text-muted"
-            }`}
+            className={`shrink-0 rounded-full px-2.5 py-1 text-xs ${topicHint === null
+              ? "bg-accent text-white"
+              : "border border-line text-muted"
+              }`}
           >
             {t("chat.auto", lang)}
           </button>
@@ -244,9 +243,8 @@ export default function ChatPage() {
             <button
               key={t.id}
               onClick={() => setTopicHint(t.id)}
-              className={`shrink-0 rounded-full px-2.5 py-1 text-xs ${
-                topicHint === t.id ? "text-white" : "border border-line text-muted"
-              }`}
+              className={`shrink-0 rounded-full px-2.5 py-1 text-xs ${topicHint === t.id ? "text-white" : "border border-line text-muted"
+                }`}
               style={topicHint === t.id ? { background: t.color } : undefined}
             >
               {t.name}
@@ -339,6 +337,20 @@ export default function ChatPage() {
 
 function AssistantBubble({ msg, onCopy }: { msg: AssistantMsg; onCopy: (m: AssistantMsg) => void }) {
   const [lang] = useLang();
+  const [visibleLength, setVisibleLength] = useState(0);
+  const latestText = useRef(msg.text);
+  latestText.current = msg.text;
+
+  useEffect(() => {
+    if (!msg.streaming && visibleLength >= latestText.current.length) return;
+    const timer = window.setInterval(() => {
+      setVisibleLength((length) => Math.min(length + 1, latestText.current.length));
+    }, 18);
+    return () => window.clearInterval(timer);
+  }, [msg.streaming, visibleLength]);
+
+  const visibleText = msg.text.slice(0, visibleLength);
+  const typing = msg.streaming || visibleLength < msg.text.length;
   return (
     <div className="group space-y-2">
       {msg.agents.length > 0 && (
@@ -387,14 +399,13 @@ function AssistantBubble({ msg, onCopy }: { msg: AssistantMsg; onCopy: (m: Assis
 
       {(msg.text || msg.streaming) && (
         <div className="flex items-start gap-2">
-          <div className="max-w-[88%] whitespace-pre-wrap rounded-2xl rounded-es-sm bg-surface-2 px-4 py-2.5 text-sm leading-relaxed text-fg">
-            {msg.text}
-            {msg.streaming && (
-              <span className="ms-1 inline-flex gap-0.5 align-middle">
-                <span className="typing-dot h-1 w-1 rounded-full bg-faint" />
-                <span className="typing-dot h-1 w-1 rounded-full bg-faint" />
-                <span className="typing-dot h-1 w-1 rounded-full bg-faint" />
-              </span>
+          <div className="max-w-[88%] rounded-2xl rounded-es-sm bg-surface-2 px-4 py-2.5 text-sm leading-relaxed text-fg">
+            {renderAssistantMarkdown(visibleText)}
+            {typing && (
+              <span
+                className="ms-0.5 inline-block h-4 w-0.5 animate-pulse bg-accent align-middle"
+                aria-hidden="true"
+              />
             )}
           </div>
           {!msg.streaming && msg.text && (
@@ -417,9 +428,8 @@ function AssistantBubble({ msg, onCopy }: { msg: AssistantMsg; onCopy: (m: Assis
             return (
               <span
                 key={k}
-                className={`rounded-full px-2 py-0.5 text-[10px] ${
-                  good ? "bg-cel-soft text-cel-ink" : "bg-surface-2 text-muted"
-                }`}
+                className={`rounded-full px-2 py-0.5 text-[10px] ${good ? "bg-cel-soft text-cel-ink" : "bg-surface-2 text-muted"
+                  }`}
               >
                 {t(key, lang)} {Math.round(v * 100)}%
               </span>
@@ -443,6 +453,79 @@ function AssistantBubble({ msg, onCopy }: { msg: AssistantMsg; onCopy: (m: Assis
       )}
     </div>
   );
+}
+
+function renderAssistantMarkdown(text: string): ReactNode {
+  const blocks: ReactNode[] = [];
+  let paragraph: string[] = [];
+  let listItems: string[] = [];
+
+  const flushParagraph = () => {
+    if (!paragraph.length) return;
+    blocks.push(
+      <p key={`p-${blocks.length}`} className="whitespace-pre-wrap">
+        {renderInlineMarkdown(paragraph.join("\n"))}
+      </p>,
+    );
+    paragraph = [];
+  };
+  const flushList = () => {
+    if (!listItems.length) return;
+    blocks.push(
+      <ul key={`ul-${blocks.length}`} className="list-disc space-y-1 ps-5 marker:text-accent">
+        {listItems.map((item, index) => (
+          <li key={index}>{renderInlineMarkdown(item)}</li>
+        ))}
+      </ul>,
+    );
+    listItems = [];
+  };
+
+  for (const line of text.split(/\r?\n/)) {
+    if (!line.trim()) {
+      flushParagraph();
+      flushList();
+      continue;
+    }
+
+    const heading = line.match(/^#{1,3}\s+(.+)$/);
+    if (heading) {
+      flushParagraph();
+      flushList();
+      blocks.push(
+        <h3 key={`h-${blocks.length}`} className="font-semibold text-accent-ink">
+          {renderInlineMarkdown(heading[1])}
+        </h3>,
+      );
+      continue;
+    }
+
+    const bullet = line.match(/^\s*[-*]\s+(.+)$/);
+    if (bullet) {
+      flushParagraph();
+      listItems.push(bullet[1]);
+      continue;
+    }
+
+    flushList();
+    paragraph.push(line);
+  }
+
+  flushParagraph();
+  flushList();
+  return <div className="space-y-2.5">{blocks}</div>;
+}
+
+function renderInlineMarkdown(text: string): ReactNode[] {
+  return text.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/g).map((part, index) => {
+    if (part.startsWith("**") && part.endsWith("**")) {
+      return <strong key={index} className="font-semibold text-accent-ink">{part.slice(2, -2)}</strong>;
+    }
+    if (part.startsWith("*") && part.endsWith("*")) {
+      return <em key={index}>{part.slice(1, -1)}</em>;
+    }
+    return part;
+  });
 }
 
 function CrossCivCard({ v }: { v: CrossCivView }) {
