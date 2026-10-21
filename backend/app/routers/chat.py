@@ -34,6 +34,7 @@ async def chat(req: ChatRequest, db: Session = Depends(get_db)) -> StreamingResp
                 lang=req.lang,
                 device=req.device,
                 topic_hint=req.topic_hint,
+                session_id=conv_id,
             ):
                 if event == "done":
                     final = data

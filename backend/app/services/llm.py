@@ -9,6 +9,8 @@
 from __future__ import annotations
 
 import asyncio
+import hashlib
+import json
 import re
 from typing import AsyncIterator, List
 
@@ -20,14 +22,28 @@ settings = get_settings()
 
 
 class LLMClient:
-    async def stream(self, system: str, prompt: str) -> AsyncIterator[str]:
+    async def stream(
+        self,
+        system: str,
+        prompt: str,
+        *,
+        session_id: str = "",
+        user_message: str | None = None,
+    ) -> AsyncIterator[str]:
         raise NotImplementedError
 
 
 class MockLLM(LLMClient):
     """基于证据的确定性拼装，不产生幻觉、零成本，用于本地与 CI。"""
 
-    async def stream(self, system: str, prompt: str) -> AsyncIterator[str]:
+    async def stream(
+        self,
+        system: str,
+        prompt: str,
+        *,
+        session_id: str = "",
+        user_message: str | None = None,
+    ) -> AsyncIterator[str]:
         # prompt 末尾约定携带 EVIDENCE 段，这里直接复述要点，逐字流式输出
         answer = _compose_from_prompt(prompt)
         for ch in answer:
@@ -67,7 +83,14 @@ async def _stream_openai_compat(
 
 
 class OpenAILLM(LLMClient):
-    async def stream(self, system: str, prompt: str) -> AsyncIterator[str]:
+    async def stream(
+        self,
+        system: str,
+        prompt: str,
+        *,
+        session_id: str = "",
+        user_message: str | None = None,
+    ) -> AsyncIterator[str]:
         async for chunk in _stream_openai_compat(
             settings.openai_base_url,
             settings.openai_api_key,
@@ -80,7 +103,14 @@ class OpenAILLM(LLMClient):
 class QwenLLM(LLMClient):
     """通义千问（DashScope 兼容模式）。模型名直接用 qwen-plus / qwen-max 等。"""
 
-    async def stream(self, system: str, prompt: str) -> AsyncIterator[str]:
+    async def stream(
+        self,
+        system: str,
+        prompt: str,
+        *,
+        session_id: str = "",
+        user_message: str | None = None,
+    ) -> AsyncIterator[str]:
         async for chunk in _stream_openai_compat(
             settings.qwen_base_url,
             settings.qwen_api_key,
@@ -91,7 +121,14 @@ class QwenLLM(LLMClient):
 
 
 class AnthropicLLM(LLMClient):
-    async def stream(self, system: str, prompt: str) -> AsyncIterator[str]:
+    async def stream(
+        self,
+        system: str,
+        prompt: str,
+        *,
+        session_id: str = "",
+        user_message: str | None = None,
+    ) -> AsyncIterator[str]:
         url = "https://api.anthropic.com/v1/messages"
         headers = {
             "x-api-key": settings.anthropic_api_key,
@@ -121,8 +158,70 @@ class AnthropicLLM(LLMClient):
                             yield text
 
 
+class HunaoLLM(LLMClient):
+    """Hunao 智能体 SSE API，转发增量文本到本项目的 SSE 事件。"""
+
+    async def stream(
+        self,
+        system: str,
+        prompt: str,
+        *,
+        session_id: str = "",
+        user_message: str | None = None,
+    ) -> AsyncIterator[str]:
+        if not settings.hunao_api_key:
+            raise RuntimeError("HUNAO_API_KEY 未设置")
+
+        url = f"{settings.hunao_base_url.rstrip('/')}/chat/stream"
+        headers = {"Authorization": f"Bearer {settings.hunao_api_key}"}
+        max_session_id = (1 << 31) - 1
+        try:
+            parsed_session_id = int(session_id)
+        except (TypeError, ValueError):
+            parsed_session_id = 0
+        if 0 < parsed_session_id <= max_session_id:
+            hunao_session_id = parsed_session_id
+        else:
+            # Hunao requires an integer within its database column's range.
+            digest = hashlib.sha256(session_id.encode("utf-8")).digest()
+            hunao_session_id = int.from_bytes(digest[:4], "big") % max_session_id + 1
+
+        payload = {
+            "session_id": session_id,
+            "session_id": hunao_session_id,
+            "message": user_message or prompt,
+        }
+        if settings.hunao_kb_id:
+            payload["kb_id"] = settings.hunao_kb_id
+        async with httpx.AsyncClient(timeout=120) as client:
+            async with client.stream("POST", url, headers=headers, json=payload) as response:
+                if response.is_error:
+                    detail = (await response.aread()).decode("utf-8", errors="replace")
+                    raise RuntimeError(
+                        f"Hunao API {response.status_code}: {detail or response.reason_phrase}"
+                    )
+                async for line in response.aiter_lines():
+                    if not line.startswith("data:"):
+                        continue
+                    try:
+                        event = json.loads(line[5:].strip())
+                    except ValueError:
+                        continue
+                    event_type = event.get("type")
+                    if event_type == "delta":
+                        text = event.get("text")
+                        if isinstance(text, str) and text:
+                            yield text
+                    elif event_type == "error":
+                        raise RuntimeError(str(event.get("detail") or "Hunao 流式接口返回错误"))
+                    elif event_type == "done":
+                        break
+
+
 def get_llm() -> LLMClient:
     provider = settings.llm_provider.lower()
+    if provider == "hunao":
+        return HunaoLLM()
     if provider == "qwen" and settings.qwen_api_key:
         return QwenLLM()
     if provider == "openai" and settings.openai_api_key:

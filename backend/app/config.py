@@ -43,6 +43,12 @@ class Settings(BaseSettings):
     anthropic_api_key: str = ""
     anthropic_model: str = "claude-3-5-haiku-latest"
 
+    # Hunao 智能体 API
+    hunao_api_key: str = ""
+    hunao_base_url: str = "https://ai.hunao.xin"
+    # 可选；为空时请求体不发送 kb_id
+    hunao_kb_id: str = ""
+
     # 千问（阿里 DashScope）—— OpenAI 兼容协议
     qwen_api_key: str = "sk-5d3bcd36eca94b8d8c3e49cb3b850b01"
     qwen_base_url: str = "https://dashscope.aliyuncs.com/compatible-mode/v1"

@@ -138,6 +138,7 @@ async def run_chat(
     lang: str = "zh",
     device: str = "web",
     topic_hint: Optional[str] = None,
+    session_id: str = "",
 ) -> AsyncIterator[Event]:
     # 0) 议题分类（路由前判断）
     topic_id = topics_svc.classify(db, message, hint=topic_hint)
@@ -168,7 +169,12 @@ async def run_chat(
     prompt = _build_prompt(message, evidence, lang, topic_card)
     llm = get_llm()
     answer_chunks: List[str] = []
-    async for chunk in llm.stream(SYSTEM_PROMPT, prompt):
+    async for chunk in llm.stream(
+        SYSTEM_PROMPT,
+        prompt,
+        session_id=session_id,
+        user_message=message,
+    ):
         answer_chunks.append(chunk)
         yield ("token", {"text": chunk})
     answer = "".join(answer_chunks)
