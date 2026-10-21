@@ -28,6 +28,7 @@ export default function AdminSettingsPage() {
       .then((s) => {
         setNotice(String(s.site_notice ?? s.notice ?? ""));
         setModeName(String(s.mode_name ?? s.mode ?? ""));
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars -- 解构剔除这四个键，仅取 rest
         const { site_notice, notice, mode_name, mode, ...rest } = s as SettingsKV & {
           site_notice?: unknown; notice?: unknown; mode_name?: unknown; mode?: unknown;
         };

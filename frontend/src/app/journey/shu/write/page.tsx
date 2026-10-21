@@ -33,7 +33,7 @@ import type {
 } from "@/lib/types";
 import { useLang, getLang } from "@/lib/i18n";
 import { gt } from "@/lib/gameDict";
-import { Reveal, CountUp, Pressable } from "@/lib/motion";
+import { Reveal, CountUp } from "@/lib/motion";
 import { TactileButton, ProvenanceCaption } from "@/components/museum";
 
 // hanzi-writer 在 SSR 时会报错（依赖 DOM/SVG），用 dynamic import
@@ -315,7 +315,7 @@ export default function ShuWritePage() {
           )}
           <Link
             href="/journey/shu"
-            className="route-link"
+            className="rounded-full border border-line px-3 py-1.5 text-xs text-muted hover:bg-surface-2"
           >
             {gt("← 书艺", lang)}
           </Link>
@@ -413,7 +413,7 @@ export default function ShuWritePage() {
           {result.new_unlocked_refs.length > 0 && (
             <div className="mt-3 rounded-lg border border-gold bg-amber-50 p-3">
               <div className="mb-1 text-[10px] tracking-widest text-amber-700">
-                {gt("🎖 新解锁经典", lang)}
+                {gt("新解锁经典", lang)}
               </div>
               {result.new_unlocked_refs.map((r: ShuRefBrief) => (
                 <div key={r.ref_id} className="mt-1 border-s-2 border-amber-500 ps-2 text-sm text-amber-900">

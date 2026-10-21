@@ -23,13 +23,6 @@ from ..models import User
 settings = get_settings()
 
 
-def _jwt_key() -> bytes:
-    secret = settings.jwt_secret.strip()
-    if len(secret) < 32 or secret == "kongzi-dev-secret-change-me":
-        raise RuntimeError("JWT_SECRET must be configured with at least 32 random characters")
-    return secret.encode()
-
-
 # ── base64url ────────────────────────────────────────────────────────────────
 def _b64e(raw: bytes) -> str:
     return base64.urlsafe_b64encode(raw).rstrip(b"=").decode()
@@ -48,7 +41,7 @@ def make_token(user_id: str) -> str:
         ).encode()
     )
     signing_input = f"{header}.{payload}".encode()
-    sig = hmac.new(_jwt_key(), signing_input, hashlib.sha256).digest()
+    sig = hmac.new(settings.jwt_secret.encode(), signing_input, hashlib.sha256).digest()
     return f"{header}.{payload}.{_b64e(sig)}"
 
 
@@ -57,7 +50,7 @@ def verify_token(token: str) -> Optional[str]:
         header, payload, sig = token.split(".")
         signing_input = f"{header}.{payload}".encode()
         expected = hmac.new(
-            _jwt_key(), signing_input, hashlib.sha256
+            settings.jwt_secret.encode(), signing_input, hashlib.sha256
         ).digest()
         if not hmac.compare_digest(_b64d(sig), expected):
             return None

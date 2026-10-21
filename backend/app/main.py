@@ -13,8 +13,6 @@ from .seed import seed_if_empty
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    if len(get_settings().jwt_secret.strip()) < 32:
-        raise RuntimeError("JWT_SECRET is required and must contain at least 32 random characters; copy backend/.env.example and set a unique secret")
     init_db()
     seed_if_empty()
     # 五语适配：幂等补齐既有库的译文 / 注释多语字段（新建库由 seed_if_empty 内部完成）

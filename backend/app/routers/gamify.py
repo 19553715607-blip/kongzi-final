@@ -33,6 +33,9 @@ def complete_task(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ) -> dict:
+    # 今日修行任务属于登录后解锁的成长档案；游客可使用其余全部功能。
+    if user.is_guest:
+        raise HTTPException(403, "guest_not_allowed")
     try:
         return gamify.complete_task(db, user, task_id)
     except ValueError as e:

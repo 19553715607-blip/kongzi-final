@@ -1,4 +1,4 @@
-import { authFetch } from "./auth";
+import { authFetch, getToken } from "./auth";
 import type {
   AdminAudienceResp,
   AdminContentKind,
@@ -36,6 +36,7 @@ import type {
   FeedItem,
   GamifyProfile,
   GraphData,
+  MergeSummary,
   Passage,
   PassageBrief,
   PassageNeighbors,
@@ -48,9 +49,44 @@ import type {
 import { getApiBase } from "./apiBase";
 const apiBase = () => getApiBase();
 
+/**
+ * 后端返回非 2xx 时抛出，携带 HTTP 状态码。
+ * 存在的意义：让调用方把「未登录（401/403）」和「真的连不上后端」区分开。
+ * 此前所有失败都抛普通 Error，页面 catch 后统一显示「无法连接后端」，
+ * 导致未登录用户访问 /journey、/me 时被误导成服务挂了。
+ */
+export class ApiError extends Error {
+  status: number;
+  constructor(status: number, detail?: string) {
+    super(detail ?? `HTTP ${status}`);
+    this.name = "ApiError";
+    this.status = status;
+  }
+}
+
+/** 是否属于「未登录 / 无权限」，用于显示「请先登录」而非「无法连接后端」。 */
+export function isAuthError(e: unknown): boolean {
+  return e instanceof ApiError && (e.status === 401 || e.status === 403);
+}
+
+/**
+ * 把错误压成一句可展示的短原因，附在失败提示后面。
+ * 目的是让用户（和排查者）一眼看出是鉴权、服务端还是网络问题，
+ * 而不是只看到笼统的「加载失败」。
+ */
+export function errorHint(e: unknown): string {
+  if (e instanceof ApiError) return `HTTP ${e.status}`;
+  if (e instanceof TypeError) return "network";
+  if (e instanceof Error && e.message) return e.message.slice(0, 40);
+  return "unknown";
+}
+
 async function getJSON<T>(path: string): Promise<T> {
-  const res = await fetch(`${apiBase()}${path}`);
-  if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+  const res = await fetch(`${apiBase()}${path}`).catch(() => {
+    // 同 authFetch：网络层失败时补上请求路径，避免只看到 "Failed to fetch"
+    throw new Error(`network @ ${path}`);
+  });
+  if (!res.ok) throw new ApiError(res.status, `${res.status} ${res.statusText}`);
   return res.json() as Promise<T>;
 }
 
@@ -96,7 +132,7 @@ export async function applyForApi(body: {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
-  if (!r.ok) throw new Error(`${r.status}`);
+  if (!r.ok) throw new ApiError(r.status);
   return r.json() as Promise<ApplyResult>;
 }
 
@@ -104,7 +140,7 @@ export async function getDeveloperMe(apiKey: string) {
   const r = await fetch(`${apiBase()}/api/v1/developers/me`, {
     headers: { "X-API-Key": apiKey },
   });
-  if (!r.ok) throw new Error(`${r.status}`);
+  if (!r.ok) throw new ApiError(r.status);
   return r.json() as Promise<DeveloperMe>;
 }
 
@@ -305,7 +341,7 @@ export const reviewCase = (
     method: "PUT",
     body: JSON.stringify(body),
   });
-// promoteSelfAdmin 已移除；管理员角色只能由现有管理员或本地运维命令授予。
+// promoteSelfAdmin 已移除：admin 通过后端 ADMIN_EMAILS 白名单授予
 
 // ── 知识图谱 ───────────────────────────────────────────────────
 export const getNeighborhood = (nodeId: string, depth = 2) =>
@@ -320,7 +356,7 @@ export const getPath = (from: string, to: string) =>
 // ── 游戏化 / 收藏 / 账户（需鉴权，authFetch 自动领游客 token）──────
 async function authJSON<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await authFetch(path, init);
-  if (!res.ok) throw new Error(`${res.status}`);
+  if (!res.ok) throw new ApiError(res.status);
   return res.json() as Promise<T>;
 }
 
@@ -348,15 +384,52 @@ export const upgradeAccount = (email: string, password: string, display_name?: s
     body: JSON.stringify({ email, password, display_name }),
   });
 
-/** 邮箱登录（不需要鉴权 header）。 */
+/**
+ * 邮箱注册（带当前游客 token）。
+ * 后端会把游客态积累的进度并入新账号，注册即完成「进度迁移」。
+ */
+export async function registerByEmail(
+  email: string,
+  password: string,
+  display_name?: string,
+) {
+  const guestToken = getToken();
+  const r = await fetch(`${apiBase()}/api/v1/auth/register`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(guestToken ? { "X-Guest-Token": guestToken } : {}),
+    },
+    body: JSON.stringify({ email, password, display_name }),
+  });
+  if (!r.ok) throw new ApiError(r.status);
+  return r.json() as Promise<{
+    token: string;
+    user: AuthUser;
+    merged?: MergeSummary;
+  }>;
+}
+
+/** 邮箱登录（不需要鉴权 header）。
+ * 带上当前游客 token，让后端把游客态积累的 XP / 六艺进境 / 收藏并入目标账号，
+ * 否则用户登录后会发现之前的进度凭空消失。
+ */
 export async function loginByEmail(email: string, password: string) {
+  const guestToken = getToken();
   const r = await fetch(`${apiBase()}/api/v1/auth/login`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      ...(guestToken ? { "X-Guest-Token": guestToken } : {}),
+    },
     body: JSON.stringify({ email, password }),
   });
-  if (!r.ok) throw new Error(`${r.status}`);
-  return r.json() as Promise<{ token: string; user: AuthUser }>;
+  if (!r.ok) throw new ApiError(r.status);
+  return r.json() as Promise<{
+    token: string;
+    user: AuthUser;
+    merged?: MergeSummary;
+  }>;
 }
 
 // ── 对话（SSE 流式）────────────────────────────────────────────
@@ -494,7 +567,7 @@ export const getAdminUserActivity = (id: string) =>
 /** 导出用户 CSV：带鉴权取 blob，触发浏览器下载。 */
 export async function downloadAdminUsersCsv(): Promise<void> {
   const res = await authFetch(`/api/v1/admin/users/export.csv`);
-  if (!res.ok) throw new Error(`${res.status}`);
+  if (!res.ok) throw new ApiError(res.status);
   const blob = await res.blob();
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
@@ -652,9 +725,6 @@ export const createAnnouncement = (body: {
     body: JSON.stringify(body),
   });
 
-export const getAnnouncements = (lang = "zh") =>
-  getJSON<AnnouncementItem[]>(`/api/v1/admin/announcements?lang=${encodeURIComponent(lang)}`);
-
 // 设置 + 审计日志
 export const getAdminSettings = () =>
   authJSON<SettingsKV>(`/api/v1/admin/settings`);
@@ -718,7 +788,7 @@ export const clearTrafficEvents = (path: string) =>
 /** 导出流量 CSV：带鉴权取 blob，触发浏览器下载。 */
 export async function downloadAdminTrafficCsv(): Promise<void> {
   const res = await authFetch(`/api/v1/admin/traffic/export.csv`);
-  if (!res.ok) throw new Error(`${res.status}`);
+  if (!res.ok) throw new ApiError(res.status);
   const blob = await res.blob();
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");

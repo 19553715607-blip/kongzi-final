@@ -74,15 +74,12 @@ def _iso(dt: Optional[datetime]) -> Optional[str]:
 
 
 def _row_dict(obj) -> dict:
-    row = {
+    return {
         c.name: (
             getattr(obj, c.name).isoformat() if isinstance(getattr(obj, c.name), datetime) else getattr(obj, c.name)
         )
         for c in obj.__table__.columns
     }
-    if isinstance(obj, AuditLog):
-        row.update(actor=obj.actor_email or obj.actor_id, target=f"{obj.target_type}:{obj.target_id or ''}".rstrip(":"), meta=obj.detail or {})
-    return row
 
 
 def _user_out(u: User) -> dict:
@@ -180,15 +177,11 @@ def export_users_csv(
         "id", "email", "display_name", "is_guest", "is_admin",
         "lang", "signup_country", "xp", "streak", "created_at",
     ])
-    def csv_cell(value: Any) -> Any:
-        if isinstance(value, str) and value.lstrip().startswith(("=", "+", "-", "@", "\t", "\r")):
-            return "'" + value
-        return value
     for u in rows:
         w.writerow([
-            u.id, csv_cell(u.email or ""), csv_cell(u.display_name or ""),
+            u.id, u.email or "", u.display_name,
             int(u.is_guest), int(u.is_admin),
-            u.lang, csv_cell(u.signup_country or ""), u.xp, u.streak_days,
+            u.lang, u.signup_country or "", u.xp, u.streak_days,
             (u.created_at.isoformat() if u.created_at else ""),
         ])
     _audit(db, admin, "export_users_csv", "user", None, {"rows": len(rows)})
@@ -943,22 +936,6 @@ class AnnouncementIn(BaseModel):
     body: str = Field(..., min_length=1)
     lang: str = "zh"
     active: bool = True
-
-
-@router.get("/announcements")
-def list_announcements(
-    lang: str = Query("zh", max_length=8),
-    db: Session = Depends(get_db),
-) -> list[dict]:
-    """Publicly return active announcements in the requested language with zh fallback."""
-    rows = db.execute(
-        select(Announcement)
-        .where(Announcement.active.is_(True), Announcement.lang.in_([lang, "zh"]))
-        .order_by(Announcement.id.desc())
-        .limit(10)
-    ).scalars().all()
-    chosen = [a for a in rows if a.lang == lang] or [a for a in rows if a.lang == "zh"]
-    return [_row_dict(a) for a in chosen]
 
 
 @router.post("/announcements", status_code=201)

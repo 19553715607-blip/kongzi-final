@@ -8,17 +8,7 @@ export default function ThemeToggle() {
   const [lang] = useLang();
 
   useEffect(() => {
-    let stored: string | null = null;
-    try {
-      stored = localStorage.getItem("theme");
-    } catch {
-      // Fall back to the browser preference when storage is unavailable.
-    }
-    const initialDark = stored
-      ? stored === "dark"
-      : window.matchMedia("(prefers-color-scheme: dark)").matches;
-    document.documentElement.classList.toggle("dark", initialDark);
-    setDark(initialDark);
+    setDark(document.documentElement.classList.contains("dark"));
   }, []);
 
   const toggle = () => {

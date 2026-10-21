@@ -78,11 +78,17 @@ export async function authFetch(
         Authorization: `Bearer ${t}`,
       },
     });
-  let res = await call(token);
+  let res = await call(token).catch(() => {
+    // fetch 在网络层就失败（断网、被拦截、混合内容、跨域等）时抛 TypeError，
+    // 原始信息只有 "Failed to fetch"，看不出请求打到哪。这里补上路径便于定位。
+    throw new Error(`network @ ${path}`);
+  });
   if (res.status === 401) {
     clearToken();
     token = await ensureToken();
-    res = await call(token);
+    res = await call(token).catch(() => {
+      throw new Error(`network @ ${path}`);
+    });
   }
   return res;
 }

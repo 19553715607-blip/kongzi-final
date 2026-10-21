@@ -3,7 +3,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { META_DESCRIPTION, META_KEYWORDS, META_TITLE } from "./metaText";
 
 export type Lang = "zh" | "en" | "fr" | "es" | "ar";
 
@@ -123,11 +122,11 @@ const DICT: Dict = {
     zh: "释义", en: "Gloss", fr: "Glose", es: "Glosa", ar: "الشرح",
   },
   "read.noBackend": {
-    zh: "无法连接后端，请先启动 uvicorn (8000)。",
-    en: "Cannot reach the backend. Start uvicorn (8000) first.",
-    fr: "Backend injoignable. Démarrez d'abord uvicorn (8000).",
-    es: "No se puede conectar al backend. Inicia uvicorn (8000) primero.",
-    ar: "تعذّر الوصول إلى الخادم. شغّل uvicorn (8000) أولًا.",
+    zh: "后端服务暂时不可用，请稍后重试。",
+    en: "Backend service is unavailable. Please try again shortly.",
+    fr: "Service backend indisponible. Réessayez dans un instant.",
+    es: "Servicio backend no disponible. Inténtalo de nuevo en un momento.",
+    ar: "خدمة الخادم غير متاحة حاليًا. أعد المحاولة بعد قليل.",
   },
   "read.saved": {
     zh: "★ 已收藏", en: "★ Saved", fr: "★ Enregistré",
@@ -176,23 +175,23 @@ const DICT: Dict = {
     zh: "登录", en: "Sign in", fr: "Connexion", es: "Acceso", ar: "تسجيل الدخول",
   },
   "login.title": {
-    zh: "登录已有账号", en: "Sign in to your account",
-    fr: "Se connecter à un compte existant", es: "Inicia sesión en tu cuenta",
-    ar: "سجّل الدخول إلى حسابك",
+    zh: "登录或注册", en: "Sign in or sign up",
+    fr: "Connexion ou inscription", es: "Inicia sesión o regístrate",
+    ar: "تسجيل الدخول أو إنشاء حساب",
   },
   "login.intro1": {
-    zh: "原本是游客身份？打开「我的中心」绑定邮箱即可升级——",
-    en: "Started as a guest? Open My center and bind an email to upgrade —",
-    fr: "Vous avez commencé comme invité ? Ouvrez Mon espace et associez un e-mail pour passer au compte —",
-    es: "¿Empezaste como invitado? Abre Mi centro y vincula un correo para actualizar la cuenta —",
-    ar: "بدأت زائرًا؟ افتح مركز حسابي واربط بريدًا إلكترونيًا للترقية —",
+    zh: "游客可直接注册，进度自动并入；已有账号请登录——",
+    en: "Guests can sign up directly and keep their progress; returning users log in —",
+    fr: "Les invités peuvent s'inscrire et conserver leur progression ; les autres se connectent —",
+    es: "Los invitados pueden registrarse y conservar su progreso; los demás inician sesión —",
+    ar: "يمكن للزائر إنشاء حساب مع الحفاظ على تقدّمه؛ ولمن لديه حساب أن يسجّل الدخول —",
   },
   "login.intro2": {
-    zh: "升级后用此页面跨设备恢复进度。",
-    en: "then use this page to restore your progress across devices.",
-    fr: "utilisez ensuite cette page pour retrouver votre progression sur tous vos appareils.",
-    es: "luego usa esta página para recuperar tu progreso en varios dispositivos.",
-    ar: "ثم استخدم هذه الصفحة لاستعادة تقدّمك عبر الأجهزة.",
+    zh: "注册或登录后即可跨设备恢复进度。",
+    en: "either way, your progress follows you across devices.",
+    fr: "dans les deux cas, votre progression vous suit sur tous vos appareils.",
+    es: "en ambos casos, tu progreso te sigue en todos tus dispositivos.",
+    ar: "في الحالتين، يتبعك تقدّمك عبر الأجهزة.",
   },
   "login.email": {
     zh: "邮箱", en: "Email", fr: "E-mail", es: "Correo", ar: "البريد الإلكتروني",
@@ -218,31 +217,31 @@ const DICT: Dict = {
     es: "Iniciar sesión", ar: "تسجيل الدخول",
   },
   "login.noAccount": {
-    zh: "还没账号？", en: "No account yet?", fr: "Pas encore de compte ?",
-    es: "¿Aún no tienes cuenta?", ar: "ليس لديك حساب بعد؟",
+    zh: "想先试试？", en: "Want to try first?", fr: "Envie d'essayer d'abord ?",
+    es: "¿Prefieres probar primero?", ar: "تريد التجربة أولًا؟",
   },
   "login.enter": {
     zh: "进入平台", en: "enter the platform", fr: "entrer sur la plateforme",
     es: "entrar a la plataforma", ar: "ادخل إلى المنصة",
   },
   "login.noAccountBody0": {
-    zh: "不需要注册。直接 ", en: "No registration needed. Just ",
-    fr: "Aucune inscription requise. Il suffit d'", es: "No hace falta registrarse. Basta con ",
-    ar: "لا حاجة للتسجيل. ببساطة ",
+    zh: "无需注册，直接 ", en: "No sign-up needed — just ",
+    fr: "Aucune inscription requise : ", es: "No hace falta registrarse: ",
+    ar: "لا حاجة للتسجيل، ",
   },
   "login.noAccountBody1": {
-    zh: "即自动获得游客身份并开始体验。任意时候在「我的中心」",
-    en: " and you automatically get a guest identity to start. At any time, in My center,",
-    fr: " et vous obtenez automatiquement un statut d'invité pour commencer. À tout moment, dans Mon espace,",
-    es: " y obtienes automáticamente una identidad de invitado para empezar. En cualquier momento, en Mi centro,",
-    ar: " فتحصل تلقائيًا على هوية زائر لتبدأ. وفي أي وقت، في مركز حسابي،",
+    zh: "即自动获得游客身份。想解锁成就与任务时，",
+    en: " and you get a guest identity instantly. To unlock badges and daily tasks,",
+    fr: " et vous obtenez un statut d'invité immédiatement. Pour débloquer badges et tâches,",
+    es: " y obtienes una identidad de invitado al instante. Para desbloquear insignias y tareas,",
+    ar: " فتحصل على هوية زائر فورًا. لفتح الأوسمة والتمارين،",
   },
   "login.noAccountBody2": {
-    zh: "填邮箱+密码即可升级为正式账号，进度全部保留。",
-    en: " fill in an email and password to upgrade to a full account — all progress is kept.",
-    fr: " renseignez un e-mail et un mot de passe pour passer à un compte complet — toute la progression est conservée.",
-    es: " introduce un correo y una contraseña para pasar a una cuenta completa: se conserva todo el progreso.",
-    ar: " أدخل بريدًا إلكترونيًا وكلمة مرور للترقية إلى حساب كامل — مع الحفاظ على كل التقدّم.",
+    zh: "在本页注册，或到「我的中心」绑定邮箱。",
+    en: " sign up on this page or bind an email in My center.",
+    fr: " inscrivez-vous ici ou associez un e-mail dans Mon espace.",
+    es: " regístrate aquí o vincula un correo en Mi centro.",
+    ar: " أنشئ حسابًا هنا أو اربط بريدًا في مركز حسابي.",
   },
 
   // ── 我的中心 ─────────────────────────────────────────────────────────
@@ -276,14 +275,14 @@ const DICT: Dict = {
     ar: "جدار الشارات · {n}/{m}",
   },
   "me.noBackend": {
-    zh: "无法连接后端 (8000)。", en: "Cannot reach the backend (8000).",
-    fr: "Backend injoignable (8000).", es: "No se puede conectar al backend (8000).",
-    ar: "تعذّر الوصول إلى الخادم (8000).",
+    zh: "后端服务暂时不可用，请稍后重试。", en: "Backend service is unavailable. Please try again shortly.",
+    fr: "Service backend indisponible. Réessayez dans un instant.", es: "Servicio backend no disponible. Inténtalo de nuevo en un momento.",
+    ar: "خدمة الخادم غير متاحة حاليًا. أعد المحاولة بعد قليل.",
   },
   "me.upgraded": {
-    zh: "✅ 升级成功，进度已保留。", en: "✅ Upgraded. Your progress is kept.",
-    fr: "✅ Mise à niveau réussie. Votre progression est conservée.",
-    es: "✅ Actualizado. Tu progreso se conserva.", ar: "✅ تمت الترقية. تقدّمك محفوظ.",
+    zh: "升级成功，进度已保留。", en: "Upgraded. Your progress is kept.",
+    fr: "Mise à niveau réussie. Votre progression est conservée.",
+    es: "Actualizado. Tu progreso se conserva.", ar: "تمت الترقية. تقدّمك محفوظ.",
   },
   "me.upgradeFail": {
     zh: "升级失败：邮箱可能已被注册。", en: "Upgrade failed: the email may already be registered.",
@@ -320,8 +319,8 @@ const DICT: Dict = {
     zh: "邮箱", en: "Email", fr: "E-mail", es: "Correo", ar: "البريد الإلكتروني",
   },
   "me.passwordHint": {
-    zh: "密码（至少 10 位）", en: "Password (at least 10 chars)", fr: "Mot de passe (10 caractères minimum)",
-    es: "Contraseña (al menos 10 caracteres)", ar: "كلمة المرور (١٠ أحرف على الأقل)",
+    zh: "密码（≥6 位）", en: "Password (≥6 chars)", fr: "Mot de passe (≥6 caractères)",
+    es: "Contraseña (≥6 caracteres)", ar: "كلمة المرور (٦ أحرف على الأقل)",
   },
   "me.upgrade": {
     zh: "升级", en: "Upgrade", fr: "Mettre à niveau", es: "Actualizar", ar: "ترقية",
@@ -549,18 +548,18 @@ const DICT: Dict = {
   "chat.track.cultural": { zh: "文化适配", en: "Cultural adaptation", fr: "Adaptation culturelle", es: "Adaptación cultural", ar: "التكييف الثقافي" },
   "chat.errHint": {
     // {msg} 由调用方替换
-    zh: "⚠️ {msg}（后端是否已在 8000 启动？）",
-    en: "⚠️ {msg} (Is the backend running on 8000?)",
-    fr: "⚠️ {msg} (Le backend tourne-t-il sur le port 8000 ?)",
-    es: "⚠️ {msg} (¿Está el backend en el 8000?)",
-    ar: "⚠️ {msg} (هل الخادم يعمل على 8000؟)",
+    zh: "{msg}（服务暂时不可用，请稍后重试。）",
+    en: "{msg} (Service temporarily unavailable, please retry.)",
+    fr: "{msg} (Service temporairement indisponible, réessayez.)",
+    es: "{msg} (Servicio no disponible, inténtalo de nuevo.)",
+    ar: "{msg} (الخدمة غير متاحة مؤقتًا، أعد المحاولة.)",
   },
   "chat.noBackend": {
-    zh: "⚠️ 无法连接后端，请先启动 uvicorn (8000)。",
-    en: "⚠️ Cannot reach the backend. Start uvicorn (8000) first.",
-    fr: "⚠️ Backend injoignable. Démarrez d'abord uvicorn (8000).",
-    es: "⚠️ No se puede conectar al backend. Inicia uvicorn (8000) primero.",
-    ar: "⚠️ تعذّر الوصول إلى الخادم. شغّل uvicorn (8000) أولًا.",
+    zh: "后端服务暂时不可用，请稍后重试。",
+    en: "Backend service is unavailable. Please try again shortly.",
+    fr: "Service backend indisponible. Réessayez dans un instant.",
+    es: "Servicio backend no disponible. Inténtalo de nuevo en un momento.",
+    ar: "خدمة الخادم غير متاحة حاليًا. أعد المحاولة بعد قليل.",
   },
   "chat.personaName": { zh: "子曰君", en: "Master Yue", fr: "Maître Yue", es: "Maestro Yue", ar: "المعلم يويه" },
   "chat.avatar": { zh: "曰", en: "Say", fr: "Dit", es: "Dice", ar: "قال" },
@@ -604,11 +603,11 @@ const DICT: Dict = {
   "graph.node.yi": { zh: "义", en: "Rightness", fr: "Justice", es: "Rectitud", ar: "الصواب" },
   "graph.node.kongzi": { zh: "孔子", en: "Confucius", fr: "Confucius", es: "Confucio", ar: "كونفوشيوس" },
   "graph.noBackend": {
-    zh: "无法连接后端，请先启动 uvicorn (8000)。",
-    en: "Cannot reach the backend. Start uvicorn (8000) first.",
-    fr: "Backend injoignable. Démarrez d'abord uvicorn (8000).",
-    es: "No se puede conectar al backend. Inicia uvicorn (8000) primero.",
-    ar: "تعذّر الوصول إلى الخادم. شغّل uvicorn (8000) أولًا.",
+    zh: "后端服务暂时不可用，请稍后重试。",
+    en: "Backend service is unavailable. Please try again shortly.",
+    fr: "Service backend indisponible. Réessayez dans un instant.",
+    es: "Servicio backend no disponible. Inténtalo de nuevo en un momento.",
+    ar: "خدمة الخادم غير متاحة حاليًا. أعد المحاولة بعد قليل.",
   },
   "graph.start": { zh: "起点", en: "Start", fr: "Départ", es: "Inicio", ar: "البداية" },
   "graph.depth": { zh: "深度", en: "Depth", fr: "Profondeur", es: "Profundidad", ar: "العمق" },
@@ -654,9 +653,9 @@ const DICT: Dict = {
 
   // ── 刷刷 ─────────────────────────────────────────────────────────────
   "feed.noBackend": {
-    zh: "无法连接后端 (8000)。", en: "Cannot reach the backend (8000).",
-    fr: "Backend injoignable (8000).", es: "No se puede conectar al backend (8000).",
-    ar: "تعذّر الوصول إلى الخادم (8000).",
+    zh: "后端服务暂时不可用，请稍后重试。", en: "Backend service is unavailable. Please try again shortly.",
+    fr: "Service backend indisponible. Réessayez dans un instant.", es: "Servicio backend no disponible. Inténtalo de nuevo en un momento.",
+    ar: "خدمة الخادم غير متاحة حاليًا. أعد المحاولة بعد قليل.",
   },
   "feed.saved": { zh: "已收藏到「我的」", en: "Saved to My center", fr: "Enregistré dans Mon espace", es: "Guardado en Mi centro", ar: "حُفظ في مركز حسابي" },
   "feed.copied": { zh: "已复制金句", en: "Quote copied", fr: "Citation copiée", es: "Cita copiada", ar: "تم نسخ الحكمة" },
@@ -668,6 +667,7 @@ const DICT: Dict = {
   "feed.savedShort": { zh: "已藏", en: "Saved", fr: "Enregistré", es: "Guardado", ar: "محفوظ" },
   "feed.save": { zh: "收藏", en: "Save", fr: "Enregistrer", es: "Guardar", ar: "حفظ" },
   "feed.likeAria": { zh: "点赞", en: "Like this passage", fr: "J'aime ce passage", es: "Me gusta este pasaje", ar: "أعجب بهذا المقطع" },
+  "feed.commentAria": { zh: "评论", en: "Comments", fr: "Commentaires", es: "Comentarios", ar: "التعليقات" },
   "feed.sheet.title": { zh: "评论区", en: "Comments", fr: "Commentaires", es: "Comentarios", ar: "التعليقات" },
   "feed.sheet.close": { zh: "关闭评论", en: "Close comments", fr: "Fermer les commentaires", es: "Cerrar comentarios", ar: "إغلاق التعليقات" },
   "feed.sheet.sending": { zh: "发送中…", en: "Posting…", fr: "Publication…", es: "Publicando…", ar: "جارٍ النشر…" },
@@ -723,9 +723,9 @@ const DICT: Dict = {
 
   // ── 案例库 ───────────────────────────────────────────────────────────
   "cases.noBackend": {
-    zh: "无法连接后端 (8000)。", en: "Cannot reach the backend (8000).",
-    fr: "Backend injoignable (8000).", es: "No se puede conectar al backend (8000).",
-    ar: "تعذّر الوصول إلى الخادم (8000).",
+    zh: "后端服务暂时不可用，请稍后重试。", en: "Backend service is unavailable. Please try again shortly.",
+    fr: "Service backend indisponible. Réessayez dans un instant.", es: "Servicio backend no disponible. Inténtalo de nuevo en un momento.",
+    ar: "خدمة الخادم غير متاحة حاليًا. أعد المحاولة بعد قليل.",
   },
   "cases.kicker": {
     zh: "案例库 · 5 议题 × 5 文明", en: "Case library · 5 topics × 5 civilizations",
@@ -819,8 +819,8 @@ const DICT: Dict = {
   "co.kicker": { zh: "共创广场", en: "Co-creation square", fr: "Place de co-création", es: "Plaza de co-creación", ar: "ساحة الإبداع المشترك" },
   "co.tagline": { zh: "可提问 · 可互动 · 可共创", en: "Ask · interact · co-create", fr: "Questionner · interagir · co-créer", es: "Preguntar · interactuar · co-crear", ar: "اسأل · تفاعل · أبدع" },
   "co.intro1": {
-    zh: "欢迎来自任何文化传统的研究者、教育者、学习者，补充跨文明立场、对话与注解。",
-    en: "Researchers, educators and learners from any cultural tradition are welcome to contribute cross-civilizational stances, dialogues and annotations.",
+    zh: "研究者、教育者、学习者都可以补充跨文明立场、对话与注解，不限文化背景。",
+    en: "Researchers, educators and learners can contribute cross-civilizational stances, dialogues and annotations, whatever their tradition.",
     fr: "Les chercheurs, enseignants et apprenants de toute tradition culturelle sont invités à enrichir les positions, dialogues et annotations inter-civilisations.",
     es: "Investigadores, docentes y estudiantes de cualquier tradición cultural pueden aportar posturas, diálogos y anotaciones intercivilizacionales.",
     ar: "نرحّب بالباحثين والمعلمين والمتعلمين من أي تقليد ثقافي للمساهمة بمواقف وحوارات وشروح بين الحضارات.",
@@ -855,11 +855,11 @@ const DICT: Dict = {
 
   // ── 开放接口 ─────────────────────────────────────────────────────────
   "dev.applyFail": {
-    zh: "申请失败：请检查后端是否已启动 (8000)。",
-    en: "Application failed: check whether the backend is running (8000).",
-    fr: "Échec de la demande : vérifiez que le backend tourne (8000).",
-    es: "Falló la solicitud: comprueba que el backend esté activo (8000).",
-    ar: "فشل الطلب: تحقّق من تشغيل الخادم (8000).",
+    zh: "申请失败：服务暂时不可用，请稍后重试。",
+    en: "Application failed: service temporarily unavailable, please retry.",
+    fr: "Échec de la demande : service temporairement indisponible, réessayez.",
+    es: "Falló la solicitud: servicio no disponible, inténtalo de nuevo.",
+    ar: "فشل الطلب: الخدمة غير متاحة مؤقتًا، أعد المحاولة.",
   },
   "dev.keyInvalid": { zh: "Key 无效或后端不可达", en: "Invalid key or backend unreachable", fr: "Clé invalide ou backend injoignable", es: "Clave no válida o backend inaccesible", ar: "المفتاح غير صالح أو الخادم غير متاح" },
   "dev.kicker": { zh: "开放接口 · Developers", en: "Open API · Developers", fr: "API ouverte · Développeurs", es: "API abierta · Desarrolladores", ar: "واجهة مفتوحة · للمطوّرين" },
@@ -872,8 +872,8 @@ const DICT: Dict = {
     ar: "الهدف ①: تقديم الدفعة الأولى من خدمات اختبار الواجهة المفتوحة لما لا يقل عن ٢٠ مؤسسة تعليمية وثقافية في الخارج.",
   },
   "dev.desc2": {
-    zh: "下方一键申请，自动审批并发 Demo Key，立即可联调。",
-    en: "Apply below in one click; approval is automatic and a demo key is issued immediately for integration.",
+    zh: "在下方申请，系统自动审批并发放 Demo Key，拿到就能联调。",
+    en: "Apply below; approval is automatic and a demo key is issued right away.",
     fr: "Demandez ci-dessous en un clic ; l'approbation est automatique et une clé de démo est délivrée immédiatement.",
     es: "Solicita abajo con un clic; la aprobación es automática y se emite una clave demo al instante.",
     ar: "تقدّم أدناه بنقرة واحدة؛ الموافقة تلقائية ويُصدر مفتاح تجريبي فورًا.",
@@ -891,7 +891,7 @@ const DICT: Dict = {
   "dev.applying": { zh: "申请中…", en: "Applying…", fr: "Demande en cours…", es: "Solicitando…", ar: "جارٍ التقديم…" },
   "dev.applySubmit": { zh: "提交申请并获取 Key", en: "Submit and get a key", fr: "Envoyer et obtenir une clé", es: "Enviar y obtener clave", ar: "أرسل واحصل على المفتاح" },
   "dev.yourKey": { zh: "您的 API Key", en: "Your API key", fr: "Votre clé API", es: "Tu clave API", ar: "مفتاح API الخاص بك" },
-  "dev.keyOnce": { zh: "⚠ 仅显示一次，请立即复制保存", en: "⚠ Shown only once — copy and save it now", fr: "⚠ Affiché une seule fois — copiez-le et conservez-le", es: "⚠ Se muestra una sola vez: cópialo y guárdalo", ar: "⚠ يُعرض مرة واحدة فقط — انسخه واحفظه الآن" },
+  "dev.keyOnce": { zh: "仅显示一次，请立即复制保存", en: "Shown only once — copy and save it now", fr: "Affiché une seule fois — copiez-le et conservez-le", es: "Se muestra una sola vez: cópialo y guárdalo", ar: "يُعرض مرة واحدة فقط — انسخه واحفظه الآن" },
   "dev.copyKey": { zh: "复制 Key", en: "Copy key", fr: "Copier la clé", es: "Copiar clave", ar: "انسخ المفتاح" },
   "dev.usageHint": { zh: "若已有 Key，可在下方粘贴查看用量。否则左侧填写申请。", en: "If you already have a key, paste it below to see usage. Otherwise apply on the left.", fr: "Si vous avez déjà une clé, collez-la ci-dessous pour voir l'usage. Sinon, faites la demande à gauche.", es: "Si ya tienes una clave, pégala abajo para ver el uso. Si no, solicítala a la izquierda.", ar: "إن كان لديك مفتاح، الصقه أدناه لعرض الاستخدام. وإلا فتقدّم على اليسار." },
   "dev.usagePlaceholder": { zh: "粘贴 kz_… 查询用量", en: "Paste kz_… to check usage", fr: "Collez kz_… pour voir l'usage", es: "Pega kz_… para consultar el uso", ar: "الصق kz_… لعرض الاستخدام" },
@@ -963,18 +963,18 @@ const DICT: Dict = {
   "adm.audit.human": { zh: "已人审", en: "Human-reviewed", fr: "Relu par un humain", es: "Revisado por persona", ar: "مراجَع بشريًا" },
   "adm.audit.humanDesc": { zh: "评了星或写了备注，可视作真正人工质检过", en: "Rated or annotated — can be regarded as genuinely quality-checked", fr: "Noté ou annoté — peut être considéré comme réellement contrôlé", es: "Valorado o anotado: puede considerarse revisado de verdad", ar: "قُيِّم أو أُضيفت ملاحظة — يمكن اعتباره مفحوصًا فعليًا" },
   "adm.audit.warn": {
-    zh: "⚠ 「AI 一键盖章」与「已人审」是两种完全不同的质量级别——前者只是流程过了，内容未必权威。",
-    en: "⚠ “AI rubber-stamp” and “human-reviewed” are two entirely different quality levels — the former only means the workflow passed, not that the content is authoritative.",
-    fr: "⚠ « Validation automatique » et « relu par un humain » sont deux niveaux de qualité entièrement différents — le premier signifie seulement que le processus est passé, pas que le contenu fait autorité.",
-    es: "⚠ «Sello automático» y «revisado por persona» son dos niveles de calidad totalmente distintos: el primero solo indica que el flujo se completó, no que el contenido sea fiable.",
-    ar: "⚠ «الختم الآلي» و«المراجعة البشرية» مستويان مختلفان تمامًا في الجودة — فالأول يعني فقط اجتياز المسار لا موثوقية المحتوى.",
+    zh: "注意：「AI 一键盖章」与「已人审」是两种完全不同的质量级别——前者只是流程过了，内容未必权威。",
+    en: "Note: “AI rubber-stamp” and “human-reviewed” are two entirely different quality levels — the former only means the workflow passed, not that the content is authoritative.",
+    fr: "Note : « Validation automatique » et « relu par un humain » sont deux niveaux de qualité entièrement différents — le premier signifie seulement que le processus est passé, pas que le contenu fait autorité.",
+    es: "Nota: «Sello automático» y «revisado por persona» son dos niveles de calidad totalmente distintos: el primero solo indica que el flujo se completó, no que el contenido sea fiable.",
+    ar: "ملاحظة: «الختم الآلي» و«المراجعة البشرية» مستويان مختلفان تمامًا في الجودة — فالأول يعني فقط اجتياز المسار لا موثوقية المحتوى.",
   },
   "adm.topic": { zh: "议题：", en: "Topics: ", fr: "Thèmes : ", es: "Temas: ", ar: "الموضوعات: " },
   "adm.status": { zh: "状态：", en: "Status: ", fr: "Statut : ", es: "Estado: ", ar: "الحالة: " },
   "adm.quality": { zh: "审核质量：", en: "Review quality: ", fr: "Qualité de relecture : ", es: "Calidad de revisión: ", ar: "جودة المراجعة: " },
   "adm.aiHint": { zh: "内容由 AI 协助生成，可能含模板拼装", en: "Content is AI-assisted and may contain templated assembly", fr: "Contenu assisté par IA, pouvant inclure un assemblage type", es: "Contenido asistido por IA, puede incluir ensamblaje de plantilla", ar: "المحتوى بمساعدة الذكاء الاصطناعي وقد يتضمن تجميعًا قوالبياً" },
   "adm.aiAssist": { zh: "AI 协助", en: "AI-assisted", fr: "Assisté par IA", es: "Asistido por IA", ar: "بمساعدة الذكاء الاصطناعي" },
-  "adm.note": { zh: "💬 备注", en: "💬 Note", fr: "💬 Remarque", es: "💬 Nota", ar: "💬 ملاحظة" },
+  "adm.note": { zh: "备注", en: "Note", fr: "Remarque", es: "Nota", ar: "ملاحظة" },
   "adm.qualityLabel": { zh: "质量：", en: "Quality: ", fr: "Qualité : ", es: "Calidad: ", ar: "الجودة: " },
   "adm.stars": { zh: "{n} 星", en: "{n} stars", fr: "{n} étoiles", es: "{n} estrellas", ar: "{n} نجوم" },
   "adm.publish": { zh: "发布", en: "Publish", fr: "Publier", es: "Publicar", ar: "نشر" },
@@ -1002,14 +1002,14 @@ const DICT: Dict = {
   "inst.newKey": { zh: "发新 Key", en: "Issue new key", fr: "Émettre une nouvelle clé", es: "Emitir nueva clave", ar: "إصدار مفتاح جديد" },
 
   // ── 六艺（通用） ─────────────────────────────────────────────────────
-  "jrn.noBackend": { zh: "无法连接后端 (8000)。", en: "Cannot reach the backend (8000).", fr: "Backend injoignable (8000).", es: "No se puede conectar al backend (8000).", ar: "تعذّر الوصول إلى الخادم (8000)." },
+  "jrn.noBackend": { zh: "后端服务暂时不可用，请稍后重试。", en: "Backend service is unavailable. Please try again shortly.", fr: "Service backend indisponible. Réessayez dans un instant.", es: "Servicio backend no disponible. Inténtalo de nuevo en un momento.", ar: "خدمة الخادم غير متاحة حاليًا. أعد المحاولة بعد قليل." },
   "jrn.noBank": { zh: "无法加载题库", en: "Cannot load the question bank", fr: "Impossible de charger la banque de questions", es: "No se puede cargar el banco de preguntas", ar: "تعذّر تحميل بنك الأسئلة" },
   "jrn.submitFail": { zh: "提交失败", en: "Submission failed", fr: "Échec de l'envoi", es: "Error al enviar", ar: "فشل الإرسال" },
   "jrn.submit": { zh: "提交", en: "Submit", fr: "Envoyer", es: "Enviar", ar: "إرسال" },
   "jrn.enter": { zh: "进入 →", en: "Enter →", fr: "Entrer →", es: "Entrar →", ar: "ادخل ←" },
   "jrn.learned": { zh: "已学", en: "Learned", fr: "Appris", es: "Aprendido", ar: "مُتعلَّم" },
   "jrn.shu": { zh: "书艺", en: "Calligraphy", fr: "Calligraphie", es: "Caligrafía", ar: "الخط" },
-  "jrn.newUnlock": { zh: "🎖 新解锁经典", en: "🎖 New classic unlocked", fr: "🎖 Nouveau classique débloqué", es: "🎖 Nuevo clásico desbloqueado", ar: "🎖 نص كلاسيكي جديد مفتوح" },
+  "jrn.newUnlock": { zh: "新解锁经典", en: "New classic unlocked", fr: "Nouveau classique débloqué", es: "Nuevo clásico desbloqueado", ar: "نص كلاسيكي جديد مفتوح" },
 
   // 书艺 · 拼字
   "jrn.shu.assemble.kicker": { zh: "六艺 · 书 · 拼字", en: "Six Arts · Calligraphy · Assemble", fr: "Six arts · Calligraphie · Assemblage", es: "Seis artes · Caligrafía · Ensamblaje", ar: "الفنون الستة · الخط · التركيب" },
@@ -1022,7 +1022,7 @@ const DICT: Dict = {
   "jrn.assembleHint": { zh: "点击部件填入空槽（多余的是干扰）", en: "Tap components to fill the slots (extras are distractors)", fr: "Touchez les composants pour remplir les cases (les autres sont des leurres)", es: "Toca los componentes para llenar las casillas (los demás son distractores)", ar: "انقر المكوّنات لملء الفراغات (والزائد مشتّتات)" },
   "jrn.retryChar": { zh: "重试本字", en: "Retry this character", fr: "Réessayer ce caractère", es: "Reintentar este carácter", ar: "أعد محاولة هذا الحرف" },
   "jrn.nextChar": { zh: "下一字 →", en: "Next character →", fr: "Caractère suivant →", es: "Siguiente carácter →", ar: "الحرف التالي ←" },
-  "jrn.assembleOk": { zh: "🎉 拼对！书艺 +{a} · xp +6", en: "🎉 Correct! Calligraphy +{a} · xp +6", fr: "🎉 Correct ! Calligraphie +{a} · xp +6", es: "🎉 ¡Correcto! Caligrafía +{a} · xp +6", ar: "🎉 صحيح! الخط +{a} · خبرة +6" },
+  "jrn.assembleOk": { zh: "拼对！书艺 +{a} · xp +6", en: "Correct! Calligraphy +{a} · xp +6", fr: "Correct ! Calligraphie +{a} · xp +6", es: "¡Correcto! Caligrafía +{a} · xp +6", ar: "صحيح! الخط +{a} · خبرة +6" },
   "jrn.assembleBad": { zh: "× 拼错。正解是：{a}", en: "× Wrong. The answer is: {a}", fr: "× Faux. La réponse est : {a}", es: "× Incorrecto. La respuesta es: {a}", ar: "× خطأ. الإجابة هي: {a}" },
 
   "jrn.xpToNext": {
@@ -1157,11 +1157,11 @@ const DICT: Dict = {
 
   // ── 本轮新增：君子之路（journey hub）文案五语化 ──
   "jrn.medalToast": {
-    zh: "🎖 解锁勋章：{list}",
-    en: "🎖 Badges unlocked: {list}",
-    fr: "🎖 Badges débloqués : {list}",
-    es: "🎖 Insignas desbloqueadas: {list}",
-    ar: "🎖 أوسمة تم فتحها: {list}",
+    zh: "解锁勋章：{list}",
+    en: "Badges unlocked: {list}",
+    fr: "Badges débloqués : {list}",
+    es: "Insignas desbloqueadas: {list}",
+    ar: "أوسمة تم فتحها: {list}",
   },
   "jrn.liuyiTitle": {
     zh: "六艺称号 · {t}",
@@ -1219,7 +1219,6 @@ const DICT: Dict = {
   "admin.guard.loginLink": { zh: "去登录 →", en: "Sign in →", fr: "Se connecter →", es: "Iniciar sesión →", ar: "تسجيل الدخول ←" },
   "admin.guard.needAdmin": { zh: "需要管理员权限", en: "Administrator access required", fr: "Accès administrateur requis", es: "Se requiere acceso de administrador", ar: "مطلوب صلاحية مشرف" },
   "admin.guard.needAdminDesc": { zh: "当前账户不是管理员，无法进入管理控制台。", en: "This account is not an administrator and cannot access the console.", fr: "Ce compte n'est pas administrateur et ne peut accéder à la console.", es: "Esta cuenta no es administradora y no puede acceder a la consola.", ar: "هذا الحساب ليس مشرفًا ولا يمكنه الوصول إلى اللوحة." },
-  "admin.guard.switchAccount": { zh: "切换管理员账号", en: "Sign in with an admin account", fr: "Se connecter avec un compte admin", es: "Entrar con una cuenta admin", ar: "تسجيل الدخول بحساب مشرف" },
 
   "admin.kpi.totalUsers": { zh: "用户总量", en: "Total users", fr: "Utilisateurs totaux", es: "Usuarios totales", ar: "إجمالي المستخدمين" },
   "admin.kpi.registered": { zh: "注册用户", en: "Registered", fr: "Inscrits", es: "Registrados", ar: "المسجّلون" },
@@ -1517,6 +1516,13 @@ const DICT: Dict = {
     es: "Continuar · Obras destacadas",
     ar: "واصل الاستكشاف · مختارات",
   },
+  "home.rail.readNote": {
+    zh: "按篇浏览全部经文",
+    en: "Browse all passages by chapter",
+    fr: "Parcourir tous les passages par chapitre",
+    es: "Explorar todos los pasajes por capítulo",
+    ar: "تصفّح جميع النصوص حسب الفصل",
+  },
 
   // 溯源图注共享文案（出处/版本/编号/年代/译者/权属）
   "prov.label.source": { zh: "出处", en: "Source", fr: "Source", es: "Fuente", ar: "المصدر" },
@@ -1569,29 +1575,88 @@ const DICT: Dict = {
   "nav.paths":    { zh: "学习路径", en: "Learning Paths", fr: "Parcours", es: "Rutas de aprendizaje", ar: "مسارات التعلّم" },
   "nav.quiz":     { zh: "掌握小测", en: "Mastery Quiz", fr: "Quiz de maîtrise", es: "Cuestionario", ar: "اختبار الإتقان" },
   "nav.terms":    { zh: "术语索引", en: "Glossary", fr: "Glossaire", es: "Glosario", ar: "مسرد المصطلحات" },
-  "nav.zh.explore": { zh: "", en: "图谱·案例", fr: "Graphe·Cas", es: "Grafo·Casos", ar: "الرسم·الحالات" },
-  "nav.zh.learn":   { zh: "", en: "君子路·六艺", fr: "Voie·Six arts", es: "Camino·Seis artes", ar: "السبيل·الفنون الستة" },
-  "nav.zh.read":    { zh: "", en: "读经", fr: "Classiques", es: "Clásicos", ar: "النصوص" },
-  "nav.zh.teach":   { zh: "", en: "教师板块", fr: "Enseignants", es: "Para docentes", ar: "للمعلّمين" },
-  "nav.zh.about":   { zh: "", en: "关于·开发者", fr: "À propos·Dev", es: "Acerca·Dev", ar: "حول·المطوّرون" },
+  // 一级栏目副标题（非中文界面的 hover 提示）不再手写：由 lib/nav.ts 的 items 派生，
+  // 避免出现「副标题写君子路·六艺、下拉里却没有」这类文案与内容漂移。
   "nav.kiosk":    { zh: "课堂", en: "Kiosk", fr: "Kiosque", es: "Quiosco", ar: "كشك" },
   "nav.menu":     { zh: "菜单", en: "Menu", fr: "Menu", es: "Menú", ar: "القائمة" },
   "nav.close":    { zh: "关闭", en: "Close", fr: "Fermer", es: "Cerrar", ar: "إغلاق" },
-  "nav.participate": { zh: "参与", en: "Participate", fr: "Participer", es: "Participar", ar: "المشاركة" },
-  "nav.shortcuts": { zh: "快捷入口", en: "Quick links", fr: "Accès rapide", es: "Accesos rápidos", ar: "روابط سريعة" },
-  "nav.primary": { zh: "主导航", en: "Primary navigation", fr: "Navigation principale", es: "Navegación principal", ar: "التنقل الرئيسي" },
-  "nav.mobile": { zh: "移动导航", en: "Mobile navigation", fr: "Navigation mobile", es: "Navegación móvil", ar: "التنقل على الهاتف" },
-  "nav.menuHint": { zh: "所有页面与工具", en: "Pages and tools", fr: "Pages et outils", es: "Páginas y herramientas", ar: "الصفحات والأدوات" },
-  "nav.preferences": { zh: "偏好设置", en: "Preferences", fr: "Préférences", es: "Preferencias", ar: "التفضيلات" },
-  "nav.breadcrumb": { zh: "页面路径", en: "Breadcrumb", fr: "Fil d’Ariane", es: "Ruta de navegación", ar: "مسار التنقل" },
-  "footer.siteMap": { zh: "站点导航", en: "Site navigation", fr: "Navigation du site", es: "Navegación del sitio", ar: "التنقل في الموقع" },
   "breadcrumb.home": { zh: "首页", en: "Home", fr: "Accueil", es: "Inicio", ar: "الرئيسية" },
-  "footer.explore":   { zh: "探索", en: "Explore", fr: "Explorer", es: "Explorar", ar: "استكشاف" },
-  "footer.learn":     { zh: "学习", en: "Learn", fr: "Apprendre", es: "Aprender", ar: "تعلّم" },
-  "footer.about":     { zh: "关于", en: "About", fr: "À propos", es: "Acerca de", ar: "حول" },
-  "footer.community": { zh: "社区", en: "Community", fr: "Communauté", es: "Comunidad", ar: "مجتمع" },
-  "footer.tools":     { zh: "工具", en: "Tools", fr: "Outils", es: "Herramientas", ar: "أدوات" },
+  // 页脚分组标题复用 nav.explore / nav.learn / nav.about，不再单独维护一份
   "footer.tagline":   { zh: "读中国 · 思中国 · 与中国同行", en: "Read China. Think. Live with China.", fr: "Lire la Chine. Penser. Vivre avec la Chine.", es: "Lee China. Piensa. Vive con China.", ar: "اقرأ الصين. فكّر. عِش مع الصين." },
+
+  // 通用提示：区分「未登录」与「服务不可用」。
+  // 此前 401 与网络故障共用一句「无法连接后端」，导致未登录用户被误导成后端挂了。
+  "common.loginRequired": {
+    zh: "该功能需要登录后使用，请先登录。",
+    en: "This feature requires an account. Please log in first.",
+    fr: "Cette fonction nécessite un compte. Connectez-vous d'abord.",
+    es: "Esta función requiere una cuenta. Inicia sesión primero.",
+    ar: "تتطلّب هذه الميزة تسجيل الدخول أولًا.",
+  },
+
+  // 登录解锁引导（成就勋章 / 今日修行任务属登录专属）
+  "gate.title": {
+    zh: "登录后开启成就与任务",
+    en: "Log in to unlock badges and tasks",
+    fr: "Connectez-vous pour débloquer badges et tâches",
+    es: "Inicia sesión para desbloquear tu progreso",
+    ar: "سجّل الدخول لفتح سجل تقدّمك",
+  },
+  "gate.desc": {
+    zh: "读经、六艺、对话这些都能直接用。成就和任务要登录，你现在攒的进度登录后会带过去。",
+    en: "Reading, the Six Arts and chat all work without an account. Badges and tasks need a login — whatever you've earned so far comes with you.",
+    fr: "Toutes les fonctions de contenu restent accessibles sans compte. Les badges et les pratiques quotidiennes se débloquent à la connexion ; votre XP, votre progression des six arts et vos favoris sont fusionnés automatiquement.",
+    es: "Todas las funciones de contenido están disponibles sin cuenta. Las insignias y las prácticas diarias se desbloquean al iniciar sesión; tu XP, progreso de las seis artes y favoritos se fusionan automáticamente.",
+    ar: "تعمل جميع ميزات المحتوى دون حساب. تُفتح الأوسمة والتمارين اليومية بعد تسجيل الدخول، وتُدمج نقاطك وتقدّمك في الفنون الستة ومفضّلاتك تلقائيًا.",
+  },
+  "gate.login": {
+    zh: "去登录", en: "Log in", fr: "Se connecter", es: "Iniciar sesión", ar: "تسجيل الدخول",
+  },
+  "gate.later": {
+    zh: "稍后再说", en: "Not now", fr: "Plus tard", es: "Ahora no", ar: "لاحقًا",
+  },
+  "gate.badgesLocked": {
+    zh: "成就勋章", en: "Badges", fr: "Badges", es: "Insignias", ar: "الأوسمة",
+  },
+  "gate.lockedTag": {
+    zh: "需登录", en: "Login required", fr: "Connexion requise", es: "Requiere sesión", ar: "يتطلّب تسجيل الدخول",
+  },
+  "gate.tasksLocked": {
+    zh: "今日修行", en: "Daily practice", fr: "Pratique du jour", es: "Práctica diaria", ar: "تمرين اليوم",
+  },
+  "login.mergedXp": {
+    zh: "登录成功，游客态积累已并入账号：+{n} XP",
+    en: "Signed in. Guest progress merged into your account: +{n} XP",
+    fr: "Connecté. Progression invité fusionnée : +{n} XP",
+    es: "Sesión iniciada. Progreso de invitado fusionado: +{n} XP",
+    ar: "تم تسجيل الدخول. دُمج تقدّم الزائر: +{n} XP",
+  },
+  "login.tab.login": {
+    zh: "登录", en: "Log in", fr: "Connexion", es: "Iniciar sesión", ar: "تسجيل الدخول",
+  },
+  "login.tab.register": {
+    zh: "注册", en: "Sign up", fr: "Inscription", es: "Registrarse", ar: "إنشاء حساب",
+  },
+  "login.displayName": {
+    zh: "昵称（选填）", en: "Display name (optional)", fr: "Nom affiché (facultatif)", es: "Nombre visible (opcional)", ar: "الاسم الظاهر (اختياري)",
+  },
+  "login.registerHint": {
+    zh: "注册后，你在游客态积累的 XP、六艺进境与收藏会自动并入新账号。",
+    en: "Your guest XP, Six Arts progress and favorites are merged into the new account automatically.",
+    fr: "Votre XP, progression des six arts et favoris de visiteur seront fusionnés automatiquement.",
+    es: "Tu XP, progreso de las seis artes y favoritos de invitado se fusionarán automáticamente.",
+    ar: "تُدمج نقاطك وتقدّمك في الفنون الستة ومفضّلاتك تلقائيًا في الحساب الجديد.",
+  },
+  "login.registerSubmit": {
+    zh: "创建账号", en: "Create account", fr: "Créer un compte", es: "Crear cuenta", ar: "إنشاء الحساب",
+  },
+  "login.registerErr": {
+    zh: "注册失败：该邮箱可能已被注册，或密码不符合要求（至少 6 位）。",
+    en: "Sign-up failed: the email may already be registered, or the password is too short (min 6).",
+    fr: "Échec de l'inscription : e-mail déjà utilisé ou mot de passe trop court (6 min.).",
+    es: "No se pudo registrar: el correo ya existe o la contraseña es demasiado corta (mín. 6).",
+    ar: "فشل إنشاء الحساب: قد يكون البريد مستخدمًا أو كلمة المرور قصيرة (6 على الأقل).",
+  },
 
   "home.hero.kicker": {
     zh: "The China Room · 中国文化学院",
@@ -1616,6 +1681,19 @@ const DICT: Dict = {
   },
   "home.hero.ctaRead": { zh: "开始读经", en: "Start reading", fr: "Commencer", es: "Comenzar", ar: "ابدأ القراءة" },
   "home.hero.ctaChat": { zh: "向子曰君提问", en: "Ask the agent", fr: "Questionner l'agent", es: "Pregunta al agente", ar: "اسأل العميل" },
+  "home.hero.ctaJourney": { zh: "开始六艺", en: "Enter the Six Arts", fr: "Entrer dans les six arts", es: "Entrar en las seis artes", ar: "ادخل الفنون الستة" },
+
+  // 首页首屏四主入口（唯一强入口区，其余区块降权）
+  "home.primary.journey": { zh: "君子路 · 六艺", en: "Six Arts Journey", fr: "La Voie des six arts", es: "El Camino de las seis artes", ar: "سبيل الفنون الستة" },
+  "home.primary.journey.desc": { zh: "礼乐射御书数六关，可玩、可评、可回溯。", en: "Ritual, music, archery, chariot, writing, math — playable and scored.", fr: "Rite, musique, tir, char, écriture, calcul : jouable et noté.", es: "Rito, música, tiro, carro, escritura, cálculo: jugable y puntuado.", ar: "الطقوس والموسيقى والرماية والعجلة والكتابة والحساب — قابلة للعب والتقييم." },
+  "home.primary.chat": { zh: "向经典提问", en: "Ask the Classics", fr: "Interroger les classiques", es: "Pregunta a los clásicos", ar: "اسأل النصوص" },
+  "home.primary.chat.desc": { zh: "每个回答标注出处，可逐条核验。", en: "Every answer cites its source and can be checked.", fr: "Chaque réponse cite sa source et se vérifie.", es: "Cada respuesta cita su fuente y se puede verificar.", ar: "كل إجابة تُسنِد إلى مصدرها ويمكن التحقق منها." },
+  "home.primary.read": { zh: "读经", en: "Read", fr: "Lire", es: "Leer", ar: "اقرأ" },
+  "home.primary.read.desc": { zh: "原文 · 注译 · 多语平行对照。", en: "Original, annotations, parallel translations.", fr: "Original, annotations, traductions parallèles.", es: "Original, anotaciones, traducciones paralelas.", ar: "النص الأصلي والشروح والترجمات المتوازية." },
+  "home.primary.feed": { zh: "刷刷", en: "Feed", fr: "Fil", es: "Feed", ar: "تصفح" },
+  "home.primary.feed.desc": { zh: "竖滑金句，双击点赞，一键存壁纸。", en: "Swipe quotes, double-tap to like, save as wallpaper.", fr: "Faites défiler les citations, aimez, enregistrez en fond d'écran.", es: "Desliza citas, doble toque para me gusta, guarda como fondo.", ar: "مرّر الاقتباسات، وانقر مرتين للإعجاب، واحفظها كخلفية." },
+  "home.enter": { zh: "进入", en: "Enter", fr: "Entrer", es: "Entrar", ar: "دخول" },
+  "home.more": { zh: "更多内容与数据", en: "More content & data", fr: "Plus de contenu et de données", es: "Más contenido y datos", ar: "مزيد من المحتوى والبيانات" },
 
   "home.mode.title": { zh: "选择你的进入方式", en: "Choose your mode", fr: "Choisissez votre mode", es: "Elige tu modo", ar: "اختر أسلوبك" },
   "home.mode.modern": { zh: "现代学者", en: "Modern Scholar", fr: "Érudit moderne", es: "Erudito moderno", ar: "الباحث الحديث" },
@@ -2002,9 +2080,6 @@ function setHtmlAttrs(l: Lang) {
   if (typeof document === "undefined") return;
   document.documentElement.lang = l;
   document.documentElement.dir = RTL_LANGS.includes(l) ? "rtl" : "ltr";
-  document.title = META_TITLE[l];
-  document.querySelector('meta[name="description"]')?.setAttribute("content", META_DESCRIPTION[l]);
-  document.querySelector('meta[name="keywords"]')?.setAttribute("content", META_KEYWORDS[l]);
 }
 
 export function getLang(): Lang {

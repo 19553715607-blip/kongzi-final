@@ -145,6 +145,8 @@ export interface Badge {
 export interface GamifyProfile {
   display_name: string;
   is_guest: boolean;
+  /** 游客态为 true：进度照记，但成就勋章与今日任务尚未解锁 */
+  locked?: boolean;
   level: Level;
   streak_days: number;
   checked_in_today: boolean;
@@ -153,6 +155,13 @@ export interface GamifyProfile {
   badges: Badge[];
   awarded_badges?: string[];
   already?: boolean;
+}
+
+/** 登录/注册时把游客进度并入账号的结果摘要 */
+export interface MergeSummary {
+  merged: boolean;
+  xp_added?: number;
+  favorites_moved?: number;
 }
 export interface Favorite {
   id: number;
@@ -1106,11 +1115,6 @@ export type SettingsKV = Record<string, unknown>;
 
 export interface AuditLogItem {
   id: number;
-  actor_email?: string | null;
-  actor_id?: string | null;
-  target_type?: string | null;
-  target_id?: string | null;
-  detail?: Record<string, unknown>;
   actor?: string;
   action?: string;
   target?: string;

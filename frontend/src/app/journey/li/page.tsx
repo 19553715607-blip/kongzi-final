@@ -3,7 +3,7 @@
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useState } from "react";
-import { getLiHostLeaderboard, getLiHostToday, submitLiHostResult } from "@/lib/api";
+import { getLiHostLeaderboard, getLiHostToday, isAuthError, submitLiHostResult, errorHint } from "@/lib/api";
 import type {
   LiHostLeaderboardResp,
   LiHostResultResp,
@@ -14,7 +14,7 @@ import type {
 import { LI_HOST_SCENARIOS, liHostScenario } from "./liHostData";
 import type { LiHostRoundDetail } from "./liHostData";
 import { geomTotal } from "./liHostLogic";
-import { useLang } from "@/lib/i18n";
+import { t, useLang } from "@/lib/i18n";
 import { gt, useGT } from "@/lib/gameDict";
 
 function LiLoading() {
@@ -57,7 +57,7 @@ export default function LiGamePage() {
   const [lang] = useLang();
 
   const refresh = useCallback(() => {
-    getLiHostToday().then(setToday).catch(() => setErr(gt("无法连接后端", lang)));
+    getLiHostToday().then(setToday).catch((e) => setErr(isAuthError(e) ? t("common.loginRequired", lang) : gt("无法加载礼艺场景，请稍后重试", lang) + `（${errorHint(e)}）`));
     getLiHostLeaderboard(8).then(setBoard).catch(() => {});
   }, [lang]);
 
@@ -113,7 +113,21 @@ export default function LiGamePage() {
   if (view === "result" && currentKey && scores && detail) {
     return (
       <div className="space-y-3">
-        {err && <div className="rounded-lg bg-accent-soft p-3 text-xs text-accent">{err}</div>}
+        {err && (
+          <div className="flex items-center gap-2 rounded-lg bg-accent-soft p-3 text-xs text-accent">
+            <span className="flex-1">{err}</span>
+            <button
+              type="button"
+              onClick={() => {
+                setErr("");
+                refresh();
+              }}
+              className="pressable shrink-0 rounded-full bg-surface px-2.5 py-1 text-accent"
+            >
+              {gt("再试一次", lang)}
+            </button>
+          </div>
+        )}
         <ResultView
           scenarioKey={currentKey}
           scores={scores}
@@ -162,7 +176,7 @@ function HubView({
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between">
-        <Link href="/journey" className="route-link">
+        <Link href="/journey" className="text-xs text-faint hover:text-accent">
           {t("← 君子之路")}
         </Link>
         <div className="font-serif text-lg text-fg">{t("礼 · 执礼")}</div>

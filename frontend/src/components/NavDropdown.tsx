@@ -1,9 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { t, type Lang } from "@/lib/i18n";
-import { isActive, isGroupActive, type NavGroup } from "@/lib/nav";
+import { isActive, type NavGroup } from "@/lib/nav";
+
+// 指针离开后延迟收起。给用户留出「从一级按钮移到面板内」的时间，
+// 同时避免指针擦过按钮边缘时菜单闪退。
+const CLOSE_DELAY = 260;
 
 type Props = {
   group: NavGroup;
@@ -22,18 +26,37 @@ export default function NavDropdown({ group, path, lang, onNavigate }: Props) {
   const rootRef = useRef<HTMLDivElement | null>(null);
   const btnRef = useRef<HTMLButtonElement | null>(null);
   const itemRefs = useRef<Array<HTMLAnchorElement | null>>([]);
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const groupActive = isGroupActive(path, group);
+  const groupActive = group.items.some((it) => isActive(path, it.href));
 
-  // 点击外部关闭
+  const cancelClose = useCallback(() => {
+    if (closeTimer.current) {
+      clearTimeout(closeTimer.current);
+      closeTimer.current = null;
+    }
+  }, []);
+
+  const scheduleClose = useCallback(() => {
+    cancelClose();
+    closeTimer.current = setTimeout(() => setOpen(false), CLOSE_DELAY);
+  }, [cancelClose]);
+
+  // 卸载时清掉未触发的定时器，避免对已卸载组件 setState
+  useEffect(() => cancelClose, [cancelClose]);
+
+  // 点击外部关闭（立即关闭，不受延迟影响）
   useEffect(() => {
     if (!open) return;
     const onDoc = (e: MouseEvent) => {
-      if (rootRef.current && !rootRef.current.contains(e.target as Node)) setOpen(false);
+      if (rootRef.current && !rootRef.current.contains(e.target as Node)) {
+        cancelClose();
+        setOpen(false);
+      }
     };
     document.addEventListener("mousedown", onDoc);
     return () => document.removeEventListener("mousedown", onDoc);
-  }, [open]);
+  }, [open, cancelClose]);
 
   const focusItem = (i: number) => {
     const el = itemRefs.current[i];
@@ -68,27 +91,38 @@ export default function NavDropdown({ group, path, lang, onNavigate }: Props) {
   };
 
   const main = t(group.labelKey, lang);
+  // 非中文界面下，用该栏目实际包含的前 3 个中文标签做 hover 提示。
+  // 由 items 派生而非手写字符串，避免出现「副标题写君子路·六艺、下拉里却没有」这类漂移。
   const tip =
-    group.zhKey && lang !== "zh" ? t(group.zhKey, lang) || undefined : undefined;
+    lang !== "zh"
+      ? group.items
+          .slice(0, 3)
+          .map((it) => t(it.labelKey, "zh"))
+          .join("·") || undefined
+      : undefined;
 
   return (
     <div
       ref={rootRef}
       className="relative"
-      onMouseEnter={() => setOpen(true)}
-      onMouseLeave={() => setOpen(false)}
+      onMouseEnter={() => {
+        cancelClose();
+        setOpen(true);
+      }}
+      onMouseLeave={scheduleClose}
     >
       <button
         ref={btnRef}
         type="button"
+        aria-haspopup="menu"
         aria-expanded={open}
         onClick={() => setOpen((o) => !o)}
         onKeyDown={onBtnKeyDown}
         title={tip}
-        className={`nav-primary-link gap-1 ${
+        className={`flex items-center gap-1 whitespace-nowrap rounded-full px-3 py-1.5 text-sm transition ${
           groupActive
-            ? "is-active"
-            : ""
+            ? "text-accent"
+            : "text-muted hover:bg-surface-2 hover:text-fg"
         }`}
       >
         {main}
@@ -109,11 +143,15 @@ export default function NavDropdown({ group, path, lang, onNavigate }: Props) {
       </button>
 
       {open && (
-        <div
-          onKeyDown={onPanelKeyDown}
-          className="nav-drop absolute top-full start-0 z-30 min-w-[208px] rounded-2xl border border-line bg-surface p-2 shadow-xl"
-        >
-          <div className="px-2.5 pb-1.5 pt-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-faint">{main}</div>
+        // 外层透明容器用 pt-1 覆盖按钮与面板之间的 4px 间隙：
+        // 指针落在间隙上时仍在子树内，不会触发 root 的 mouseleave，
+        // 否则从按钮斜向移入面板会在半路把菜单关掉。
+        <div className="absolute top-full start-0 z-30 pt-1">
+          <div
+            role="menu"
+            onKeyDown={onPanelKeyDown}
+            className="nav-drop min-w-[180px] rounded-xl border border-line bg-surface p-1.5 shadow-lg"
+          >
           {group.items.map((it, i) => {
             const on = isActive(path, it.href);
             return (
@@ -123,25 +161,26 @@ export default function NavDropdown({ group, path, lang, onNavigate }: Props) {
                   itemRefs.current[i] = el;
                 }}
                 href={it.href}
+                role="menuitem"
                 onClick={() => {
                   setOpen(false);
                   onNavigate?.();
                 }}
-                aria-current={on ? "page" : undefined}
-                className={`flex min-h-10 items-center gap-2 whitespace-nowrap rounded-xl px-3 py-2 text-sm transition ${
+                className={`flex items-center gap-2 whitespace-nowrap rounded-lg px-3 py-2 text-sm transition ${
                   on
                     ? "bg-accent-soft text-accent"
                     : "text-fg hover:bg-surface-2"
                 }`}
               >
                 <span
-                  className={`h-1.5 w-1.5 shrink-0 rounded-full ${on ? "bg-accent" : "bg-line"}`}
+                  className="h-1.5 w-1.5 shrink-0 rounded-full bg-accent"
                   aria-hidden="true"
                 />
                 {t(it.labelKey, lang)}
               </Link>
             );
           })}
+          </div>
         </div>
       )}
     </div>

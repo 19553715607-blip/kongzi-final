@@ -110,7 +110,8 @@ def checkin(db: Session, user: User) -> dict:
     user.last_checkin = today
     _award_xp(user, 20)
     _award_art(user, "li", 5)
-    newly = evaluate_badges(db, user)
+    # 游客可签到（进度照记），但勋章属于登录后解锁的成长档案，不在此发放
+    newly = [] if user.is_guest else evaluate_badges(db, user)
     db.commit()
     db.refresh(user)
     return {"already": False, "awarded_badges": newly, **profile(db, user)}
@@ -143,9 +144,14 @@ def profile(db: Session, user: User) -> dict:
             select(UserBadge).where(UserBadge.user_id == user.id)
         ).scalars()
     }
+    # 分层：游客可使用全部内容功能，进度照常记录（xp / 连签 / 六艺进境都真实累加），
+    # 但「成就勋章」与「今日修行任务」是登录后才解锁的成长档案。
+    # 这里返回 locked，并让 badges/tasks 一律呈现未解锁，前端据此渲染锁定态与解锁引导。
+    locked = bool(user.is_guest)
     return {
         "display_name": user.display_name,
         "is_guest": user.is_guest,
+        "locked": locked,
         "level": level_of(user.xp or 0),
         "streak_days": user.streak_days or 0,
         "checked_in_today": user.last_checkin == _today(),
@@ -154,14 +160,97 @@ def profile(db: Session, user: User) -> dict:
             for k, label in LIUYI
         ],
         "tasks": [
-            {**t, "done": t["id"] in done} for t in TASKS
+            {**t, "done": (t["id"] in done) and not locked} for t in TASKS
         ],
         "badges": [
             {
                 "id": bid, **meta,
-                "unlocked": bid in owned,
-                "unlocked_at": owned.get(bid),
+                "unlocked": (bid in owned) and not locked,
+                "unlocked_at": None if locked else owned.get(bid),
             }
             for bid, meta in BADGES.items()
         ],
     }
+
+
+def merge_guest_into(db: Session, guest: User, target: User) -> dict:
+    """把游客身份下积累的进度并入目标账号，随后删除游客记录。
+
+    场景：用户在游客态读经、玩六艺、签到攒了进度，之后登录一个已有账号。
+    这些积累不该丢，否则等于「登录惩罚」。
+
+    合并策略：
+      - xp        相加（两边都是真实获得的）
+      - 六艺进境  逐项取较高值（单项上限 100，避免靠反复登录刷分）
+      - 连签天数  取较高值；最近签到取较晚的日期
+      - 今日任务  同一天取并集，否则保留较新的一天
+      - 勋章      并集，保留原有解锁时间
+      - 收藏      迁移到目标账号，同一 (type, ref) 的重复项丢弃
+    """
+    if guest.id == target.id or not guest.is_guest:
+        return {"merged": False}
+
+    xp_added = guest.xp or 0
+    target.xp = (target.xp or 0) + xp_added
+
+    merged_liuyi = dict(target.liuyi or {})
+    for k, v in (guest.liuyi or {}).items():
+        merged_liuyi[k] = min(100, max(merged_liuyi.get(k, 0), v or 0))
+    target.liuyi = merged_liuyi
+
+    target.streak_days = max(target.streak_days or 0, guest.streak_days or 0)
+    if (guest.last_checkin or "") > (target.last_checkin or ""):
+        target.last_checkin = guest.last_checkin
+
+    guest_daily = guest.daily or {}
+    target_daily = dict(target.daily or {})
+    if guest_daily.get("date") and guest_daily.get("date") == target_daily.get("date"):
+        target_daily["done"] = list(
+            {*(target_daily.get("done") or []), *(guest_daily.get("done") or [])}
+        )
+        target.daily = target_daily
+    elif guest_daily.get("date") and guest_daily.get("date") > (target_daily.get("date") or ""):
+        target.daily = {
+            "date": guest_daily["date"],
+            "done": list(guest_daily.get("done") or []),
+        }
+
+    owned = {
+        b.badge_id
+        for b in db.execute(
+            select(UserBadge).where(UserBadge.user_id == target.id)
+        ).scalars()
+    }
+    for b in db.execute(
+        select(UserBadge).where(UserBadge.user_id == guest.id)
+    ).scalars():
+        if b.badge_id not in owned:
+            db.add(
+                UserBadge(
+                    user_id=target.id, badge_id=b.badge_id, unlocked_at=b.unlocked_at
+                )
+            )
+
+    existing_favs = {
+        (f.target_type, f.target_ref)
+        for f in db.execute(
+            select(Favorite).where(Favorite.user_id == target.id)
+        ).scalars()
+    }
+    moved = 0
+    for f in db.execute(
+        select(Favorite).where(Favorite.user_id == guest.id)
+    ).scalars():
+        if (f.target_type, f.target_ref) in existing_favs:
+            db.delete(f)
+        else:
+            f.user_id = target.id
+            moved += 1
+
+    # 游客的勋章行已并入或丢弃，删除后清理游客记录本身
+    db.query(UserBadge).filter(UserBadge.user_id == guest.id).delete()
+    db.delete(guest)
+    db.commit()
+    db.refresh(target)
+
+    return {"merged": True, "xp_added": xp_added, "favorites_moved": moved}

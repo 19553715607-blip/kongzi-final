@@ -1,10 +1,19 @@
 // 把刷刷卡片用 Canvas 绘制成 9:16 壁纸图片（无外部依赖、无位图）。
-// 复刻卡片观感：深底 + 朱砂/青绿光斑 + 原文大字 + 译文 + 出处 + 署名标签 + 品牌水印。
+// 宣纸立轴观感：纸底 + 双线框 + 朱砂印章 + 墨色原文 + 出处胶囊 + 署名行。
 import type { FeedItem } from "@/lib/types";
 import type { Lang } from "@/lib/i18n";
 
 export const WALL_W = 1080;
 export const WALL_H = 1920;
+
+// 主题色（与 globals.css 浅色 token 对齐；canvas 取不到 CSS 变量）
+const PAPER = "#FBFAF7";
+const INK = "#141414";
+const MUTED = "#5A5750";
+const FAINT = "#8A8781";
+const ACCENT_DEEP = "#6E2A12";
+const ACCENT_SOFT = "#FAECE7";
+const GOLD = "#9E7A1C";
 
 function wrapLines(ctx: CanvasRenderingContext2D, text: string, maxW: number): string[] {
   const out: string[] = [];
@@ -33,7 +42,7 @@ function wrapLines(ctx: CanvasRenderingContext2D, text: string, maxW: number): s
         if (ctx.measureText(test).width > maxW && line) {
           out.push(line);
           line = w;
-        } else line = test;
+        } else line += w;
       }
       if (line) out.push(line);
     }
@@ -49,16 +58,7 @@ function roundRect(
   ctx.arcTo(x + w, y, x + w, y + h, r);
   ctx.arcTo(x + w, y + h, x, y + h, r);
   ctx.arcTo(x, y + h, x, y, r);
-  ctx.arcTo(x, y, x + w, y, r);
   ctx.closePath();
-}
-
-function blob(ctx: CanvasRenderingContext2D, x: number, y: number, r: number, color: string) {
-  const g = ctx.createRadialGradient(x, y, 0, x, y, r);
-  g.addColorStop(0, color);
-  g.addColorStop(1, "rgba(0,0,0,0)");
-  ctx.fillStyle = g;
-  ctx.fillRect(x - r, y - r, r * 2, r * 2);
 }
 
 export function renderCardImage(it: FeedItem, lang: Lang, brand: string): string | null {
@@ -68,73 +68,106 @@ export function renderCardImage(it: FeedItem, lang: Lang, brand: string): string
   const ctx = canvas.getContext("2d");
   if (!ctx) return null;
 
-  // 背景
-  ctx.fillStyle = "#2C2C2A";
+  // ── 纸底 ──
+  ctx.fillStyle = PAPER;
   ctx.fillRect(0, 0, WALL_W, WALL_H);
-  blob(ctx, WALL_W + 40, -40, 460, "rgba(113,43,19,0.55)");
-  blob(ctx, -60, WALL_H - 520, 420, "rgba(8,80,65,0.5)");
+  // 底部极淡的暖调渐变（像纸的沉色），克制
+  const warm = ctx.createLinearGradient(0, WALL_H * 0.55, 0, WALL_H);
+  warm.addColorStop(0, "rgba(251,250,247,0)");
+  warm.addColorStop(1, "rgba(153,60,29,0.05)");
+  ctx.fillStyle = warm;
+  ctx.fillRect(0, WALL_H * 0.55, WALL_W, WALL_H * 0.45);
+
+  // ── 双线框（立轴）──
+  ctx.strokeStyle = "rgba(20,20,20,0.30)";
+  ctx.lineWidth = 3;
+  roundRect(ctx, 44, 44, WALL_W - 88, WALL_H - 88, 6);
+  ctx.stroke();
+  ctx.strokeStyle = "rgba(20,20,20,0.12)";
+  ctx.lineWidth = 1.5;
+  roundRect(ctx, 62, 62, WALL_W - 124, WALL_H - 124, 4);
+  ctx.stroke();
+
+  // ── 朱砂印章（右上：圆角方 + 品牌首字）──
+  const sealX = WALL_W - 176;
+  const sealY = 108;
+  const sealG = ctx.createLinearGradient(sealX, sealY, sealX + 96, sealY + 96);
+  sealG.addColorStop(0, "#A8451F");
+  sealG.addColorStop(1, "#7E2F13");
+  ctx.fillStyle = sealG;
+  roundRect(ctx, sealX, sealY, 96, 96, 14);
+  ctx.fill();
+  ctx.fillStyle = "#FAECE7";
+  ctx.font = '700 46px "Songti SC","STSong","SimSun",Georgia,serif';
+  ctx.textAlign = "center";
+  ctx.fillText(brand.slice(0, 1), sealX + 48, sealY + 64);
 
   ctx.textAlign = "center";
   ctx.direction = lang === "ar" ? "rtl" : "ltr";
 
-  // 品牌水印（顶部，印章方块 + 名称）
-  ctx.fillStyle = "rgba(245,240,230,0.7)";
+  // ── 品牌名 + 出处（顶部）──
+  ctx.fillStyle = INK;
   ctx.font = '34px Georgia, "Songti SC", serif';
-  ctx.fillText(brand, WALL_W / 2, 170);
-  ctx.fillStyle = "rgba(245,240,230,0.45)";
+  ctx.fillText(brand, WALL_W / 2 - 40, 158);
+  ctx.fillStyle = FAINT;
   ctx.font = '26px Georgia, serif';
-  ctx.fillText("—  " + it.ref_label + "  —", WALL_W / 2, 226);
+  ctx.fillText("—  " + it.ref_label + "  —", WALL_W / 2 - 40, 214);
 
-  // 原文大字
-  ctx.fillStyle = "#F5F0E6";
+  // ── 原文大字（墨色）──
+  ctx.fillStyle = INK;
   ctx.font = '600 76px "Songti SC","STSong","SimSun",Georgia,serif';
-  const lines = wrapLines(ctx, it.original_text, WALL_W - 200);
+  const lines = wrapLines(ctx, it.original_text, WALL_W - 260);
   const lh = 118;
-  let y = 720 - ((lines.length - 1) * lh) / 2;
+  let y = 760 - ((lines.length - 1) * lh) / 2;
   for (const ln of lines) {
     ctx.fillText(ln, WALL_W / 2, y);
     y += lh;
   }
 
-  // 译文
+  // ── 译文 ──
   if (it.translation) {
-    ctx.fillStyle = "#D3D1C7";
+    ctx.fillStyle = MUTED;
     ctx.font = 'italic 38px Georgia, "Songti SC", serif';
-    const tlines = wrapLines(ctx, it.translation, WALL_W - 240);
-    y += 40;
+    const tlines = wrapLines(ctx, it.translation, WALL_W - 300);
+    y += 46;
     for (const ln of tlines) {
       ctx.fillText(ln, WALL_W / 2, y);
       y += 56;
     }
   }
 
-  // 出处胶囊
+  // ── 出处胶囊（朱砂边、纸底）──
   const pillW = Math.max(260, ctx.measureText(it.ref_label).width + 90);
-  ctx.fillStyle = "rgba(245,240,230,0.14)";
-  roundRect(ctx, (WALL_W - pillW) / 2, y + 30, pillW, 64, 32);
+  ctx.fillStyle = ACCENT_SOFT;
+  roundRect(ctx, (WALL_W - pillW) / 2, y + 34, pillW, 64, 32);
   ctx.fill();
-  ctx.fillStyle = "#F5F0E6";
+  ctx.strokeStyle = "rgba(153,60,29,0.45)";
+  ctx.lineWidth = 1.5;
+  roundRect(ctx, (WALL_W - pillW) / 2, y + 34, pillW, 64, 32);
+  ctx.stroke();
+  ctx.fillStyle = ACCENT_DEEP;
   ctx.font = '30px Georgia, "Songti SC", serif';
-  ctx.fillText(it.ref_label, WALL_W / 2, y + 74);
+  ctx.fillText(it.ref_label, WALL_W / 2, y + 78);
 
-  // 底部署名 + 标签
+  // ── 底部署名 + 标签 ──
   ctx.textAlign = "start";
   ctx.direction = "ltr";
-  const bx = 90;
-  const by = WALL_H - 170;
-  ctx.fillStyle = "#BA7517";
+  const bx = 110;
+  const by = WALL_H - 190;
+  // 署名小金点（ persona 首字）
+  ctx.fillStyle = GOLD;
   ctx.beginPath();
   ctx.arc(bx + 30, by, 30, 0, Math.PI * 2);
   ctx.fill();
-  ctx.fillStyle = "#412402";
+  ctx.fillStyle = "#1A1408";
   ctx.font = '26px "Songti SC", serif';
   ctx.textAlign = "center";
   ctx.fillText(it.persona.slice(0, 1), bx + 30, by + 9);
   ctx.textAlign = "start";
-  ctx.fillStyle = "#F5F0E6";
+  ctx.fillStyle = INK;
   ctx.font = '30px "PingFang SC", system-ui, sans-serif';
   ctx.fillText(it.persona, bx + 80, by + 2);
-  ctx.fillStyle = "#FAC775";
+  ctx.fillStyle = FAINT;
   ctx.font = '26px "PingFang SC", system-ui, sans-serif';
   ctx.fillText(it.tags.join("   "), bx + 80, by + 46);
 

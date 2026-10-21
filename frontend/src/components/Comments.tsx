@@ -5,7 +5,6 @@ import { t, useLang, type Lang } from "@/lib/i18n";
 import { toast } from "@/components/Toast";
 import { Reveal, Pressable } from "@/lib/motion";
 import { getApiBase } from "@/lib/apiBase";
-import { getToken } from "@/lib/auth";
 
 // ── 数据契约（与后端 /api/v1/comments 对齐）─────────────────────────────
 type CommentNode = {
@@ -16,7 +15,6 @@ type CommentNode = {
   created_at: string;
   visitor_id?: string | null;
   user_id?: string | null;
-  is_mine?: boolean;
   replies?: CommentNode[];
 };
 
@@ -60,8 +58,6 @@ function headers(json = false): Record<string, string> {
   if (json) h["Content-Type"] = "application/json";
   const vid = getVisitorId();
   if (vid) h["X-Visitor-Id"] = vid;
-  const token = getToken();
-  if (token) h.Authorization = `Bearer ${token}`;
   return h;
 }
 
@@ -116,7 +112,7 @@ function CommentItem({
 
   const replies = node.replies ?? [];
   const isDeep = depth >= COLLAPSE_DEPTH;
-  const isMine = node.is_mine === true;
+  const isMine = !!node.visitor_id && node.visitor_id === myVisitor;
 
   const submitReply = async () => {
     const content = draft.trim();

@@ -8,9 +8,7 @@ import * as THREE from "three";
 import { LowPolyPerson, PAL, WORLD } from "./liHostVisuals";
 import * as sfx from "./liHostAudio";
 
-// Spawn inside the gate. A spawn at z=1.2 put the follow camera outside the
-// courtyard behind the gate beam, which obscured the playable scene on entry.
-export const PLAYER_START = new THREE.Vector3(0, 0, -1.6);
+export const PLAYER_START = new THREE.Vector3(0, 0, 1.2);
 
 export interface MoveInput {
   x: number;
@@ -128,8 +126,8 @@ export function FollowCamera({
   useFrame(() => {
     if (!active) return;
     const t = target.current;
-    const dist = 3.5 - bowTilt * 0.8;
-    const height = 2.15 + bowTilt * 0.3;
+    const dist = 4.2 - bowTilt * 0.8;
+    const height = 2.35 + bowTilt * 0.3;
     ideal.current.set(t.x, t.y + height, t.z + dist);
     camera.position.lerp(ideal.current, 0.09);
     look.current.set(t.x, t.y + 1.05 - bowTilt * 0.4, t.z - 1.8);

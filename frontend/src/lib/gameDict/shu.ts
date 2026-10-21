@@ -6,10 +6,10 @@ type E = Partial<Record<Lang, string>>;
 
 export const SHU: Record<string, E> = {
   // ── 主练习 page.tsx ──
-  "无法连接后端 — 请先登录": {
-    en: "Cannot reach the server — please log in first",
-    fr: "Impossible de contacter le serveur — veuillez vous connecter",
-    es: "No se puede conectar con el servidor — inicia sesión primero",
+  "无法加载书艺内容，请稍后重试": {
+    en: "Cannot load the content. Please try again shortly.",
+    fr: "Impossible de charger le contenu. Réessayez dans un instant.",
+    es: "No se puede cargar el contenido. Inténtalo de nuevo en un momento.",
     ar: "تعذّر الاتصال بالخادم — سجّل الدخول أولاً",
   },
   "提交失败 — 网络异常": {
@@ -168,7 +168,7 @@ export const SHU: Record<string, E> = {
     ar: "المعنى الأصلي",
   },
   "今义：": { en: "Today: ", fr: "Aujourd'hui : ", es: "Hoy: ", ar: "المعنى الحالي: " },
-  "🎖 新解锁经典": {
+  "新解锁经典": {
     en: "🎖 New classic unlocked",
     fr: "🎖 Nouveau classique débloqué",
     es: "🎖 Nuevo clásico desbloqueado",
@@ -293,11 +293,11 @@ export const SHU: Record<string, E> = {
   "类：": { en: "Type: ", fr: "Type : ", es: "Tipo: ", ar: "النوع: " },
 
   // ── brush3d/Brush3DGame.tsx ──
-  "无法加载书艺字卡 — 请先登录": {
-    en: "Couldn't load calligraphy cards — please log in first",
-    fr: "Impossible de charger les cartes de calligraphie — connectez-vous",
-    es: "No se pudieron cargar las tarjetas de caligrafía — inicia sesión",
-    ar: "تعذّر تحميل بطاقات الخط — سجّل الدخول",
+  "无法加载书艺字卡，请稍后重试": {
+    en: "Couldn't load calligraphy cards. Please try again shortly.",
+    fr: "Impossible de charger les cartes de calligraphie. Réessayez.",
+    es: "No se pudieron cargar las tarjetas de caligrafía. Inténtalo de nuevo.",
+    ar: "تعذّر تحميل بطاقات الخط. أعد المحاولة بعد قليل.",
   },
   "至少写成 3 段再交卷": {
     en: "Write at least 3 segments before submitting",

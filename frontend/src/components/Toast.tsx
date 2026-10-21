@@ -38,7 +38,7 @@ export default function Toaster() {
       {items.map((it) => (
         <div
           key={it.id}
-          className={`animate-toast rounded-full border px-4 py-2 text-sm shadow-lg backdrop-blur ${
+          className={`animate-toast flex items-center gap-2 rounded-full border px-4 py-2 text-sm shadow-lg backdrop-blur ${
             it.kind === "ok"
               ? "border-line bg-surface/95 text-fg"
               : it.kind === "info"
@@ -46,6 +46,12 @@ export default function Toaster() {
                 : "border-accent/40 bg-accent-soft/95 text-accent-ink"
           }`}
         >
+          <span
+            aria-hidden
+            className={`h-1.5 w-1.5 shrink-0 rounded-full ${
+              it.kind === "err" ? "bg-accent" : it.kind === "info" ? "bg-cel" : "bg-cel"
+            }`}
+          />
           {it.text}
         </div>
       ))}

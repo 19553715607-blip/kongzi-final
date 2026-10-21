@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
   answerShuCard,
+  errorHint,
   getShuProgress,
   getShuToday,
 } from "@/lib/api";
@@ -43,7 +44,7 @@ export default function ShuJourneyPage() {
   const [err, setErr] = useState("");
 
   const load = () => {
-    getShuToday().then(setToday).catch(() => setErr(gt("无法连接后端 — 请先登录", getLang())));
+    getShuToday().then(setToday).catch((e) => setErr(gt("无法加载书艺内容，请稍后重试", getLang()) + `（${errorHint(e)}）`));
     getShuProgress().then(setProgress).catch(() => {});
   };
   useEffect(load, []);
@@ -69,7 +70,7 @@ export default function ShuJourneyPage() {
         <div className="icon-plate">!</div>
         <div className="state-title">{gt("加载失败", lang)}</div>
         <p className="state-sub">{err}</p>
-        <Link href="/login" className="retry-btn">{gt("去登录 →", lang)}</Link>
+        <button type="button" onClick={() => { setErr(""); load(); }} className="retry-btn">{gt("再试一次", lang)}</button>
       </div>
     );
   }
@@ -97,7 +98,7 @@ export default function ShuJourneyPage() {
           </div>
           <Link
             href="/journey"
-            className="route-link"
+            className="rounded-full border border-line px-3 py-1.5 text-xs text-muted hover:bg-surface-2"
           >
             {gt("← 六艺", lang)}
           </Link>

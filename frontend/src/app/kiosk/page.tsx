@@ -15,7 +15,6 @@ export default function KioskPage() {
   const [paused, setPaused] = useState(false);
   const [showControls, setShowControls] = useState(false);
   const [campus, setCampus] = useState<string | null>(null);
-  const [loadError, setLoadError] = useState(false);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
   const hideTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -25,15 +24,8 @@ export default function KioskPage() {
     const c = url.get("campus");
     setCampus(c);
     track("/kiosk", { device: "kiosk", source: "qr", campus: c || undefined });
+    getFeed("en", 30).then(setItems).catch(() => {});
   }, []);
-
-  useEffect(() => {
-    let active = true;
-    setLoadError(false);
-    getFeed(lang, 30).then((rows) => { if (active) { setItems(rows); setIdx(0); setLoadError(rows.length === 0); } })
-      .catch(() => { if (active) setLoadError(true); });
-    return () => { active = false; };
-  }, [lang]);
 
   // 自动轮播
   useEffect(() => {
@@ -72,9 +64,7 @@ export default function KioskPage() {
     return (
       <div className="flex h-full flex-col items-center justify-center gap-4 text-sm text-white/60">
         <span className="h-2 w-2 animate-pulse rounded-full bg-[#FAC775]" />
-        {loadError ? (
-          <div className="text-center"><p>{t("state.error.title", lang)}</p><button className="mt-3 underline" onClick={() => { setLoadError(false); getFeed(lang, 30).then((rows) => { setItems(rows); setIdx(0); }).catch(() => setLoadError(true)); }}>{t("state.retry", lang)}</button></div>
-        ) : t("kiosk.loading", lang)}
+        {t("kiosk.loading", lang)}
       </div>
     );
 

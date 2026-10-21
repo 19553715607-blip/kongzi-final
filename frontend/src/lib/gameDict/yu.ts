@@ -200,11 +200,11 @@ export const YU: Record<string, E> = {
   },
 
   // 加载错误
-  "无法加载御艺场景 — 请先登录": {
-    en: "Could not load chariot scenarios — please log in first",
-    fr: "Impossible de charger les scénarios de charroi — connectez-vous",
-    es: "No se pudieron cargar los recorridos — inicia sesión",
-    ar: "تعذر تحميل مسارات القيادة — سجّل الدخول أولًا",
+  "无法加载御艺场景，请稍后重试": {
+    en: "Could not load chariot scenarios. Please try again shortly.",
+    fr: "Impossible de charger les scénarios de charroi. Réessayez.",
+    es: "No se pudieron cargar los recorridos. Inténtalo de nuevo.",
+    ar: "تعذر تحميل مسارات القيادة. أعد المحاولة بعد قليل.",
   },
 
   // 引导浮层

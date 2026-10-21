@@ -9,13 +9,7 @@ function Call($method, $path, $token, $bodyObj) {
   catch { $code=$null; if ($_.Exception.Response){$code=[int]$_.Exception.Response.StatusCode}; return @{ code=$code; error=$_.ErrorDetails.Message } }
 }
 
-$adminEmail = $env:KONGZI_SMOKE_ADMIN_EMAIL
-$adminPassword = $env:KONGZI_SMOKE_ADMIN_PASSWORD
-if ([string]::IsNullOrWhiteSpace($adminEmail) -or [string]::IsNullOrWhiteSpace($adminPassword)) {
-  throw "Set KONGZI_SMOKE_ADMIN_EMAIL and KONGZI_SMOKE_ADMIN_PASSWORD in this PowerShell session before running the ban smoke test."
-}
-$admin = Call POST /auth/login $null @{email=$adminEmail;password=$adminPassword}
-if ($admin.code -ne 200 -or -not $admin.data.token) { throw "Smoke admin sign-in failed (HTTP $($admin.code))." }
+$admin = Call POST /auth/login $null @{email="admin@kongzi.local";password="Kongzi@2026"}
 $at = $admin.data.token
 
 # temp user

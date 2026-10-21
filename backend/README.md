@@ -9,30 +9,13 @@
 cd backend
 python3 -m venv .venv
 .venv/bin/pip install -r requirements.txt
-cp .env.example .env
-# 编辑 .env：设置 JWT_SECRET（至少 32 个随机字符）；生产环境使用独立强密钥
+cp .env.example .env                      # 可选，默认值即可
 .venv/bin/uvicorn app.main:app --reload --port 8077
 ```
 
 启动后：
 - 交互式文档（Swagger）：http://127.0.0.1:8077/docs
 - 首次启动自动建表并灌入论语种子数据（5 句 + 5 概念）。
-
-首次安装有两种管理员初始化方式。全新安装可从可信的服务器终端直接创建管理员；程序会交互式询问邮箱和密码（密码不会出现在命令历史中）：
-
-```bash
-python -m app.create_admin
-```
-
-已有普通账号则用以下命令授予管理员权限：
-
-```bash
-python -m app.bootstrap_admin you@example.org
-```
-
-请从 `backend/` 目录执行这些命令，并确保 `.env` 中的 `DATABASE_URL` 与正在运行的后端一致。项目压缩包不包含数据库，也没有预置账号或默认密码；请在新安装上创建自己的管理员凭据。邮箱白名单不会自动授予管理员权限；管理员角色只由已登录管理员或本地运维命令设置。
-
-管理员冒烟脚本需要在当前 PowerShell 会话中设置 `KONGZI_SMOKE_ADMIN_EMAIL` 与 `KONGZI_SMOKE_ADMIN_PASSWORD`；不要将真实凭据写入脚本或提交到源码。
 
 ## 验证
 

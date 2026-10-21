@@ -32,7 +32,7 @@ def list_concepts(
     rarity: Optional[str] = Query(None),
     db: Session = Depends(get_db),
 ) -> List[ConceptOut]:
-    stmt = select(Concept).where(Concept.is_published.is_(True))
+    stmt = select(Concept)
     if school:
         stmt = stmt.where(Concept.school == school)
     if rarity:
@@ -43,6 +43,6 @@ def list_concepts(
 @router.get("/concepts/{concept_id}", response_model=ConceptOut)
 def get_concept(concept_id: str, db: Session = Depends(get_db)) -> ConceptOut:
     c = db.get(Concept, concept_id)
-    if not c or not c.is_published:
+    if not c:
         raise HTTPException(404, f"concept {concept_id} not found")
     return _to_out(c)

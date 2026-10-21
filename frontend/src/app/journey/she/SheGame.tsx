@@ -361,7 +361,7 @@ export default function SheGame() {
             )}
             <Link
               href="/journey"
-              className="route-link"
+              className="rounded-full border border-line px-3 py-1.5 text-xs text-muted hover:bg-surface-2"
             >
               {gt("← 六艺", lang)}
             </Link>

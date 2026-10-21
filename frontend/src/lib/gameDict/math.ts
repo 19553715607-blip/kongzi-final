@@ -7,11 +7,11 @@ type E = Partial<Record<Lang, string>>;
 
 export const MATH: Record<string, E> = {
   // 加载 / 错误
-  "无法加载数艺题库 — 请先登录": {
-    en: "Couldn't load the Math bank — please log in first",
-    fr: "Impossible de charger la banque de calcul — connectez-vous d'abord",
-    es: "No se pudo cargar el banco de cálculo: inicia sesión primero",
-    ar: "تعذّر تحميل بنك الحساب — سجّل الدخول أولًا",
+  "无法加载数艺题库，请稍后重试": {
+    en: "Couldn't load the Math bank. Please try again shortly.",
+    fr: "Impossible de charger la banque de calcul. Réessayez dans un instant.",
+    es: "No se pudo cargar el banco de cálculo. Inténtalo de nuevo en un momento.",
+    ar: "تعذّر تحميل بنك الحساب. أعد المحاولة بعد قليل.",
   },
 
   // 顶部 HUD

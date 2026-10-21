@@ -208,7 +208,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <div className="seal flex h-12 w-12 items-center justify-center rounded-lg text-xl">孔</div>
           <div className="font-serif text-lg text-fg">{t("admin.guard.needLogin", lang)}</div>
           <Link
-            href="/login?next=%2Fadmin"
+            href="/login"
             className="rounded-lg bg-accent px-4 py-2 text-sm text-white hover:opacity-90"
           >
             {t("admin.guard.loginLink", lang)}
@@ -218,12 +218,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <div className="mx-auto flex min-h-full max-w-md flex-col items-center justify-center gap-3 p-8 text-center">
           <div className="font-serif text-lg text-fg">{t("admin.guard.needAdmin", lang)}</div>
           <p className="text-xs text-muted">{t("admin.guard.needAdminDesc", lang)}</p>
-          <Link
-            href="/login?next=%2Fadmin"
-            className="rounded-lg bg-accent px-4 py-2 text-sm text-white hover:opacity-90"
-          >
-            {t("admin.guard.switchAccount", lang)}
-          </Link>
           <button
             onClick={() => router.push("/")}
             className="rounded-lg border border-line px-4 py-2 text-sm text-muted"

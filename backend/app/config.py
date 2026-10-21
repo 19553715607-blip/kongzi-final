@@ -24,12 +24,12 @@ class Settings(BaseSettings):
     graph_backend: str = "memory"
     neo4j_uri: str = ""  # 例 bolt://localhost:7687
     neo4j_user: str = "neo4j"
-    neo4j_password: str = ""
+    neo4j_password: str = "kongzi-graph"
 
     # 鉴权
-    jwt_secret: str = ""
+    jwt_secret: str = "kongzi-dev-secret-change-me"
     jwt_ttl_days: int = 30
-    # Legacy setting retained for compatibility; registration never grants admin from an email.
+    # 管理员邮箱白名单（逗号分隔）。登录/注册/升级时邮箱命中则自动置 is_admin。
     admin_emails: str = ""
 
     @property
@@ -43,8 +43,8 @@ class Settings(BaseSettings):
     anthropic_api_key: str = ""
     anthropic_model: str = "claude-3-5-haiku-latest"
 
-    # 千问（阿里 DashScope）—— OpenAI 兼容协议；key 从 .env 的 QWEN_API_KEY 读取
-    qwen_api_key: str = ""
+    # 千问（阿里 DashScope）—— OpenAI 兼容协议
+    qwen_api_key: str = "sk-5d3bcd36eca94b8d8c3e49cb3b850b01"
     qwen_base_url: str = "https://dashscope.aliyuncs.com/compatible-mode/v1"
     qwen_model: str = "qwen-plus"  # 可选: qwen-max / qwen-turbo / qwen-long / qwen2.5-72b-instruct
 

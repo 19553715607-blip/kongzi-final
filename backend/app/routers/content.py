@@ -77,7 +77,7 @@ def random_passage(
     db: Session = Depends(get_db),
 ) -> PassageOut:
     """随机取一条经典（首页「换一句」）。"""
-    ids = db.execute(select(Passage.id).where(Passage.is_published.is_(True), Passage.chapter.has(Chapter.is_published.is_(True)), Passage.chapter.has(Chapter.book.has(Book.is_published.is_(True))))).scalars().all()
+    ids = db.execute(select(Passage.id)).scalars().all()
     if not ids:
         raise HTTPException(404, "no passages")
     return _to_passage_out(_load_passage(db, _random.choice(list(ids))), lang)
@@ -89,7 +89,7 @@ def today_passage(
     db: Session = Depends(get_db),
 ) -> PassageOut:
     """每日一典：按日期确定性取句，同一天所有用户看到同一句。"""
-    ids = db.execute(select(Passage.id).where(Passage.is_published.is_(True), Passage.chapter.has(Chapter.is_published.is_(True)), Passage.chapter.has(Chapter.book.has(Book.is_published.is_(True)))).order_by(Passage.sort_order)).scalars().all()
+    ids = db.execute(select(Passage.id).order_by(Passage.sort_order)).scalars().all()
     if not ids:
         raise HTTPException(404, "no passages")
     # 用日期做种子，保证当天固定、次日轮换
@@ -104,7 +104,7 @@ def passage_neighbors(
 ) -> dict:
     """同一部经典内上一条 / 下一条（按章序 + 句序），读经页键盘导航用。"""
     current = db.execute(select(Passage).where(Passage.id == ref_id)).scalar_one_or_none()
-    if not current or not current.is_published:
+    if not current:
         raise HTTPException(404, f"passage {ref_id} not found")
     chapter = db.execute(
         select(Chapter).where(Chapter.id == current.chapter_id)
@@ -112,7 +112,7 @@ def passage_neighbors(
     rows = db.execute(
         select(Passage, Chapter.sort_order)
         .join(Chapter, Chapter.id == Passage.chapter_id)
-        .where(Chapter.book_id == chapter.book_id, Chapter.is_published.is_(True), Chapter.book.has(Book.is_published.is_(True)), Passage.is_published.is_(True))
+        .where(Chapter.book_id == chapter.book_id)
         .order_by(Chapter.sort_order, Passage.sort_order)
     ).all()
     items = [{"id": r[0].id, "ref_label": r[0].ref_label, "original_text": r[0].original_text} for r in rows]
@@ -136,7 +136,6 @@ def related_passages(
     mine = set(current.concepts or [])
     all_rows = db.execute(
         select(Passage)
-        .where(Passage.is_published.is_(True), Passage.chapter.has(Chapter.is_published.is_(True)), Passage.chapter.has(Chapter.book.has(Book.is_published.is_(True))))
         .options(
             selectinload(Passage.translations),
             selectinload(Passage.annotations),
@@ -167,7 +166,7 @@ def related_passages(
 
 @router.get("/books")
 def list_books(db: Session = Depends(get_db)) -> List[dict]:
-    books = db.execute(select(Book).where(Book.is_published.is_(True)).order_by(Book.sort_order)).scalars().all()
+    books = db.execute(select(Book).order_by(Book.sort_order)).scalars().all()
     return [
         {"id": b.id, "title_zh": b.title_zh, "title_i18n": b.title_i18n}
         for b in books
@@ -178,7 +177,7 @@ def list_books(db: Session = Depends(get_db)) -> List[dict]:
 def list_chapters(book_id: str, db: Session = Depends(get_db)) -> List[dict]:
     chapters = (
         db.execute(
-            select(Chapter).where(Chapter.book_id == book_id, Chapter.is_published.is_(True), Chapter.book.has(Book.is_published.is_(True))).order_by(Chapter.sort_order)
+            select(Chapter).where(Chapter.book_id == book_id).order_by(Chapter.sort_order)
         )
         .scalars()
         .all()
@@ -191,7 +190,7 @@ def list_passages(chapter_id: str, db: Session = Depends(get_db)) -> List[dict]:
     rows = (
         db.execute(
             select(Passage)
-            .where(Passage.chapter_id == chapter_id, Passage.is_published.is_(True), Passage.chapter.has(Chapter.is_published.is_(True)), Passage.chapter.has(Chapter.book.has(Book.is_published.is_(True))))
+            .where(Passage.chapter_id == chapter_id)
             .order_by(Passage.sort_order)
         )
         .scalars()
@@ -207,10 +206,7 @@ def get_passage(
     db: Session = Depends(get_db),
 ) -> PassageOut:
     """读经页五层信息：原文 / 拼音 / 译文 / 注释 / (AI 解读占位)。"""
-    passage = _load_passage(db, ref_id)
-    if not passage.is_published or not passage.chapter.is_published or not passage.chapter.book.is_published:
-        raise HTTPException(404, f"passage {ref_id} not found")
-    return _to_passage_out(passage, lang)
+    return _to_passage_out(_load_passage(db, ref_id), lang)
 
 
 @router.get("/search")

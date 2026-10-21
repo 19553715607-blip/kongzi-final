@@ -2,16 +2,20 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { loginByEmail } from "@/lib/api";
+import { loginByEmail, registerByEmail } from "@/lib/api";
 import { setToken } from "@/lib/auth";
 import { t, useLang } from "@/lib/i18n";
 import { Reveal } from "@/lib/motion";
 import { TactileButton } from "@/components/museum";
 
+type Mode = "login" | "register";
+
 export default function LoginPage() {
   const [lang] = useLang();
+  const [mode, setMode] = useState<Mode>("login");
   const [email, setEmail] = useState("");
   const [pw, setPw] = useState("");
+  const [name, setName] = useState("");
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -20,24 +24,26 @@ export default function LoginPage() {
     setErr("");
     setBusy(true);
     try {
-      const r = await loginByEmail(email, pw);
+      // 两种模式都会带上当前游客 token：登录并入已有账号，注册并入新账号，
+      // 游客态积累的 XP / 六艺进境 / 收藏都不会丢。
+      const r =
+        mode === "login"
+          ? await loginByEmail(email, pw)
+          : await registerByEmail(email, pw, name.trim() || undefined);
       setToken(r.token);
-      // Preserve an internal destination such as /admin, while rejecting open redirects.
-      const requested = new URLSearchParams(window.location.search).get("next");
-      let destination = "/me";
-      if (requested && !requested.includes("\\")) {
+      const xp = r.merged?.xp_added ?? 0;
+      if (xp > 0) {
         try {
-          const url = new URL(requested, window.location.origin);
-          if (url.origin === window.location.origin) {
-            destination = `${url.pathname}${url.search}${url.hash}`;
-          }
+          sessionStorage.setItem("kongzi_merged_xp", String(xp));
         } catch {
-          // Fall back to the account page for malformed return paths.
+          /* 隐私模式下 sessionStorage 可能不可用，忽略 */
         }
       }
-      window.location.assign(destination);
+      // 从解锁弹窗跳来时带上 next，完成后回到原页面
+      const next = new URLSearchParams(window.location.search).get("next");
+      window.location.href = next && next.startsWith("/") ? next : "/me";
     } catch {
-      setErr(t("login.err", lang));
+      setErr(t(mode === "login" ? "login.err" : "login.registerErr", lang));
     } finally {
       setBusy(false);
     }
@@ -66,6 +72,33 @@ export default function LoginPage() {
 
       <Reveal delay={80}>
         <form onSubmit={submit} className="space-y-3 rounded-2xl border border-line bg-surface p-5">
+          {/* 登录 / 注册切换 */}
+          <div className="flex rounded-full bg-surface-2 p-0.5" role="tablist">
+            {(["login", "register"] as Mode[]).map((m) => (
+              <button
+                key={m}
+                type="button"
+                role="tab"
+                aria-selected={mode === m}
+                onClick={() => {
+                  setMode(m);
+                  setErr("");
+                }}
+                className={`flex-1 rounded-full px-3 py-1.5 text-xs transition ${
+                  mode === m ? "bg-accent text-white" : "text-muted hover:text-fg"
+                }`}
+              >
+                {t(m === "login" ? "login.tab.login" : "login.tab.register", lang)}
+              </button>
+            ))}
+          </div>
+
+          {mode === "register" && (
+            <p className="rounded-lg bg-surface-2/60 px-3 py-2 text-[11px] leading-relaxed text-muted">
+              {t("login.registerHint", lang)}
+            </p>
+          )}
+
           <label className="block text-xs text-muted">
             {t("login.email", lang)}
             <input
@@ -88,22 +121,32 @@ export default function LoginPage() {
               onChange={(e) => setPw(e.target.value)}
               placeholder={t("login.pwHint", lang)}
               className="mt-1 w-full rounded-lg border border-line bg-surface-2 px-3 py-2 text-sm text-fg outline-none focus:border-accent"
-              autoComplete="current-password"
+              autoComplete={mode === "login" ? "current-password" : "new-password"}
             />
           </label>
+          {mode === "register" && (
+            <label className="block text-xs text-muted">
+              {t("login.displayName", lang)}
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                maxLength={24}
+                className="mt-1 w-full rounded-lg border border-line bg-surface-2 px-3 py-2 text-sm text-fg outline-none focus:border-accent"
+              />
+            </label>
+          )}
+
           {err && (
             <div className="error-state !flex-row !items-center !gap-3 !px-3 !py-2.5 !text-start">
               <span className="icon-plate !h-8 !w-8 !shrink-0 !text-base">!</span>
               <span className="state-sub">{err}</span>
             </div>
           )}
-          <TactileButton
-            type="submit"
-            variant="accent"
-            disabled={busy}
-            className="w-full"
-          >
-            {busy ? t("login.busy", lang) : t("login.submit", lang)}
+          <TactileButton type="submit" variant="accent" disabled={busy} className="w-full">
+            {busy
+              ? t("login.busy", lang)
+              : t(mode === "login" ? "login.submit" : "login.registerSubmit", lang)}
           </TactileButton>
         </form>
       </Reveal>

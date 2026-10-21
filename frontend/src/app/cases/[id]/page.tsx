@@ -19,22 +19,15 @@ const CIV_COLORS: Record<string, string> = {
 export default function CaseDetailPage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: { id: string };
 }) {
-  const [id, setId] = useState("");
+  const { id } = params;
   const [lang] = useLang();
   const [c, setC] = useState<CaseDetail | null>(null);
   const [topics, setTopics] = useState<TopicBrief[]>([]);
   const [toast, setToast] = useState("");
 
   useEffect(() => {
-    let active = true;
-    params.then(({ id: routeId }) => { if (active) setId(routeId); }).catch(() => {});
-    return () => { active = false; };
-  }, [params]);
-
-  useEffect(() => {
-    if (!id) return;
     getCase(Number(id)).then(setC).catch(() => setC(null));
     getTopics(lang).then(setTopics).catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -74,7 +67,7 @@ export default function CaseDetailPage({
       {/* 返回 + 标题 */}
       <Reveal delay={0}>
         <div className="text-xs">
-          <Link href="/cases" className="route-link">
+          <Link href="/cases" className="pressable text-faint hover:text-accent">
             {t("case.back", lang)}
           </Link>
         </div>

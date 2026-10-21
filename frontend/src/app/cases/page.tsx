@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { getCaseStats, getCases, getTopics } from "@/lib/api";
+import { getCaseStats, getCases, getTopics, isAuthError } from "@/lib/api";
 import { t, useLang } from "@/lib/i18n";
 import { Reveal, CountUp } from "@/lib/motion";
 import { CollectionCard } from "@/components/museum";
@@ -23,7 +23,7 @@ export default function CasesPage() {
   const [err, setErr] = useState("");
 
   useEffect(() => {
-    getTopics().then(setTopics).catch(() => setErr(t("cases.noBackend", lang)));
+    getTopics().then(setTopics).catch((e) => setErr(isAuthError(e) ? t("common.loginRequired", lang) : t("cases.noBackend", lang)));
     getCaseStats().then(setStats).catch(() => {});
   }, [lang]);
 
@@ -35,15 +35,13 @@ export default function CasesPage() {
       page,
       page_size: PAGE_SIZE,
       status: "published",
-      lang,
     })
       .then((d) => {
         setItems(d.items);
         setTotal(d.total);
       })
-      .catch(() => setErr(t("cases.noBackend", lang)))
       .finally(() => setLoading(false));
-  }, [topicId, q, page, lang]);
+  }, [topicId, q, page]);
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 

@@ -10,7 +10,7 @@ from datetime import datetime
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -24,10 +24,12 @@ router = APIRouter(prefix="/api/v1", tags=["institutions"])
 
 # ── 公开申请（demo: 自动审批以便外接联调）────────────────────────────────────
 class ApplyIn(BaseModel):
-    name: str = Field(..., min_length=2, max_length=160)
-    country: str = Field("", max_length=80)
-    contact_email: str = Field(..., min_length=3, max_length=254)
-    purpose: str = Field("", max_length=2000)
+    name: str
+    country: str = ""
+    contact_email: str
+    purpose: str = ""
+    auto_approve: bool = True   # 原型 demo 一键发 key；生产改为 False
+    monthly_quota: int = 10_000
 
 
 @router.post("/developers/apply")
@@ -37,13 +39,20 @@ def apply(body: ApplyIn, db: Session = Depends(get_db)) -> dict:
         country=body.country,
         contact_email=body.contact_email,
         purpose=body.purpose,
-        monthly_quota=10_000,
-        status="pending",
-        approved_at=None,
-        approved_by=None,
+        monthly_quota=body.monthly_quota,
+        status="approved" if body.auto_approve else "pending",
+        approved_at=datetime.utcnow() if body.auto_approve else None,
+        approved_by="auto" if body.auto_approve else None,
     )
     db.add(inst)
     db.flush()
+
+    api_key_value = None
+    if body.auto_approve:
+        ak = ApiKey(institution_id=inst.id, key=generate_key(), label="default")
+        db.add(ak)
+        db.flush()
+        api_key_value = ak.key
 
     db.commit()
     return {
@@ -54,7 +63,11 @@ def apply(body: ApplyIn, db: Session = Depends(get_db)) -> dict:
             "monthly_quota": inst.monthly_quota,
         },
         "api_key": api_key_value,
-        "message": "申请已提交，等待审批。",
+        "message": (
+            "已自动审批并生成 API Key（请妥善保管，只显示一次）"
+            if body.auto_approve
+            else "申请已提交，等待审批。"
+        ),
     }
 
 

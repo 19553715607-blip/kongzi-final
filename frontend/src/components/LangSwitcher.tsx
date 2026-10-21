@@ -10,7 +10,6 @@ export default function LangSwitcher({ compact = false }: { compact?: boolean })
         <button
           key={l.code}
           onClick={() => setLang(l.code as Lang)}
-          aria-pressed={lang === l.code}
           title={l.native}
           className={`rounded-full px-2 py-0.5 text-[11px] transition ${
             lang === l.code

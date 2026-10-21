@@ -17,7 +17,7 @@ import { useLang } from "@/lib/i18n";
 import { gt } from "@/lib/gameDict";
 import { Reveal, CountUp, Pressable } from "@/lib/motion";
 import { TactileButton, ProvenanceCaption } from "@/components/museum";
-import { getMathProgress, getMathToday, solveMathScenario } from "@/lib/api";
+import { getMathProgress, getMathToday, solveMathScenario, errorHint } from "@/lib/api";
 import type {
   MathProgressResp,
   MathScenarioBrief,
@@ -63,7 +63,7 @@ export default function MathGame() {
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const loadAll = useCallback(() => {
-    getMathToday().then(setToday).catch(() => setLoadErr(gt("无法加载数艺题库 — 请先登录", lang)));
+    getMathToday().then(setToday).catch((e) => setLoadErr(gt("无法加载数艺题库，请稍后重试", lang) + `（${errorHint(e)}）`));
     getMathProgress().then(setProgress).catch(() => {});
   }, [lang]);
   useEffect(() => { loadAll(); }, [loadAll]);
@@ -204,7 +204,7 @@ export default function MathGame() {
             {progress && <Stat label={gt("称号", lang)} value={gt(progress.title, lang)} />}
             {progress && <Stat label={gt("数艺", lang)} value={`${progress.liuyi_shu2}`} numeric />}
             {progress && <Stat label={gt("最佳", lang)} value={`${progress.best_score}`} numeric />}
-            <Link href="/journey" className="route-link">
+            <Link href="/journey" className="rounded-full border border-line px-3 py-1.5 text-xs text-muted hover:bg-surface-2">
               {gt("← 六艺", lang)}
             </Link>
           </div>
@@ -216,7 +216,7 @@ export default function MathGame() {
           <div className="icon-plate">!</div>
           <div className="state-title">{gt("加载失败", lang)}</div>
           <p className="state-sub">{loadErr}</p>
-          <Link href="/login" className="retry-btn">{gt("去登录", lang)}</Link>
+          <button type="button" onClick={() => loadAll()} className="retry-btn">{gt("再试一次", lang)}</button>
         </div>
       )}
 

@@ -12,6 +12,7 @@ env/
 # ─── Node ────────────────────────────────────────────────
 node_modules/
 .next/
+.next-build/
 .next.stale-*/
 out/
 .npm/
@@ -62,3 +63,7 @@ dist/
 build/
 .coverage
 htmlcov/
+
+# ─── 本地 Agent 配置（不进共享仓库） ──────────────────
+.claude/
+.cursor/

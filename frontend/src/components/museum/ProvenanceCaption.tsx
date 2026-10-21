@@ -1,7 +1,5 @@
 "use client";
 
-import { ReactNode } from "react";
-
 /** 图注即溯源：内容下固定一行元数据（出处/版本/编号/年代/作者/公有领域）。
  *  items: [{ label, value, pd?: boolean（公有领域高亮） }]
  */

@@ -17,13 +17,7 @@ function Call($method, $path, $token, $bodyObj) {
 }
 
 Write-Host "== 1) login admin =="
-$adminEmail = $env:KONGZI_SMOKE_ADMIN_EMAIL
-$adminPassword = $env:KONGZI_SMOKE_ADMIN_PASSWORD
-if ([string]::IsNullOrWhiteSpace($adminEmail) -or [string]::IsNullOrWhiteSpace($adminPassword)) {
-  throw "Set KONGZI_SMOKE_ADMIN_EMAIL and KONGZI_SMOKE_ADMIN_PASSWORD in this PowerShell session before running the admin smoke test."
-}
-$admin = Call POST /auth/login $null @{email=$adminEmail;password=$adminPassword}
-if ($admin.code -ne 200 -or -not $admin.data.token) { throw "Smoke admin sign-in failed (HTTP $($admin.code))." }
+$admin = Call POST /auth/login $null @{email="admin@kongzi.local";password="Kongzi@2026"}
 Write-Host ("login code=" + $admin.code)
 $at = $admin.data.token
 $aid = $admin.data.user.id

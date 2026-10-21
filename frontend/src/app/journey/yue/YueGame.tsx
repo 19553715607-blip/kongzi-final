@@ -17,7 +17,7 @@ import { Canvas } from "@react-three/fiber";
 import { useGT } from "@/lib/gameDict";
 import { Reveal, CountUp, Pressable } from "@/lib/motion";
 import { TactileButton, ProvenanceCaption } from "@/components/museum";
-import { getYueProgress, getYueToday, playYueScenario } from "@/lib/api";
+import { getYueProgress, getYueToday, playYueScenario, errorHint } from "@/lib/api";
 import type {
   YueNote,
   YuePlayResp,
@@ -90,7 +90,7 @@ export default function YueGame() {
   const playTimer = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const loadAll = useCallback(() => {
-    getYueToday().then(setToday).catch(() => setLoadErr(tr("无法加载乐艺题库 — 请先登录")));
+    getYueToday().then(setToday).catch((e) => setLoadErr(tr("无法加载乐艺题库，请稍后重试") + `（${errorHint(e)}）`));
     getYueProgress().then(setProgress).catch(() => {});
   }, []);
   useEffect(() => { loadAll(); }, [loadAll]);
@@ -294,7 +294,7 @@ export default function YueGame() {
             {progress && <Stat label={tr("称号")} value={tr(progress.title)} />}
             {progress && <Stat label={tr("乐艺")} value={`${progress.liuyi_yue}`} numeric />}
             {progress && <Stat label={tr("最佳")} value={`${progress.best_score}`} numeric />}
-            <Link href="/journey" className="route-link">
+            <Link href="/journey" className="rounded-full border border-line px-3 py-1.5 text-xs text-muted hover:bg-surface-2">
               {tr("← 六艺")}
             </Link>
           </div>
@@ -306,7 +306,7 @@ export default function YueGame() {
           <div className="icon-plate">!</div>
           <div className="state-title">{tr("加载失败")}</div>
           <p className="state-sub">{loadErr}</p>
-          <Link href="/login" className="retry-btn">{tr("去登录")}</Link>
+          <button type="button" onClick={() => loadAll()} className="retry-btn">{tr("再试一次")}</button>
         </div>
       )}
 

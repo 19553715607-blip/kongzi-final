@@ -7,6 +7,7 @@ import {
   getGamifyProfile,
   getJourneyLeaderboard,
   getJourneyOverview,
+  isAuthError,
 } from "@/lib/api";
 import type {
   Badge,
@@ -19,6 +20,7 @@ import type {
 import { t, useLang } from "@/lib/i18n";
 import { CountUp, Reveal } from "@/lib/motion";
 import { GamePath, HudAssets } from "@/components/museum";
+import LoginGate from "@/components/LoginGate";
 
 const BADGE_TIER_COLOR: Record<string, string> = {
   normal: "#9CA3AF",
@@ -39,9 +41,11 @@ export default function JourneyPage() {
   const [err, setErr] = useState("");
   const [toast, setToast] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
+  // 游客点到登录专属区（成就 / 任务）时弹出解锁引导
+  const [gateOpen, setGateOpen] = useState(false);
 
   const load = () => {
-    getGamifyProfile().then(setP).catch(() => setErr(t("jrn.noBackend", lang)));
+    getGamifyProfile().then(setP).catch((e) => setErr(isAuthError(e) ? t("common.loginRequired", lang) : t("jrn.noBackend", lang)));
     getJourneyOverview(lang).then(setOv).catch(() => {});
     getJourneyLeaderboard(10).then(setLb).catch(() => {});
   };
@@ -119,7 +123,10 @@ export default function JourneyPage() {
       {/* 解锁提示 */}
       {toast.length > 0 && (
         <div className="rounded-xl border border-gold bg-accent-soft px-4 py-3 text-sm text-accent-ink">
-          🎖 {t("jrn.medalToast", lang).replace("{list}", toast.join(lang === "zh" ? "、" : lang === "ar" ? "، " : ", "))}
+          <span className="seal me-2 inline-flex h-6 w-6 items-center justify-center rounded-md font-serif text-xs">
+            勋
+          </span>
+          {t("jrn.medalToast", lang).replace("{list}", toast.join(lang === "zh" ? "、" : lang === "ar" ? "، " : ", "))}
         </div>
       )}
 
@@ -151,7 +158,7 @@ export default function JourneyPage() {
         </div>
 
         <div className="flex flex-col items-center justify-center rounded-2xl border border-line bg-surface px-6 py-5">
-          <div className="text-3xl">🔥</div>
+          <div className="seal mb-1 flex h-11 w-11 items-center justify-center rounded-lg font-serif text-xl">恒</div>
           <CountUp value={p.streak_days} className="font-serif text-2xl font-medium text-fg" />
           <div className="mb-2 text-xs text-faint">{t("jrn.streak", lang)}</div>
           <button
@@ -190,49 +197,73 @@ export default function JourneyPage() {
         </Reveal>
       )}
 
-      {/* 今日修行 */}
+      {/* 今日修行：登录后解锁 */}
       <Reveal delay={160} className="rounded-2xl border border-line bg-surface p-5">
-        <div className="mb-3 text-sm font-medium text-fg">{t("jrn.today", lang)}</div>
-        <div className="space-y-2">
-          {p.tasks.map((task) => (
-            <div
-              key={task.id}
-              className="flex items-center gap-3 rounded-xl border border-line bg-surface-2/50 px-4 py-3"
-            >
-              <div className="flex-1">
-                <div className={`text-sm ${task.done ? "text-faint line-through" : "text-fg"}`}>
-                  {task.title}
-                </div>
-                <div className="text-xs text-faint">{task.hint} · +{task.xp} XP</div>
-              </div>
-              <button
-                onClick={() => doTask(task.id)}
-                disabled={busy || task.done}
-                className={`rounded-full px-3 py-1.5 text-xs ${
-                  task.done ? "bg-cel-soft text-cel-ink" : "bg-accent text-white"
-                }`}
-              >
-                {task.done ? t("jrn.done", lang) : t("jrn.todo", lang)}
-              </button>
-            </div>
-          ))}
+        <div className="mb-3 flex items-center gap-2">
+          <span className="text-sm font-medium text-fg">{t("jrn.today", lang)}</span>
+          {p.locked && (
+            <span className="rounded-full bg-accent-soft px-2 py-0.5 text-[10px] text-accent-ink">
+              {t("gate.lockedTag", lang)}
+            </span>
+          )}
         </div>
-      </Reveal>
-
-      {/* 君子勋章墙 */}
-      {ov && (
-        <Reveal delay={200} className="rounded-2xl border border-line bg-surface p-5">
-          <div className="mb-3 text-sm font-medium text-fg">
-            {t("jrn.junziMedals", lang).replace("{a}", String(ov.badges_unlocked)).replace("{b}", String(ov.badges_total))}
-          </div>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {ov.badges.map((b) => (
-              <BadgeCell key={b.key} b={b} />
+        {p.locked ? (
+          <LockedHint onOpen={() => setGateOpen(true)} />
+        ) : (
+          <div className="space-y-2">
+            {p.tasks.map((task) => (
+              <div
+                key={task.id}
+                className="flex items-center gap-3 rounded-xl border border-line bg-surface-2/50 px-4 py-3"
+              >
+                <div className="flex-1">
+                  <div className={`text-sm ${task.done ? "text-faint line-through" : "text-fg"}`}>
+                    {task.title}
+                  </div>
+                  <div className="text-xs text-faint">{task.hint} · +{task.xp} XP</div>
+                </div>
+                <button
+                  onClick={() => doTask(task.id)}
+                  disabled={busy || task.done}
+                  className={`rounded-full px-3 py-1.5 text-xs ${
+                    task.done ? "bg-cel-soft text-cel-ink" : "bg-accent text-white"
+                  }`}
+                >
+                  {task.done ? t("jrn.done", lang) : t("jrn.todo", lang)}
+                </button>
+              </div>
             ))}
           </div>
-          <p className="mt-3 text-[10px] text-faint">
-            {t("jrn.grandHint", lang)}
-          </p>
+        )}
+      </Reveal>
+
+      {/* 君子勋章墙：登录后解锁 */}
+      {ov && (
+        <Reveal delay={200} className="rounded-2xl border border-line bg-surface p-5">
+          <div className="mb-3 flex items-center gap-2">
+            <span className="text-sm font-medium text-fg">
+              {t("jrn.junziMedals", lang).replace("{a}", String(ov.badges_unlocked)).replace("{b}", String(ov.badges_total))}
+            </span>
+            {p.locked && (
+              <span className="rounded-full bg-accent-soft px-2 py-0.5 text-[10px] text-accent-ink">
+                {t("gate.lockedTag", lang)}
+              </span>
+            )}
+          </div>
+          {p.locked ? (
+            <LockedHint onOpen={() => setGateOpen(true)} />
+          ) : (
+            <>
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                {ov.badges.map((b) => (
+                  <BadgeCell key={b.key} b={b} />
+                ))}
+              </div>
+              <p className="mt-3 text-[10px] text-faint">
+                {t("jrn.grandHint", lang)}
+              </p>
+            </>
+          )}
         </Reveal>
       )}
 
@@ -265,8 +296,8 @@ export default function JourneyPage() {
         </Reveal>
       )}
 
-      {/* 旧 GamifyProfile 勋章（保留作系统勋章，但放底部） */}
-      {p.badges.length > 0 && (
+      {/* 旧 GamifyProfile 勋章（保留作系统勋章，但放底部；游客态由上方锁定卡统一承载） */}
+      {!p.locked && p.badges.length > 0 && (
         <Reveal delay={280} className="rounded-2xl border border-line bg-surface p-5">
           <div className="mb-3 text-sm font-medium text-fg">
             {t("jrn.systemMedals", lang).replace("{a}", String(p.badges.filter((b) => b.unlocked).length)).replace("{b}", String(p.badges.length))}
@@ -280,14 +311,15 @@ export default function JourneyPage() {
                 }`}
               >
                 <div
-                  className="mx-auto mb-1 flex h-8 w-8 items-center justify-center rounded-full text-base"
+                  className="mx-auto mb-1 flex h-8 w-8 items-center justify-center rounded-full font-serif text-sm"
                   style={{
                     background: b.unlocked ? "#F4C430" : "var(--line)",
+                    color: b.unlocked ? "#412402" : "var(--muted)",
                     filter: b.unlocked ? "none" : "grayscale(1)",
-                    opacity: b.unlocked ? 1 : 0.5,
+                    opacity: b.unlocked ? 1 : 0.6,
                   }}
                 >
-                  {b.unlocked ? "🏅" : "🔒"}
+                  {b.unlocked ? "勋" : "封"}
                 </div>
                 <div className={`text-[11px] ${b.unlocked ? "text-accent-ink" : "text-faint"}`}>
                   {b.name}
@@ -297,7 +329,24 @@ export default function JourneyPage() {
           </div>
         </Reveal>
       )}
+
+      <LoginGate open={gateOpen} onClose={() => setGateOpen(false)} />
     </div>
+  );
+}
+
+/** 游客态的锁定占位：说明这是登录专属，点击弹出解锁引导 */
+function LockedHint({ onOpen }: { onOpen: () => void }) {
+  const [lang] = useLang();
+  return (
+    <button
+      type="button"
+      onClick={onOpen}
+      className="pressable w-full rounded-xl border border-dashed border-line bg-surface-2/40 px-4 py-6 text-center transition hover:border-accent/40"
+    >
+      <div className="font-serif text-sm text-fg">{t("gate.title", lang)}</div>
+      <div className="mt-1 text-xs text-muted">{t("gate.login", lang)} →</div>
+    </button>
   );
 }
 
@@ -315,7 +364,6 @@ function buildPathNodes(arts: JourneyArtBrief[]) {
   const ordered = ART_ORDER.map((o) => arts.find((a) => a.key === o.key)).filter(
     (a): a is JourneyArtBrief => !!a,
   );
-  const curIdx = ordered.findIndex((a) => a.score < 60);
   return ordered.map((a) => {
     const glyph = ART_ORDER.find((o) => o.key === a.key)?.glyph ?? a.label;
     const state: "done" | "cur" | "lock" =
@@ -340,14 +388,14 @@ function BadgeCell({ b }: { b: JourneyBadge }) {
       title={b.desc}
     >
       <div
-        className="mx-auto mb-1.5 flex h-10 w-10 items-center justify-center rounded-full text-xl"
+        className="mx-auto mb-1.5 flex h-10 w-10 items-center justify-center rounded-full font-serif text-base"
         style={{
           background: b.unlocked ? color : "var(--surface-2)",
-          color: "#fff",
+          color: b.unlocked ? "#fff" : "var(--muted)",
           filter: b.unlocked ? "none" : "grayscale(1)",
         }}
       >
-        {b.unlocked ? (b.tier === "treasure" ? "💎" : b.tier === "gold" ? "🏆" : "🏅") : "🔒"}
+        {b.unlocked ? "勋" : "封"}
       </div>
       <div
         className={`text-sm font-medium ${b.unlocked ? "" : "text-faint"}`}
@@ -363,15 +411,28 @@ function BadgeCell({ b }: { b: JourneyBadge }) {
 // ─── 排行行 ─────────────────────────────────────────────────
 function LeaderRow({ row }: { row: { rank: number; name: string; total: number; by_art: Record<string, number>; is_self: boolean } }) {
   const [lang] = useLang();
-  const medal = row.rank === 1 ? "🥇" : row.rank === 2 ? "🥈" : row.rank === 3 ? "🥉" : `${row.rank}`;
+  const rankPill =
+    row.rank === 1
+      ? { text: "状元", cls: "border-gold bg-accent-soft text-accent-ink" }
+      : row.rank === 2
+        ? { text: "榜眼", cls: "border-line bg-surface-2 text-muted" }
+        : row.rank === 3
+          ? { text: "探花", cls: "border-line bg-surface-2 text-muted" }
+          : null;
   return (
     <div
       className={`flex items-center gap-3 rounded-lg px-3 py-2 ${
         row.is_self ? "border border-accent bg-accent-soft" : "bg-surface-2/40"
       }`}
     >
-      <div className="w-7 text-center font-serif text-sm" style={{ color: row.is_self ? "var(--accent)" : undefined }}>
-        {medal}
+      <div className="flex w-12 justify-center">
+        {rankPill ? (
+          <span className={`rounded-full border px-2 py-0.5 font-serif text-[11px] ${rankPill.cls}`}>
+            {rankPill.text}
+          </span>
+        ) : (
+          <span className="font-serif text-sm text-muted">{row.rank}</span>
+        )}
       </div>
       <div className="flex-1">
         <div className={`text-sm ${row.is_self ? "font-medium text-accent-ink" : "text-fg"}`}>

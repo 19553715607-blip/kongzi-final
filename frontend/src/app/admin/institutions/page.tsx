@@ -285,7 +285,7 @@ export default function AdminInstitutionsPage() {
       {/* 统计 + 过滤 */}
       <section className="grid grid-cols-2 gap-2 sm:grid-cols-5">
         {loading &&
-          cards.map(([labelKey, val], i) => (
+          cards.map(([, val], i) => (
             <div key={val} className="rounded-xl border border-line bg-surface p-3" style={{ animationDelay: `${i * 60}ms` }}>
               <div className="skeleton mb-2 h-3 w-16" />
               <div className="skeleton h-6 w-12" />

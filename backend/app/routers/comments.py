@@ -54,11 +54,13 @@ def _author_name(user: Optional[User], visitor_id: str, body_name: Optional[str]
     return (body_name or f"访客{visitor_id[-6:]}")[:40]
 
 
-def _comment_dict(c: Comment, viewer_id: Optional[str] = None) -> dict:
+def _comment_dict(c: Comment) -> dict:
     return {
         "id": c.id,
         "target_type": c.target_type,
         "target_id": c.target_id,
+        "visitor_id": c.visitor_id,
+        "user_id": c.user_id,
         "author_name": c.author_name,
         "content": c.content,
         "parent_id": c.parent_id,
@@ -67,15 +69,14 @@ def _comment_dict(c: Comment, viewer_id: Optional[str] = None) -> dict:
         "likes": c.likes,
         "report_count": c.report_count,
         "created_at": c.created_at.isoformat() if c.created_at else None,
-        "is_mine": bool(viewer_id and c.user_id == viewer_id),
     }
 
 
-def _build_tree(rows: list[Comment], viewer_id: Optional[str] = None) -> list[dict]:
+def _build_tree(rows: list[Comment]) -> list[dict]:
     """在内存组树：parent_id 关联，深度不限；replies 按 created_at 升序。"""
     nodes: dict[str, dict] = {}
     for c in rows:
-        d = _comment_dict(c, viewer_id)
+        d = _comment_dict(c)
         d["replies"] = []
         nodes[c.id] = d
     roots: list[dict] = []
@@ -101,7 +102,6 @@ class CommentIn(BaseModel):
 def list_comments(
     target_type: str = Query(..., min_length=1),
     target_id: str = Query(..., min_length=1),
-    authorization: Optional[str] = Header(None),
     db: Session = Depends(get_db),
 ) -> dict:
     """返回嵌套树（仅 visible）+ total（含整串所有 visible 条）。"""
@@ -122,10 +122,7 @@ def list_comments(
         c for c in rows
         if not c.root_id or c.root_id in visible_root_ids
     ]
-    user = _optional_user(authorization, db)
-    if user and getattr(user, "is_banned", False):
-        raise HTTPException(403, "account banned")
-    tree = _build_tree(visible_rows, user.id if user else None)
+    tree = _build_tree(visible_rows)
     total = db.scalar(
         select(func.count()).select_from(Comment).where(
             Comment.target_type == target_type,
@@ -150,8 +147,6 @@ def create_comment(
         raise HTTPException(400, f"content too long (>{_MAX_LEN})")
 
     user = _optional_user(authorization, db)
-    if user and getattr(user, "is_banned", False):
-        raise HTTPException(403, "account banned")
 
     # visitor_id：优先请求头，否则生成
     visitor_id = (x_visitor_id or "").strip() or str(uuid.uuid4())
@@ -192,7 +187,7 @@ def create_comment(
     )
     db.add(comment)
     db.commit()
-    out = _comment_dict(comment, user.id if user else None)
+    out = _comment_dict(comment)
     out["visitor_id"] = visitor_id  # 回传给客户端持久化
     return out
 
@@ -215,15 +210,15 @@ def delete_my_comment(
     comment_id: str,
     db: Session = Depends(get_db),
     authorization: Optional[str] = Header(None),
+    x_visitor_id: Optional[str] = Header(None, alias="X-Visitor-Id"),
 ) -> dict:
     """本人（visitor_id 或 user_id 匹配）可软删（status=hidden，不硬删）。"""
     c = db.get(Comment, comment_id)
     if not c:
         raise HTTPException(404, "comment not found")
     user = _optional_user(authorization, db)
-    # Authenticated comments are deletable only by their account. Guest visitor IDs
-    # are caller-controlled and therefore are not an ownership credential.
-    owner = bool(user and c.user_id == user.id)
+    visitor_id = (x_visitor_id or "").strip()
+    owner = (user and c.user_id == user.id) or (visitor_id and c.visitor_id == visitor_id)
     if not owner:
         raise HTTPException(403, "not your comment")
     c.status = "hidden"

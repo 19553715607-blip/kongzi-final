@@ -9,11 +9,13 @@ import {
   getGamifyProfile,
   removeFavorite,
   upgradeAccount,
+  isAuthError,
 } from "@/lib/api";
 import { clearToken, logout, setToken, switchGuest } from "@/lib/auth";
 import { t, useLang } from "@/lib/i18n";
 import { CountUp, Reveal } from "@/lib/motion";
 import { TactileButton } from "@/components/museum";
+import LoginGate from "@/components/LoginGate";
 import type { Favorite, GamifyProfile } from "@/lib/types";
 
 
@@ -24,13 +26,25 @@ export default function MePage() {
   const [email, setEmail] = useState("");
   const [pw, setPw] = useState("");
   const [msg, setMsg] = useState("");
+  // 游客点到登录专属区（成就）时弹出解锁引导
+  const [gateOpen, setGateOpen] = useState(false);
 
   const load = () => {
-    getGamifyProfile().then(setP).catch(() => setMsg(t("me.noBackend", lang)));
+    getGamifyProfile().then(setP).catch((e) => setMsg(isAuthError(e) ? t("common.loginRequired", lang) : t("me.noBackend", lang)));
     getFavorites().then(setFavs).catch(() => {});
   };
   useEffect(() => {
     load();
+    // 登录时后端并入了游客进度，这里提示一次后清除
+    try {
+      const mergedXp = sessionStorage.getItem("kongzi_merged_xp");
+      if (mergedXp) {
+        setMsg(t("login.mergedXp", lang).replace("{n}", mergedXp));
+        sessionStorage.removeItem("kongzi_merged_xp");
+      }
+    } catch {
+      /* sessionStorage 不可用时忽略 */
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lang]);
 
@@ -133,7 +147,7 @@ export default function MePage() {
               <input
                 type="password"
                 required
-                minLength={10}
+                minLength={6}
                 value={pw}
                 onChange={(e) => setPw(e.target.value)}
                 placeholder={t("me.passwordHint", lang)}
@@ -147,29 +161,49 @@ export default function MePage() {
         </Reveal>
       )}
 
-      {/* 勋章墙摘要 */}
+      {/* 勋章墙摘要：登录后解锁 */}
       <Reveal delay={120}>
         <section className="rounded-2xl border border-line bg-surface p-5">
-          <div className="mb-3 text-sm font-medium text-fg">
-            {t("me.badges", lang)
-              .replace("{n}", String(p.badges.filter((b) => b.unlocked).length))
-              .replace("{m}", String(p.badges.length))}
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {p.badges.map((b) => (
-              <span
-                key={b.id}
-                title={b.desc}
-                className={`rounded-full px-3 py-1 text-xs ${
-                  b.unlocked
-                    ? "bg-accent-soft text-accent-ink"
-                    : "bg-surface-2 text-faint opacity-60"
-                }`}
-              >
-                {b.unlocked ? "🏅" : "🔒"} {b.name}
+          <div className="mb-3 flex items-center gap-2">
+            <span className="text-sm font-medium text-fg">
+              {p.locked
+                ? t("gate.badgesLocked", lang)
+                : t("me.badges", lang)
+                    .replace("{n}", String(p.badges.filter((b) => b.unlocked).length))
+                    .replace("{m}", String(p.badges.length))}
+            </span>
+            {p.locked && (
+              <span className="rounded-full bg-accent-soft px-2 py-0.5 text-[10px] text-accent-ink">
+                {t("gate.lockedTag", lang)}
               </span>
-            ))}
+            )}
           </div>
+          {p.locked ? (
+            <button
+              type="button"
+              onClick={() => setGateOpen(true)}
+              className="pressable w-full rounded-xl border border-dashed border-line bg-surface-2/40 px-4 py-6 text-center transition hover:border-accent/40"
+            >
+              <div className="font-serif text-sm text-fg">{t("gate.title", lang)}</div>
+              <div className="mt-1 text-xs text-muted">{t("gate.login", lang)} →</div>
+            </button>
+          ) : (
+            <div className="flex flex-wrap gap-2">
+              {p.badges.map((b) => (
+                <span
+                  key={b.id}
+                  title={b.desc}
+                  className={`rounded-full px-3 py-1 text-xs ${
+                    b.unlocked
+                      ? "bg-accent-soft text-accent-ink"
+                      : "bg-surface-2 text-faint opacity-60"
+                  }`}
+                >
+                  {b.unlocked ? "勋" : "封"} {b.name}
+                </span>
+              ))}
+            </div>
+          )}
         </section>
       </Reveal>
 
@@ -262,6 +296,8 @@ export default function MePage() {
           </p>
         </section>
       </Reveal>
+
+      <LoginGate open={gateOpen} onClose={() => setGateOpen(false)} />
     </div>
   );
 }

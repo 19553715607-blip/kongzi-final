@@ -1,13 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { addFavorite, getFeed, getFavorites, removeFavorite } from "@/lib/api";
+import { addFavorite, getFeed, getFavorites, removeFavorite, isAuthError } from "@/lib/api";
 import { getApiBase } from "@/lib/apiBase";
 import { visitorHeaders } from "@/lib/visitor";
 import { t, useLang } from "@/lib/i18n";
 import { toast } from "@/components/Toast";
 import { Reveal } from "@/lib/motion";
-import { TactileButton } from "@/components/museum";
+import ChineseBackdrop from "@/components/ChineseBackdrop";
 import CommentSheet from "./_components/CommentSheet";
 import WallpaperSheet from "./_components/WallpaperSheet";
 import { renderCardImage } from "./_components/renderCard";
@@ -39,7 +39,7 @@ export default function FeedPage() {
         // 进入卡片后拉取每条金句的真实点赞数与本人 liked
         void preloadLikes(d);
       })
-      .catch(() => setErr(t("feed.noBackend", lang)));
+      .catch((e) => setErr(isAuthError(e) ? t("common.loginRequired", lang) : t("feed.noBackend", lang)));
   }, [lang]);
 
   // 已登录用户：拉取收藏列表，初始化星星状态
@@ -198,7 +198,7 @@ export default function FeedPage() {
             <span className="state-sub">{t("feed.empty.sub", lang)}</span>
           </div>
         ) : (
-          items.map((it, i) => {
+          items.map((it) => {
             const id = String(it.ref_id);
             const lk = likes[id] ?? { liked: false, count: 0 };
             return (
@@ -282,86 +282,70 @@ function Card({
   }, [burstSignal]);
 
   return (
-    <section className="card-hover relative flex h-full snap-start flex-col justify-center overflow-hidden bg-[#2C2C2A] px-7 text-center">
-      {/* 氛围光斑 */}
-      <div className="pointer-events-none absolute -right-12 -top-8 h-56 w-56 rounded-full bg-[#712B13] opacity-30 blur-2xl" />
-      <div className="pointer-events-none absolute -left-12 bottom-24 h-44 w-44 rounded-full bg-[#085041] opacity-30 blur-2xl" />
+    <section className="card-hover relative flex h-full snap-start flex-col justify-center overflow-hidden rounded-2xl border border-line bg-surface px-7 text-center">
+      <ChineseBackdrop variant="mountains clouds" />
 
       {/* 原文大字（双击点赞区） */}
       <div onDoubleClick={onDoubleLike} className="relative select-none">
-        <p className="relative font-serif text-[28px] font-medium leading-[1.7] tracking-[0.18em] text-[#F5F0E6]">
+        <p className="relative font-serif text-[28px] font-medium leading-[1.7] tracking-[0.18em] text-fg">
           {it.original_text}
         </p>
         {it.translation && (
-          <p className="relative mt-5 font-serif text-xs italic leading-relaxed text-[#D3D1C7]">
+          <p className="relative mt-5 font-serif text-xs italic leading-relaxed text-muted">
             {it.translation}
           </p>
         )}
-        <span className="relative mx-auto mt-5 inline-block rounded-full bg-[#F5F0E6]/10 px-3 py-1 text-[11px] text-[#F5F0E6]">
+        <span className="relative mx-auto mt-5 inline-block rounded-full border border-line bg-surface-2 px-3 py-1 text-[11px] text-muted">
           {it.ref_label}
         </span>
 
-        {/* 双击点赞爆裂 */}
+        {/* 双击点赞：朱砂印章「赞」 */}
         {showBurst && (
-          <div className="feed-burst" aria-hidden>
-            <span className="burst-heart">❤️</span>
-            {[0, 60, 120, 180, 240, 300].map((deg, k) => {
-              const rad = (deg * Math.PI) / 180;
-              const dx = Math.cos(rad) * 70;
-              const dy = Math.sin(rad) * 70 - 30;
-              return (
-                <span
-                  key={k}
-                  className="burst-dot"
-                  style={
-                    {
-                      "--dx": `${dx}px`,
-                      "--dy": `${dy}px`,
-                    } as React.CSSProperties
-                  }
-                />
-              );
-            })}
+          <div className="like-stamp" aria-hidden>
+            <span className="stamp-ring" />
+            <span className="stamp-seal">赞</span>
           </div>
         )}
       </div>
 
       {/* 署名 + 标签（左下） */}
       <div className="absolute bottom-7 start-6 end-20 text-start">
-        <div className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-[#F5F0E6]">
-          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#BA7517] font-serif text-[10px] text-[#412402]">
+        <div className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-fg">
+          <span className="seal flex h-6 w-6 items-center justify-center rounded-full font-serif text-[10px]">
             {it.persona[0]}
           </span>
           {it.persona}
         </div>
-        <div className="text-[11px] text-[#FAC775]">{it.tags.join("  ")}</div>
+        <div className="text-[11px] text-faint">{it.tags.join("  ")}</div>
       </div>
 
-      {/* 右侧动作栏 */}
-      <div className="absolute bottom-7 end-4 flex flex-col items-center gap-5">
+      {/* 右侧动作栏：印章字（赞 / 评 / 转 / 纸 / 藏） */}
+      <div className="absolute bottom-7 end-4 flex flex-col items-center gap-3.5">
         <Action
           label=""
           badge={likeCount > 0 ? String(likeCount) : ""}
           onClick={onLike}
           ariaLabel={t("feed.likeAria", lang)}
           active={liked}
-          activeCls="feed-like-btn liked"
         >
-          <span className={`like-glyph text-2xl ${liked ? "scale-110" : ""}`}>
-            {liked ? "❤️" : "🤍"}
-          </span>
+          <span className={`font-serif text-base ${liked ? "" : "text-muted"}`}>赞</span>
         </Action>
         <Action
           label=""
           badge={commentCount > 0 ? String(commentCount) : ""}
           onClick={onOpenComments}
+          ariaLabel={t("feed.commentAria", lang)}
         >
-          💬
+          <span className="font-serif text-base text-muted">评</span>
         </Action>
-        <Action label={t("feed.share", lang)} onClick={onShare}>↗</Action>
-        <Action label={t("feed.wallpaper", lang)} onClick={onWallpaper}>🖼</Action>
-        <Action label={saved ? t("feed.savedShort", lang) : t("feed.save", lang)} onClick={onSave}>
-          <span className="text-xl">{saved ? "⭐" : "☆"}</span>
+        <Action label={t("feed.share", lang)} onClick={onShare} ariaLabel={t("feed.share", lang)}>
+          <span className="font-serif text-base text-muted">转</span>
+        </Action>
+        <Action label={t("feed.wallpaper", lang)} onClick={onWallpaper} ariaLabel={t("feed.wallpaper", lang)}>
+          <span className="font-serif text-base text-muted">纸</span>
+        </Action>
+        <Action label={saved ? t("feed.savedShort", lang) : t("feed.save", lang)} onClick={onSave} active={saved}>
+          <span className={`font-serif text-base ${saved ? "" : "text-muted"}`}>藏</span>
         </Action>
       </div>
     </section>
@@ -375,7 +359,6 @@ function Action({
   onClick,
   ariaLabel,
   active = false,
-  activeCls = "",
 }: {
   children: React.ReactNode;
   label: string;
@@ -383,18 +366,18 @@ function Action({
   onClick: () => void;
   ariaLabel?: string;
   active?: boolean;
-  activeCls?: string;
 }) {
   return (
-    <div className="flex flex-col items-center gap-0.5 text-[#F5F0E6]">
-      <TactileButton
-        variant="ghost"
+    <div className="flex flex-col items-center gap-0.5 text-fg">
+      <button
         onClick={onClick}
         aria-label={ariaLabel}
-        className={`!h-11 !w-11 !rounded-full !p-0 ${active ? activeCls : ""}`}
+        className={`pressable flex h-10 w-10 items-center justify-center rounded-lg border bg-surface/90 transition hover:border-accent hover:text-accent ${
+          active ? "border-accent bg-accent-soft text-accent" : "border-line text-muted"
+        }`}
       >
         {children}
-      </TactileButton>
+      </button>
       {badge ? (
         <span className="text-[10px] tabular-nums leading-none">{badge}</span>
       ) : label ? (

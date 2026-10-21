@@ -32,11 +32,11 @@ export const YUE: Record<string, E> = {
   },
 
   // 加载错误
-  "无法加载乐艺题库 — 请先登录": {
-    en: "Could not load music scenarios — please log in first",
-    fr: "Impossible de charger les scénarios musicaux — connectez-vous",
-    es: "No se pudieron cargar los escenarios musicales — inicia sesión",
-    ar: "تعذر تحميل سيناريوهات الموسيقى — سجّل الدخول أولًا",
+  "无法加载乐艺题库，请稍后重试": {
+    en: "Could not load music scenarios. Please try again shortly.",
+    fr: "Impossible de charger les scénarios musicaux. Réessayez.",
+    es: "No se pudieron cargar los escenarios musicales. Inténtalo de nuevo.",
+    ar: "تعذر تحميل سيناريوهات الموسيقى. أعد المحاولة بعد قليل.",
   },
 
   // 击钟 toast

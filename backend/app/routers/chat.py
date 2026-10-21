@@ -1,10 +1,9 @@
 from __future__ import annotations
 
 import json
-import time
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 
@@ -14,9 +13,6 @@ from ..schemas import ChatRequest
 from ..services.orchestrator import run_chat
 
 router = APIRouter(prefix="/api/v1", tags=["chat"])
-_chat_calls: dict[str, list[float]] = {}
-_CHAT_WINDOW = 60
-_CHAT_LIMIT = 10
 
 
 def _sse(event: str, data: object) -> str:
@@ -24,18 +20,9 @@ def _sse(event: str, data: object) -> str:
 
 
 @router.post("/chat")
-async def chat(req: ChatRequest, request: Request, db: Session = Depends(get_db)) -> StreamingResponse:
+async def chat(req: ChatRequest, db: Session = Depends(get_db)) -> StreamingResponse:
     """流式对话。返回 text/event-stream，事件：agents/token/citation/verify/followups/done。"""
 
-    now = time.monotonic()
-    peer = request.client.host if request.client else "unknown"
-    recent = [stamp for stamp in _chat_calls.get(peer, []) if now - stamp < _CHAT_WINDOW]
-    if len(_chat_calls) > 5000:
-        _chat_calls.clear()
-    if len(recent) >= _CHAT_LIMIT:
-        raise HTTPException(429, "chat rate limit exceeded; retry in a minute")
-    recent.append(now)
-    _chat_calls[peer] = recent
     conv_id = req.conversation_id or str(uuid.uuid4())
 
     async def event_stream():
@@ -51,8 +38,8 @@ async def chat(req: ChatRequest, request: Request, db: Session = Depends(get_db)
                 if event == "done":
                     final = data
                 yield _sse(event, data)
-        except Exception:  # noqa: BLE001
-            yield _sse("error", {"message": "The response could not be generated. Please try again."})
+        except Exception as exc:  # noqa: BLE001  保证流不中断在客户端裸奔
+            yield _sse("error", {"message": str(exc)})
             return
 
         # 持久化会话与消息（best-effort）

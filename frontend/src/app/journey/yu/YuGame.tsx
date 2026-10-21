@@ -17,9 +17,10 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { useGT } from "@/lib/gameDict";
+import { useLang } from "@/lib/i18n";
 import { Reveal, CountUp, Pressable } from "@/lib/motion";
 import { TactileButton, ProvenanceCaption } from "@/components/museum";
-import { driveYuScenario, getYuProgress, getYuToday } from "@/lib/api";
+import { driveYuScenario, getYuProgress, getYuToday, errorHint } from "@/lib/api";
 import type {
   YuDriveResp,
   YuEvent,
@@ -68,10 +69,19 @@ export default function YuGame() {
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // ── 加载 ──
-  useEffect(() => {
-    getYuToday().then(setToday).catch(() => setLoadErr(tr("无法加载御艺场景 — 请先登录")));
+  // 注意：useGT() 每次渲染都返回新函数，不能作为 useCallback 依赖，否则会无限重载。
+  // 依赖语言码（稳定字符串）即可：语言切换时重新拉取，其余渲染不受影响。
+  const [lang] = useLang();
+  const reload = useCallback(() => {
+    setLoadErr("");
+    getYuToday().then(setToday).catch((e) => setLoadErr(tr("无法加载御艺场景，请稍后重试") + `（${errorHint(e)}）`));
     getYuProgress().then(setProgress).catch(() => {});
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lang]);
+
+  useEffect(() => {
+    reload();
+  }, [reload]);
 
   const say = useCallback((text: string, good: boolean) => {
     if (toastTimer.current) clearTimeout(toastTimer.current);
@@ -202,7 +212,7 @@ export default function YuGame() {
             {progress && <Stat label={tr("称号")} value={tr(progress.title)} />}
             {progress && <Stat label={tr("御艺")} value={`${progress.liuyi_yu}`} numeric />}
             {progress && <Stat label={tr("最佳")} value={`${progress.best_score}`} numeric />}
-            <Link href="/journey" className="route-link">
+            <Link href="/journey" className="rounded-full border border-line px-3 py-1.5 text-xs text-muted hover:bg-surface-2">
               {tr("← 六艺")}
             </Link>
           </div>
@@ -214,7 +224,7 @@ export default function YuGame() {
           <div className="icon-plate">!</div>
           <div className="state-title">{tr("加载失败")}</div>
           <p className="state-sub">{loadErr}</p>
-          <Link href="/login" className="retry-btn">{tr("去登录")}</Link>
+          <button type="button" onClick={reload} className="retry-btn">{tr("再试一次")}</button>
         </div>
       )}
 

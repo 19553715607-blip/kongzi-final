@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from typing import Optional
 
 from fastapi import APIRouter, Depends, Header, Request
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
@@ -17,15 +17,20 @@ router = APIRouter(prefix="/api/v1/reach", tags=["reach"])
 
 
 class TrackIn(BaseModel):
-    visitor_id: str = Field(..., min_length=1, max_length=128)
-    path: str = Field(..., min_length=1, max_length=500)
-    device: str = Field("web", max_length=32)
-    source: str = Field("direct", max_length=80)
-    campus: Optional[str] = Field(None, max_length=160)
+    visitor_id: str
+    path: str
+    device: str = "web"
+    source: str = "direct"
+    campus: Optional[str] = None
 
 
-def _client_ip(request: Request) -> Optional[str]:
-    """Use the socket peer; forwarded headers require an explicitly trusted proxy."""
+def _client_ip(request: Request, x_forwarded_for: Optional[str]) -> Optional[str]:
+    """取真实客户端 IP：优先 X-Forwarded-For 第一个，回退 request.client.host。"""
+    if x_forwarded_for:
+        # 取第一个（最左是原始客户端；后面是各级代理）
+        ip = x_forwarded_for.split(",")[0].strip()
+        if ip:
+            return ip
     client = request.client
     return client.host if client else None
 
@@ -35,6 +40,7 @@ def track(
     body: TrackIn,
     request: Request,
     user_agent: Optional[str] = Header(None, alias="User-Agent"),
+    x_forwarded_for: Optional[str] = Header(None, alias="X-Forwarded-For"),
     db: Session = Depends(get_db),
 ) -> dict:
     """前端在每次路由变化时调用一次。匿名 visitor_id 由前端生成存 localStorage。
@@ -45,7 +51,7 @@ def track(
     device = body.device
     if device == "web" and user_agent and "Mobile" in user_agent:
         device = "mobile"
-    ip = _client_ip(request)
+    ip = _client_ip(request, x_forwarded_for)
     country_code, country_name = ip_to_country(ip)
     ev = PageEvent(
         visitor_id=body.visitor_id,

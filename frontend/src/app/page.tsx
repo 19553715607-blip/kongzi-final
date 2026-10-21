@@ -1,11 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import {
   addFavorite,
   getCorpusStats,
-  getAnnouncements,
   getPassage,
   getPassageNeighbors,
   getRandomPassage,
@@ -25,7 +25,7 @@ import {
   AnnouncementBar,
 } from "@/components/museum";
 import ChineseBackdrop from "@/components/ChineseBackdrop";
-import type { AnnouncementItem, CorpusStats, Passage, TopicBrief, TopicPassage } from "@/lib/types";
+import type { CorpusStats, Passage, TopicBrief, TopicPassage } from "@/lib/types";
 
 // 后端 /corpus/stats 的 breakdown 以中文为 key（数据契约，不能改）。
 // 这里把中文 key 映射到 i18n 键，只翻译**显示标签**；查表仍用中文 key。
@@ -61,18 +61,32 @@ function bdLabel(k: string, lang: Parameters<typeof t>[1]): string {
   return key ? t(key, lang) : k;
 }
 
-// 滑轨缩略图：宣纸卡上的几何小景（配色同品牌）
-function RailThumb({ tone }: { tone: "cinnabar" | "celadon" | "gold" }) {
+// 滑轨缩略图：有配图用配图，没有则退回品牌色几何小景（容错，避免图挂了出现破图）
+function RailThumb({
+  img,
+  tone = "cinnabar",
+}: {
+  img?: string;
+  tone?: "cinnabar" | "celadon" | "gold";
+}) {
+  if (img) {
+    return (
+      <span className="relative block h-full w-full overflow-hidden">
+        <Image src={img} alt="" fill sizes="240px" className="object-cover" unoptimized />
+      </span>
+    );
+  }
+  // 渐变色跟随主题变量，避免换色后这里的朱砂红与全站冲突
   const map = {
-    cinnabar: "linear-gradient(135deg,#993C1D 0%,#5E2410 100%)",
-    celadon: "linear-gradient(135deg,#3E7C6F 0%,#1F4A42 100%)",
-    gold: "linear-gradient(135deg,#C9A227 0%,#8A6D16 100%)",
+    cinnabar: "linear-gradient(135deg,var(--accent) 0%,var(--accent-deep) 100%)",
+    celadon: "linear-gradient(135deg,var(--cel) 0%,var(--cel-deep) 100%)",
+    gold: "linear-gradient(135deg,var(--gold) 0%,var(--gold-deep) 100%)",
   } as const;
   return (
     <span className="flex h-full w-full items-center justify-center" style={{ background: map[tone] }}>
       <svg width="46" height="46" viewBox="0 0 48 48" aria-hidden="true">
-        <circle cx="24" cy="24" r="18" fill="none" stroke="#FBFAF7" strokeOpacity="0.55" strokeWidth="1.4" />
-        <circle cx="24" cy="24" r="6" fill="#FBFAF7" fillOpacity="0.7" />
+        <circle cx="24" cy="24" r="18" fill="none" stroke="currentColor" strokeOpacity="0.5" strokeWidth="1.4" className="text-white" />
+        <circle cx="24" cy="24" r="6" fill="currentColor" fillOpacity="0.65" className="text-white" />
       </svg>
     </span>
   );
@@ -80,7 +94,6 @@ function RailThumb({ tone }: { tone: "cinnabar" | "celadon" | "gold" }) {
 
 export default function Home() {
   const [lang] = useLang();
-  const [announcement, setAnnouncement] = useState<AnnouncementItem | null>(null);
   const [quote, setQuote] = useState<Passage | null>(null);
   const [stats, setStats] = useState<CorpusStats | null>(null);
   const [err, setErr] = useState(false);
@@ -94,38 +107,65 @@ export default function Home() {
   const [topics, setTopics] = useState<TopicBrief[]>([]);
   const [activeTopic, setActiveTopic] = useState<string | null>(null);
   const [topicPassages, setTopicPassages] = useState<TopicPassage[]>([]);
+  // 馆藏精选横轨用：跨议题并集，与上面「当前议题」的列表分开存
+  const [railPassages, setRailPassages] = useState<TopicPassage[]>([]);
   const [loadingTopic, setLoadingTopic] = useState(false);
-  const loadingRef = useRef(false);
+  const quoteSeq = useRef(0);
   const quoteRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    let active = true;
-    getAnnouncements(lang).then((rows) => { if (active) setAnnouncement(rows[0] ?? null); }).catch(() => {});
-    return () => { active = false; };
-  }, [lang]);
 
   useEffect(() => {
     loadQuote(mode);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lang]);
 
+  // 语料统计与语言无关，只拉一次
   useEffect(() => {
     getCorpusStats().then(setStats).catch(() => {});
-    getTopics(lang)
-      .then((ts) => {
-        setTopics(ts);
-        if (ts[0]) {
-          setActiveTopic(ts[0].id);
-          loadTopicPassages(ts[0].id);
-        }
-      })
-      .catch(() => {});
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // 议题名称与议题下的原文/译文都是后端按 lang 返回的，
+  // 必须跟着 lang 重拉；否则切语言后标题变了、议题 chip 还是旧语言。
+  // 保留用户当前选中的议题，只在它已不存在时才回落到第一个。
+  useEffect(() => {
+    let alive = true;
+    getTopics(lang)
+      .then(async (ts) => {
+        if (!alive) return;
+        setTopics(ts);
+        const keep = ts.find((x) => x.id === activeTopic) ?? ts[0];
+        if (keep) {
+          setActiveTopic(keep.id);
+          void loadTopicPassages(keep.id);
+        }
+
+        // 馆藏精选横轨：单个议题的原文只有 1–2 条，撑不满一条横轨，
+        // 改为取前 4 个议题做并集去重，最多 5 条。
+        const lists = await Promise.all(
+          ts.slice(0, 4).map((tp) => getTopicPassages(tp.id, lang).catch(() => [] as TopicPassage[])),
+        );
+        if (!alive) return;
+        const seen = new Set<string>();
+        const merged: TopicPassage[] = [];
+        for (const list of lists) {
+          for (const p of list) {
+            if (seen.has(p.id)) continue;
+            seen.add(p.id);
+            merged.push(p);
+          }
+        }
+        setRailPassages(merged.slice(0, 5));
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lang]);
+
   async function loadQuote(m: "daily" | "random", refId?: string) {
-    if (loadingRef.current) return;
-    loadingRef.current = true;
+    // 用请求序号代替「上锁丢弃」：连点「换一句」时后发的请求赢，先发的结果作废。
+    // 原来 loadingRef 的做法会把后来的点击直接吞掉，导致模式切换了、正文却没变。
+    const seq = ++quoteSeq.current;
     setErr(false);
     setFaved(false);
     try {
@@ -134,14 +174,16 @@ export default function Home() {
         : m === "daily"
           ? await getTodayPassage(lang)
           : await getRandomPassage(lang);
+      if (seq !== quoteSeq.current) return;
       setQuote(p);
       getPassageNeighbors(p.id)
-        .then((nb) => setNeighbors({ prev: nb.prev, next: nb.next }))
+        .then((nb) => {
+          if (seq === quoteSeq.current) setNeighbors({ prev: nb.prev, next: nb.next });
+        })
         .catch(() => {});
     } catch {
+      if (seq !== quoteSeq.current) return;
       setErr(true);
-    } finally {
-      loadingRef.current = false;
     }
   }
 
@@ -210,7 +252,7 @@ export default function Home() {
     quote?.translations.find((tr) => tr.lang === lang) ??
     quote?.translations.find((tr) => tr.lang === "en");
 
-  const railTones = ["cinnabar", "celadon", "gold"] as const;
+  // 藏品精选已改为纯文本卡，不再需要缩略图色调轮换
 
   // 文明问题 chips
   const civQs = ["home.civ.q1", "home.civ.q2", "home.civ.q3", "home.civ.q4"];
@@ -230,12 +272,22 @@ export default function Home() {
     { key: "home.need.culture",   desc: "home.need.culture.desc",   href: "/chat", glyph: "趣" },
   ];
 
-  // 精选学习路径 rail
+  // 首屏四主入口：四个核心体验各一直达卡片。
+  // 这里是全站唯一的强入口区，不再与导航下拉重复罗列全部页面。
+  const primaryCards = [
+    { href: "/journey", key: "home.primary.journey", desc: "home.primary.journey.desc", glyph: "艺" },
+    { href: "/chat",    key: "home.primary.chat",    desc: "home.primary.chat.desc",    glyph: "问" },
+    { href: "/read",    key: "home.primary.read",    desc: "home.primary.read.desc",    glyph: "经" },
+    { href: "/feed",    key: "home.primary.feed",    desc: "home.primary.feed.desc",    glyph: "刷" },
+  ];
+
+  // 精选学习路径 rail（配图：竹简 / 山峦 / 编钟 / 两圆）
+  // 用 WebP 480×360：卡片实际显示 240 CSS px，2x 屏刚好够，体积约为原 PNG 的 1/100。
   const pathCards = [
-    { titleKey: "paths.analects.title",  tone: "cinnabar" as const, acc: "P-01" },
-    { titleKey: "paths.lineage.title",   tone: "celadon" as const,   acc: "P-02" },
-    { titleKey: "paths.arts.title",      tone: "gold" as const,      acc: "P-03" },
-    { titleKey: "paths.crossciv.title",  tone: "cinnabar" as const, acc: "P-04" },
+    { titleKey: "paths.analects.title",  acc: "P-01", img: "/home/path-analects.webp" },
+    { titleKey: "paths.lineage.title",   acc: "P-02", img: "/home/path-lineage.webp" },
+    { titleKey: "paths.arts.title",      acc: "P-03", img: "/home/path-arts.webp" },
+    { titleKey: "paths.crossciv.title",  acc: "P-04", img: "/home/path-crossciv.webp" },
   ];
 
   return (
@@ -243,7 +295,7 @@ export default function Home() {
       {/* 公告条：新展/专题 */}
       <Reveal as="section" delay={0}>
         <AnnouncementBar tag={t("home.announce.tag", lang)}>
-          {announcement?.body || t("home.announce.text", lang)}
+          {t("home.announce.text", lang)}
         </AnnouncementBar>
       </Reveal>
 
@@ -258,8 +310,8 @@ export default function Home() {
           {t("home.hero.desc", lang)}
         </p>
         <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-          <Link href="/read">
-            <TactileButton variant="gold">{t("home.hero.ctaRead", lang)}</TactileButton>
+          <Link href="/journey">
+            <TactileButton variant="accent">{t("home.hero.ctaJourney", lang)}</TactileButton>
           </Link>
           <Link href="/chat">
             <TactileButton variant="ghost">{t("home.hero.ctaChat", lang)}</TactileButton>
@@ -267,32 +319,25 @@ export default function Home() {
         </div>
       </Reveal>
 
-      {/* 模式选择：Modern Scholar / Classical Sage → 映射 chat / read */}
+      {/* 首屏四主入口：君子路·六艺 / 向经典提问 / 读经 / 刷刷 */}
       <Reveal as="section" delay={80}>
-        <h2 className="mb-3 font-serif text-base font-medium text-fg">{t("home.mode.title", lang)}</h2>
-        <div className="grid gap-3 sm:grid-cols-2">
-          <Link
-            href="/chat"
-            className="group card-hover pressable rounded-2xl border border-line bg-surface p-5"
-          >
-            <div className="flex items-baseline gap-2">
-              <span className="font-serif text-lg font-medium text-fg">{t("home.mode.modern", lang)}</span>
-              {lang !== "zh" && <span className="text-xs text-faint">{t("home.mode.modern", "zh")}</span>}
-            </div>
-            <p className="mt-1.5 text-sm leading-relaxed text-muted">{t("home.mode.modern.desc", lang)}</p>
-            <span className="mt-3 inline-block text-sm text-accent group-hover:underline">{t("home.mode.enter", lang)} →</span>
-          </Link>
-          <Link
-            href="/read"
-            className="group card-hover pressable rounded-2xl border border-line bg-surface p-5"
-          >
-            <div className="flex items-baseline gap-2">
-              <span className="font-serif text-lg font-medium text-fg">{t("home.mode.sage", lang)}</span>
-              {lang !== "zh" && <span className="text-xs text-faint">{t("home.mode.sage", "zh")}</span>}
-            </div>
-            <p className="mt-1.5 text-sm leading-relaxed text-muted">{t("home.mode.sage.desc", lang)}</p>
-            <span className="mt-3 inline-block text-sm text-accent group-hover:underline">{t("home.mode.enter", lang)} →</span>
-          </Link>
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+          {primaryCards.map((c) => (
+            <Link
+              key={c.href}
+              href={c.href}
+              className="group card-hover pressable flex flex-col rounded-2xl border border-line bg-surface p-4"
+            >
+              <span className="seal mb-2 inline-flex h-9 w-9 items-center justify-center rounded-md font-serif text-sm">
+                {c.glyph}
+              </span>
+              <div className="font-serif text-sm font-medium text-fg">{t(c.key, lang)}</div>
+              <p className="mt-1 flex-1 text-xs leading-relaxed text-muted">{t(c.desc, lang)}</p>
+              <span className="mt-2 text-xs text-accent opacity-60 transition group-hover:opacity-100">
+                {t("home.enter", lang)} →
+              </span>
+            </Link>
+          ))}
         </div>
       </Reveal>
 
@@ -307,26 +352,6 @@ export default function Home() {
               className="pressable rounded-full border border-line bg-bg px-3 py-1.5 text-xs leading-relaxed text-muted transition hover:border-accent hover:text-accent"
             >
               {t(k, lang)}
-            </Link>
-          ))}
-        </div>
-      </Reveal>
-
-      {/* 为何了解中国文化 */}
-      <Reveal as="section" delay={160}>
-        <h2 className="mb-3 font-serif text-base font-medium text-fg">{t("home.why.title", lang)}</h2>
-        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-          {whyCards.map((c) => (
-            <Link
-              key={c.key}
-              href={c.href}
-              className="group card-hover pressable rounded-2xl border border-line bg-surface p-4"
-            >
-              <span className="seal mb-2 inline-flex h-8 w-8 items-center justify-center rounded-md font-serif text-sm">
-                {c.glyph}
-              </span>
-              <div className="font-serif text-sm font-medium text-fg">{t(c.key, lang)}</div>
-              <p className="mt-1 text-xs leading-relaxed text-muted">{t(c.desc, lang)}</p>
             </Link>
           ))}
         </div>
@@ -352,9 +377,9 @@ export default function Home() {
         </div>
         <div className="mt-3 flex flex-wrap items-center gap-2 rounded-xl bg-surface-2/50 px-4 py-2.5 text-xs">
           <span className="text-faint">{t("home.need.quick", lang)}:</span>
-          <Link href="/read" className="route-chip">{t("home.need.timeline", lang)}</Link>
-          <Link href="/terms" className="route-chip">{t("home.need.terms", lang)}</Link>
-          <Link href="/read" className="route-chip">{t("home.need.classics", lang)}</Link>
+          <Link href="/read" className="pressable rounded-full bg-bg px-3 py-1 text-muted hover:text-accent">{t("home.need.timeline", lang)}</Link>
+          <Link href="/terms" className="pressable rounded-full bg-bg px-3 py-1 text-muted hover:text-accent">{t("home.need.terms", lang)}</Link>
+          <Link href="/read" className="pressable rounded-full bg-bg px-3 py-1 text-muted hover:text-accent">{t("home.need.classics", lang)}</Link>
         </div>
       </Reveal>
 
@@ -362,7 +387,7 @@ export default function Home() {
       <Reveal as="section" delay={240}>
         <div className="mb-2 flex items-baseline gap-2">
           <h2 className="font-serif text-base font-medium text-fg">{t("home.paths.title", lang)}</h2>
-          <Link href="/paths" className="route-inline-link pressable ms-auto text-xs">
+          <Link href="/paths" className="pressable ms-auto text-xs text-accent hover:underline">
             {t("home.paths.more", lang)} →
           </Link>
           <span className="ornament-rule flex-1">
@@ -370,21 +395,34 @@ export default function Home() {
           </span>
         </div>
         <HorizontalRail>
-          {pathCards.map((p, i) => (
+          {pathCards.map((p) => (
             <CollectionCard
               key={p.titleKey}
-              className="w-[220px] sm:w-[240px]"
-              thumb={<RailThumb tone={p.tone} />}
+              className="w-[220px] sm:w-[240px] self-stretch"
+              thumb={<RailThumb img={p.img} />}
               title={t(p.titleKey, lang)}
               accession={p.acc}
               href="/paths"
             />
           ))}
           <CollectionCard
-            className="w-[150px]"
+            className="w-[220px] sm:w-[240px] self-stretch"
             thumb={
-              <span className="flex h-full w-full items-center justify-center bg-surface-2 font-serif text-sm text-accent">
-                {t("home.cta", lang)} →
+              <span className="flex h-full w-full flex-col items-center justify-center gap-1.5 bg-surface-2/70 text-accent">
+                <svg
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.6"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M5 12h14M13 6l6 6-6 6" />
+                </svg>
+                <span className="font-serif text-xs">{t("home.paths.more", lang)}</span>
               </span>
             }
             title={t("nav.learn", lang)}
@@ -394,8 +432,9 @@ export default function Home() {
         </HorizontalRail>
       </Reveal>
 
-      {/* 继续探索：横向滑轨藏品卡（保留原有金句关联滑轨） */}
-      {quote && topicPassages.length > 0 && (
+      {/* 继续探索：跨议题的馆藏精选。
+          原来首卡又放了一遍当前金句，和下面的大字正文完全重复，已去掉。 */}
+      {railPassages.length > 0 && (
         <Reveal as="section" delay={280}>
           <div className="mb-2 flex items-baseline gap-2">
             <h2 className="font-serif text-base font-medium text-fg">{t("home.rail.title", lang)}</h2>
@@ -404,31 +443,19 @@ export default function Home() {
             </span>
           </div>
           <HorizontalRail>
-            <CollectionCard
-              className="w-[220px] sm:w-[240px]"
-              thumb={<RailThumb tone="cinnabar" />}
-              title={quote.original_text}
-              accession={quote.ref_label ?? quote.id}
-              href="/read"
-            />
-            {topicPassages.map((p, i) => (
+            {railPassages.map((p) => (
               <CollectionCard
                 key={p.id}
-                className="w-[220px] sm:w-[240px]"
-                thumb={<RailThumb tone={railTones[i % railTones.length]} />}
+                className="w-[220px] sm:w-[240px] self-stretch is-clamped"
                 title={p.original_text}
                 accession={p.ref_label ?? p.id}
                 onClick={() => goTo(p.id)}
               />
             ))}
             <CollectionCard
-              className="w-[150px]"
-              thumb={
-                <span className="flex h-full w-full items-center justify-center bg-surface-2 font-serif text-sm text-accent">
-                  {t("home.cta", lang)} →
-                </span>
-              }
+              className="w-[220px] sm:w-[240px] self-stretch"
               title={t("nav.read", lang)}
+              note={t("home.rail.readNote", lang)}
               accession="ALL"
               href="/read"
             />
@@ -605,7 +632,7 @@ export default function Home() {
               ))}
           </div>
           <div className="mt-3 text-xs text-muted">
-            <Link href="/cases" className="route-inline-link pressable text-xs">
+            <Link href="/cases" className="pressable text-accent hover:underline">
               <CountUp value={stats.breakdown[BD_CASES_KEY] ?? 0} />{" "}
               {t("corpus.cases", lang)} →
             </Link>
@@ -613,12 +640,52 @@ export default function Home() {
         </Reveal>
       )}
 
-      {/* 全球议题精选（保留） */}
-      {topics.length > 0 && (
-        <Reveal as="section" delay={400} className="rounded-2xl border border-line bg-surface p-5">
+      {/* 折叠区：收纳与主入口重复或次要的内容，保证首屏只有一条主路径 */}
+      <details className="rounded-2xl border border-line bg-surface [&[open]>summary>svg]:rotate-180">
+        <summary className="flex cursor-pointer list-none items-center gap-2 px-5 py-3 text-sm text-muted transition hover:text-fg">
+          <span>{t("home.more", lang)}</span>
+          <svg
+            width="12"
+            height="12"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="ms-auto transition-transform"
+            aria-hidden="true"
+          >
+            <path d="M6 9l6 6 6-6" />
+          </svg>
+        </summary>
+        <div className="space-y-6 px-5 pb-5">
+          {/* 为何了解中国文化 */}
+          <section>
+            <h2 className="mb-3 font-serif text-base font-medium text-fg">{t("home.why.title", lang)}</h2>
+            <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+              {whyCards.map((c) => (
+                <Link
+                  key={c.key}
+                  href={c.href}
+                  className="group card-hover pressable rounded-2xl border border-line bg-surface-2/40 p-4"
+                >
+                  <span className="seal mb-2 inline-flex h-8 w-8 items-center justify-center rounded-md font-serif text-sm">
+                    {c.glyph}
+                  </span>
+                  <div className="font-serif text-sm font-medium text-fg">{t(c.key, lang)}</div>
+                  <p className="mt-1 text-xs leading-relaxed text-muted">{t(c.desc, lang)}</p>
+                </Link>
+              ))}
+            </div>
+          </section>
+
+          {/* 全球议题精选 */}
+          {topics.length > 0 && (
+            <section>
           <div className="mb-3 flex items-center gap-2">
             <h2 className="font-serif text-sm font-medium text-fg">{t("home.topics", lang)}</h2>
-            <Link href="/cases" className="route-inline-link pressable ms-auto text-xs">
+            <Link href="/cases" className="pressable ms-auto text-xs text-accent hover:underline">
               {t("home.topics.more", lang)} →
             </Link>
           </div>
@@ -671,8 +738,10 @@ export default function Home() {
           ) : (
             <p className="text-xs text-faint">{t("home.topics.empty", lang)}</p>
           )}
-        </Reveal>
-      )}
+            </section>
+          )}
+        </div>
+      </details>
     </div>
   );
 }

@@ -2,7 +2,7 @@
 
 import * as echarts from "echarts";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { getNeighborhood } from "@/lib/api";
+import { getNeighborhood, isAuthError } from "@/lib/api";
 import { t, useLang } from "@/lib/i18n";
 import { Reveal } from "@/lib/motion";
 import type { GraphData, GraphNode } from "@/lib/types";
@@ -109,7 +109,7 @@ export default function GraphPage() {
         setData(normalizeGraph(d));
         setSelected(center);
       })
-      .catch(() => setErr(t("graph.noBackend", lang)));
+      .catch((e) => setErr(isAuthError(e) ? t("common.loginRequired", lang) : t("graph.noBackend", lang)));
   }, [center, depth, lang]);
 
   // ECharts（自包含：每次挂载/数据变更自建自销，StrictMode 安全）

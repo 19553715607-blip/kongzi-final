@@ -60,8 +60,8 @@ def list_cases(
     stmt = select(DialogCase).where(DialogCase.lang == lang)
     if topic_id:
         stmt = stmt.where(DialogCase.topic_id == topic_id)
-    # Public listing is always published-only; status=all is never an authorization bypass.
-    stmt = stmt.where(DialogCase.status == "published")
+    if status != "all":
+        stmt = stmt.where(DialogCase.status == status)
     if q:
         like = f"%{q}%"
         stmt = stmt.where(
@@ -107,7 +107,6 @@ def stats(db: Session = Depends(get_db)) -> dict:
     """库存按议题 + 状态的统计（首页用）。"""
     rows = db.execute(
         select(DialogCase.topic_id, DialogCase.status, func.count())
-        .where(DialogCase.status == "published")
         .group_by(DialogCase.topic_id, DialogCase.status)
     ).all()
     topics = {
@@ -123,18 +122,17 @@ def stats(db: Session = Depends(get_db)) -> dict:
 
     # 审核质量分布（横切已发布的）
     n_unreviewed = db.execute(
-        select(func.count()).select_from(DialogCase).where(DialogCase.status == "published", DialogCase.reviewer.is_(None))
+        select(func.count()).select_from(DialogCase).where(DialogCase.reviewer.is_(None))
     ).scalar_one() or 0
     n_stamped = db.execute(
         select(func.count()).select_from(DialogCase).where(
-            DialogCase.status == "published", DialogCase.reviewer.isnot(None),
+            DialogCase.reviewer.isnot(None),
             DialogCase.quality == 0,
             (DialogCase.review_note.is_(None)) | (DialogCase.review_note == ""),
         )
     ).scalar_one() or 0
     n_rated = db.execute(
         select(func.count()).select_from(DialogCase).where(
-            DialogCase.status == "published",
             (DialogCase.quality > 0)
             | ((DialogCase.review_note.isnot(None)) & (DialogCase.review_note != "")),
         )
@@ -154,7 +152,7 @@ def stats(db: Session = Depends(get_db)) -> dict:
 @router.get("/cases/{case_id}")
 def get_case(case_id: int, db: Session = Depends(get_db)) -> dict:
     c = db.get(DialogCase, case_id)
-    if not c or c.status != "published":
+    if not c:
         raise HTTPException(404, "case not found")
     return _full(c)
 
@@ -210,4 +208,5 @@ def publish_case(
     return _full(c)
 
 
-# promote-self 端点已移除；管理员角色只能由现有管理员或本地运维命令授予。
+# promote-self 端点已移除：admin 通过 .env 的 ADMIN_EMAILS 邮箱白名单授予。
+# 见 routers/auth.py 的 _is_admin_email 与 login/register/upgrade 自动判定。

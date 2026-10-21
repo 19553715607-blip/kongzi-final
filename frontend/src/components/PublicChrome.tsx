@@ -25,7 +25,7 @@ export default function PublicChrome({ children }: { children: React.ReactNode }
   return (
     <>
       {!isKiosk && <Nav />}
-      <main className={isKiosk ? "" : "mx-auto max-w-4xl px-4 py-6 pb-20 lg:pb-6"}>
+      <main className={isKiosk ? "" : "mx-auto max-w-4xl px-4 py-6 pb-20 md:pb-6"}>
         {!isKiosk && <Breadcrumb />}
         {children}
       </main>

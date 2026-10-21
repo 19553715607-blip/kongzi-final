@@ -11,6 +11,7 @@ import {
   getPassageNeighbors,
   getPassages,
   getRelatedPassages,
+  isAuthError,
 } from "@/lib/api";
 import { copyText } from "@/lib/ui";
 import { toast } from "@/components/Toast";
@@ -77,7 +78,7 @@ export default function ReadPage() {
         setBooks(bs);
         if (bs[0]) setBookId(bs[0].id);
       })
-      .catch(() => setErr(t("read.noBackend", lang)));
+      .catch((e) => setErr(isAuthError(e) ? t("common.loginRequired", lang) : t("read.noBackend", lang)));
   }, [lang]);
 
   useEffect(() => {
@@ -479,10 +480,7 @@ export default function ReadPage() {
             </div>
           ) : related.length > 0 ? (
             <HorizontalRail>
-              {related.map((r, i) => {
-                const rtr =
-                  r.translations.find((x) => x.lang === lang) ??
-                  r.translations.find((x) => x.lang === "zh");
+              {related.map((r) => {
                 return (
                   <CollectionCard
                     key={r.id}

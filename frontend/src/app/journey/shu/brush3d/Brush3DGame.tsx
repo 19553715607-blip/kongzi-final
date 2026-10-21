@@ -37,7 +37,7 @@ import { createBrushRefs, BrushScene, type BrushRefs } from "./brushScene";
 import * as sfx from "./brushAudio";
 import { useLang, getLang } from "@/lib/i18n";
 import { gt } from "@/lib/gameDict";
-import { Reveal, CountUp, Pressable } from "@/lib/motion";
+import { Reveal, CountUp } from "@/lib/motion";
 import { TactileButton, ProvenanceCaption } from "@/components/museum";
 
 type Phase = "idle" | "loading" | "writing" | "submitting" | "scored";
@@ -88,7 +88,7 @@ export default function Brush3DGame() {
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const loadAll = useCallback(() => {
-    getShuToday().then(setToday).catch(() => setLoadErr(gt("无法加载书艺字卡 — 请先登录", getLang())));
+    getShuToday().then(setToday).catch(() => setLoadErr(gt("无法加载书艺字卡，请稍后重试", getLang())));
     getShuProgress().then(setProgress).catch(() => {});
   }, []);
   useEffect(() => { loadAll(); }, [loadAll]);
@@ -221,7 +221,7 @@ export default function Brush3DGame() {
           <div className="flex flex-wrap items-center gap-2 text-xs text-muted">
             {progress && <Stat label={gt("称号", lang)} value={progress.title} />}
             {progress && <Stat label={gt("书艺", lang)} value={`${progress.liuyi_shu}`} numeric />}
-            <Link href="/journey/shu" className="route-link">
+            <Link href="/journey/shu" className="rounded-full border border-line px-3 py-1.5 text-xs text-muted hover:bg-surface-2">
               {gt("← 书艺", lang)}
             </Link>
           </div>

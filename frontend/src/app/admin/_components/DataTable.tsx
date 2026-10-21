@@ -1,7 +1,7 @@
 "use client";
 
 import { ReactNode, useMemo, useState } from "react";
-import { t, useLang, type Lang } from "@/lib/i18n";
+import { t, useLang } from "@/lib/i18n";
 
 // ── 统一管理数据表格：可排序表头 / 行 hover / 批量选择 / 骨架 / 空态 / 分页 ──
 // 泛型化，可复用到 users/games/cases/institutions 等页。

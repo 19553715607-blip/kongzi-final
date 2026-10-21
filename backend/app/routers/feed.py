@@ -7,7 +7,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 
 from ..db import get_db
-from ..models import Book, Chapter, Passage
+from ..models import Passage
 
 router = APIRouter(prefix="/api/v1", tags=["feed"])
 
@@ -40,11 +40,6 @@ def feed(
     passages = (
         db.execute(
             select(Passage)
-            .where(
-                Passage.is_published.is_(True),
-                Passage.chapter.has(Chapter.is_published.is_(True)),
-                Passage.chapter.has(Chapter.book.has(Book.is_published.is_(True))),
-            )
             .options(selectinload(Passage.translations), selectinload(Passage.chapter))
             .order_by(Passage.sort_order)
         )

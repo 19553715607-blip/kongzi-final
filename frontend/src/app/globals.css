@@ -6,29 +6,33 @@
 /* 主语言 = The Met 馆藏美学：米白纸感 + 墨色 + 衬线标题；强调沿用品牌朱砂 */
 :root {
   color-scheme: light;
-  --paper: #FBFAF7;
-  --bg: #FBFAF7;
+  --paper: #F8F9FC;
+  --bg: #F8F9FC;
   --surface: #FFFFFF;
-  --surface-2: #F5F1E8;
-  --ink: #141414;
-  --fg: #141414;
-  --muted: #5A5750;
-  --faint: #8A8781;
-  --line: #E3E1DA;
+  --surface-2: #EEF1F8;
+  --ink: #141821;
+  --fg: #141821;
+  --muted: #4E5566;
+  --faint: #858C9B;
+  --line: #DDE2EC;
 
-  --accent: #993C1D;
-  --accent-bright: #B84A24;
-  --accent-soft: #FAECE7;
-  --accent-ink: #4A1B0C;
-  --accent-deep: #6E2A12;
+  --accent: #35608F;
+  --accent-bright: #4A74AB;
+  --accent-soft: #E7EDF8;
+  --accent-ink: #1A2C48;
+  --accent-deep: #24406B;
 
-  --cel: #0F6E56;
-  --cel-soft: #E1F5EE;
-  --cel-ink: #04342C;
-  --cel-deep: #0A4A3A;
+  /* 印章渐变：单独成对变量，换色调时与 --accent 一起调，避免印章固守朱砂 */
+  --seal-a: #35608F;
+  --seal-b: #24406B;
 
-  --gold: #C9A227;
-  --gold-deep: #9E7A1C;
+  --cel: #2F6F62;
+  --cel-soft: #E1F1EC;
+  --cel-ink: #0B332B;
+  --cel-deep: #1E5044;
+
+  --gold: #B8892E;
+  --gold-deep: #8A6420;
 
   --radius-sm: 6px;
   --radius: 10px;
@@ -40,28 +44,31 @@
 
 .dark {
   color-scheme: dark;
-  --paper: #141210;
-  --bg: #141210;
-  --surface: #1C1916;
-  --surface-2: #26221C;
-  --ink: #ECE6DA;
-  --fg: #ECE6DA;
-  --muted: #B6AE9D;
-  --faint: #8C8475;
+  --paper: #0E1118;
+  --bg: #0E1118;
+  --surface: #161A23;
+  --surface-2: #1E232E;
+  --ink: #E4E8F0;
+  --fg: #E4E8F0;
+  --muted: #A5AEBE;
+  --faint: #7B8494;
   --line: rgba(255, 255, 255, 0.12);
 
-  --accent: #D2724F;
-  --accent-bright: #E08A63;
-  --accent-soft: #3A201A;
-  --accent-ink: #F1C8B7;
-  --accent-deep: #8A3E22;
+  --accent: #6E9BD6;
+  --accent-bright: #8AB2E4;
+  --accent-soft: #182A42;
+  --accent-ink: #BBD4F0;
+  --accent-deep: #3A5F8C;
+
+  --seal-a: #35608F;
+  --seal-b: #24406B;
 
   --cel: #5DCAA5;
   --cel-soft: #15302A;
   --cel-ink: #9FE0C9;
   --cel-deep: #2E7A5E;
 
-  --gold: #E3B94C;
+  --gold: #E3C060;
   --gold-deep: #A8842A;
 
   --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 14px rgba(0, 0, 0, 0.35);
@@ -81,10 +88,10 @@ html, body {
 
 ::selection { background: var(--accent); color: #fff; }
 
-/* 印章式徽标（品牌常量，不随主题变） */
+/* 印章式徽标（品牌常量：颜色由 --seal-a/--seal-b 控制，随色调统一调整） */
 .seal {
   font-family: "Songti SC", "STSong", serif;
-  background: linear-gradient(135deg, #A8451F 0%, #7E2F13 100%);
+  background: linear-gradient(135deg, var(--seal-a) 0%, var(--seal-b) 100%);
   color: #FAECE7;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 1px 3px rgba(74, 27, 12, 0.35);
 }
@@ -140,103 +147,6 @@ html, body {
 @media (prefers-reduced-motion: reduce) {
   .nav-drop { animation: none; }
 }
-
-/* 公共导航：分层清楚、触控尺寸充足，当前页面始终可辨。 */
-.nav-primary-link {
-  display: inline-flex;
-  min-height: 40px;
-  align-items: center;
-  white-space: nowrap;
-  border-radius: 999px;
-  padding: 0 12px;
-  color: var(--muted);
-  font-size: 13px;
-  font-weight: 500;
-  transition: color 0.18s ease, background-color 0.18s ease;
-}
-.nav-primary-link:hover { color: var(--fg); background: var(--surface-2); }
-.nav-primary-link.is-active { color: var(--accent); background: var(--accent-soft); }
-.mobile-tab {
-  position: relative;
-  display: flex;
-  min-width: 0;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 3px;
-  color: var(--faint);
-  font-size: 10px;
-  font-weight: 500;
-  line-height: 1;
-  -webkit-tap-highlight-color: transparent;
-}
-.mobile-tab::before {
-  position: absolute;
-  inset: 0 12px auto;
-  height: 2px;
-  border-radius: 0 0 2px 2px;
-  background: transparent;
-  content: "";
-}
-.mobile-tab.is-active { color: var(--accent); }
-.mobile-tab.is-active::before { background: var(--accent); }
-.nav-drawer { overscroll-behavior: contain; }
-.nav-drawer-link {
-  display: flex;
-  min-height: 48px;
-  align-items: center;
-  gap: 10px;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: var(--bg);
-  padding: 0 13px;
-  color: var(--fg);
-  font-size: 13px;
-  font-weight: 500;
-  transition: border-color 0.18s ease, background-color 0.18s ease, color 0.18s ease;
-}
-.nav-drawer-link:hover { border-color: color-mix(in srgb, var(--accent) 30%, var(--line)); background: var(--surface-2); }
-.nav-drawer-link.is-active { border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); background: var(--accent-soft); color: var(--accent); }
-.nav-drawer-account-link {
-  display: flex;
-  min-height: 42px;
-  align-items: center;
-  justify-content: space-between;
-  color: var(--muted);
-  font-size: 13px;
-}
-.nav-drawer-account-link:hover { color: var(--accent); }
-.route-link {
-  display: inline-flex;
-  min-height: 40px;
-  align-items: center;
-  gap: 6px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  background: var(--surface);
-  padding: 0 14px;
-  color: var(--muted);
-  font-size: 12px;
-  font-weight: 500;
-  transition: border-color 0.18s ease, color 0.18s ease, background-color 0.18s ease, transform 0.12s ease;
-}
-.route-link:hover { border-color: color-mix(in srgb, var(--accent) 38%, var(--line)); background: var(--accent-soft); color: var(--accent); }
-.route-link:active { transform: scale(0.98); }
-.route-chip {
-  display: inline-flex;
-  min-height: 36px;
-  align-items: center;
-  border: 1px solid transparent;
-  border-radius: 999px;
-  background: var(--bg);
-  padding: 0 12px;
-  color: var(--muted);
-  transition: border-color 0.18s ease, color 0.18s ease, background-color 0.18s ease;
-}
-.route-chip:hover { border-color: var(--line); color: var(--accent); }
-.route-inline-link { display: inline-flex; min-height: 36px; align-items: center; color: var(--accent); }
-.route-inline-link:hover { text-decoration: underline; text-underline-offset: 3px; }
-.mobile-tabbar { padding-bottom: env(safe-area-inset-bottom); height: calc(4.25rem + env(safe-area-inset-bottom)); }
 
 /* 礼游戏：解锁动效（金光闪一下 + 上滑） */
 @keyframes unlock {
@@ -421,15 +331,22 @@ button.retry-btn:hover { filter: brightness(1.06); }
 
 /* 馆藏卡：固定 ACC. 式编号行 */
 .collection-card {
-  display: block; background: var(--surface); border: 1px solid var(--line);
+  display: flex; flex-direction: column;
+  background: var(--surface); border: 1px solid var(--line);
   border-radius: var(--radius-sm); overflow: hidden;
   transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
 }
 .collection-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-card-hover); border-color: color-mix(in srgb, var(--accent) 30%, var(--line)); }
-.collection-card .cc-thumb { aspect-ratio: 4/3; background: var(--surface-2); display: block; }
-.collection-card .cc-body { padding: 10px 12px 12px; }
+.collection-card .cc-thumb { aspect-ratio: 4/3; background: var(--surface-2); display: block; flex: none; }
+.collection-card .cc-body { padding: 10px 12px 12px; flex: 1; }
 .collection-card .cc-title { font-family: Georgia, "Songti SC", serif; font-size: 13.5px; font-weight: 600; line-height: 1.4; color: var(--fg); display: block; }
 .collection-card .cc-acc { font-family: ui-monospace, Menlo, monospace; font-size: 10.5px; color: var(--faint); margin-top: 4px; display: block; letter-spacing: 0.04em; }
+.collection-card .cc-note { display: block; margin-top: 5px; font-size: 11.5px; line-height: 1.55; color: var(--muted); }
+/* 预览型卡片：标题限 4 行。经文长短差异极大，不限行的话一条长文会把整条横轨撑高 */
+.collection-card.is-clamped .cc-title {
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4;
+  line-clamp: 4; overflow: hidden;
+}
 
 /* 时间轴：节点即事件，可点击展开 */
 .timeline { position: relative; padding: 8px 0; }
@@ -496,11 +413,20 @@ button.retry-btn:hover { filter: brightness(1.06); }
 /* 横向滑轨（可拖拽/横滑，scroll-snap） */
 .h-rail {
   display: flex; gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory;
+  align-items: stretch;
   padding: 4px 4px 16px; scrollbar-width: thin;
 }
-.h-rail > * { scroll-snap-align: start; flex: 0 0 auto; }
+.h-rail > * { scroll-snap-align: start; flex: 0 0 auto; align-self: stretch; }
 .h-rail::-webkit-scrollbar { height: 4px; }
 .h-rail::-webkit-scrollbar-thumb { background: var(--line); border-radius: 2px; }
+/* 横轨两侧渐隐：只在「这个方向还有内容没露出来」时出现，提示可以横滑 */
+.rail-fade {
+  position: absolute; top: 0; bottom: 16px; width: 56px;
+  pointer-events: none; opacity: 0; transition: opacity 0.22s ease;
+}
+.rail-fade.is-on { opacity: 1; }
+.rail-fade-l { left: 0; background: linear-gradient(to right, var(--bg) 14%, transparent); }
+.rail-fade-r { right: 0; background: linear-gradient(to left, var(--bg) 14%, transparent); }
 
 /* 六艺路径节点（已通/当前呼吸/未解锁三态） */
 .game-path { display: flex; align-items: center; padding: 18px 4px; }
@@ -714,38 +640,35 @@ body::after {
 @media (prefers-reduced-motion: reduce) {
   body::after { animation: none !important; }
 }
-/* ── Feed 双击点赞：红心爆裂 + 粒子（TikTok 手感，纯 CSS）────────────── */
-.feed-burst {
+/* ── Feed 双击点赞：朱砂印章「赞」（替代红心粒子，水墨纸感）────────────── */
+.like-stamp {
   position: absolute; inset: 0; display: grid; place-items: center;
   pointer-events: none; z-index: 5;
 }
-.feed-burst .burst-heart {
-  font-size: 84px; line-height: 1; filter: drop-shadow(0 6px 18px rgba(255,60,80,0.45));
-  animation: burst-heart-pop 0.62s cubic-bezier(0.22, 1, 0.36, 1) both;
+.like-stamp .stamp-seal {
+  display: grid; place-items: center;
+  width: 92px; height: 92px; border-radius: 14px;
+  font-family: "Songti SC", "STSong", serif; font-size: 40px; font-weight: 700;
+  color: #FAECE7; background: linear-gradient(135deg, var(--seal-a) 0%, var(--seal-b) 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 6px 24px rgba(74, 27, 12, 0.35);
+  animation: stamp-in 0.72s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
-.feed-burst .burst-dot {
-  position: absolute; width: 10px; height: 10px; border-radius: 999px;
-  background: #ff4d6d; opacity: 0.9;
-  animation: burst-dot-fly 0.7s ease-out both;
+.like-stamp .stamp-ring {
+  position: absolute; width: 92px; height: 92px; border-radius: 16px;
+  border: 2px solid color-mix(in srgb, var(--accent) 60%, transparent);
+  animation: stamp-ring 0.72s ease-out both;
 }
-@keyframes burst-heart-pop {
-  0%   { transform: scale(0) rotate(-12deg); opacity: 0; }
-  35%  { transform: scale(1.18) rotate(4deg); opacity: 1; }
-  60%  { transform: scale(1) rotate(0deg); opacity: 1; }
-  100% { transform: scale(1.25) rotate(0deg); opacity: 0; }
+@keyframes stamp-in {
+  0%   { transform: scale(1.7) rotate(-8deg); opacity: 0; }
+  22%  { transform: scale(1.02) rotate(-3deg); opacity: 1; }
+  34%  { transform: scale(0.98) rotate(-2deg); }
+  100% { transform: scale(1.06) rotate(-2deg); opacity: 0; }
 }
-@keyframes burst-dot-fly {
-  0%   { transform: translate(0, 0) scale(1); opacity: 0.95; }
-  100% { transform: translate(var(--dx, 0), var(--dy, -40px)) scale(0.2); opacity: 0; }
-}
-/* 点赞红心点击回弹 */
-.feed-like-btn.liked .like-glyph { animation: like-pop 0.32s cubic-bezier(0.22, 1, 0.36, 1); }
-@keyframes like-pop {
-  0% { transform: scale(1); } 45% { transform: scale(1.35); } 100% { transform: scale(1); }
+@keyframes stamp-ring {
+  0%   { transform: scale(0.6); opacity: 0.9; }
+  100% { transform: scale(2.1); opacity: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .feed-burst .burst-heart, .feed-burst .burst-dot, .feed-like-btn.liked .like-glyph {
-    animation: none !important;
-  }
-  .feed-burst .burst-heart { transform: scale(1); opacity: 0; }
+  .like-stamp .stamp-seal, .like-stamp .stamp-ring { animation: none !important; }
+  .like-stamp .stamp-seal { opacity: 0; }
 }

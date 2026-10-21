@@ -1,17 +1,19 @@
 "use client";
 
-import { getApiBase } from "@/lib/apiBase";
+import { useApiBase } from "@/lib/useApiBase";
 
 import { useState } from "react";
 import { applyForApi, getDeveloperMe } from "@/lib/api";
 import { t, useLang } from "@/lib/i18n";
 import { Reveal, CountUp } from "@/lib/motion";
-import { TactileButton } from "@/components/museum";
+import { CollectionCard, TactileButton } from "@/components/museum";
 import type { DeveloperMe } from "@/lib/types";
 
 
 export default function DevelopersPage() {
   const [lang] = useLang();
+  // 文档里的示例代码要绝对地址，且 SSR 与客户端必须一致（否则 hydration 报错）
+  const apiBase = useApiBase();
   const [form, setForm] = useState({ name: "", country: "", contact_email: "", purpose: "" });
   const [apiKey, setApiKey] = useState<string | null>(null);
   const [msg, setMsg] = useState("");
@@ -189,14 +191,14 @@ export default function DevelopersPage() {
         <div className="space-y-3">
           {/* i18n-scan-ignore-start —— 下面是 API 调用示例，示例查询词保持中文（演示检索中文经典）*/}
           <CodeBlock title="curl" code={`curl -H "X-API-Key: $KEY" \\
-  "${getApiBase()}/api/v1/public/search?q=克己复礼&lang=en"`} />
-          <CodeBlock title="JavaScript (fetch)" code={`const r = await fetch("${getApiBase()}/api/v1/public/cases?topic_id=climate", {
+  "${apiBase}/api/v1/public/search?q=克己复礼&lang=en"`} />
+          <CodeBlock title="JavaScript (fetch)" code={`const r = await fetch("${apiBase}/api/v1/public/cases?topic_id=climate", {
   headers: { "X-API-Key": process.env.KONGZI_KEY }
 });
 const data = await r.json();`} />
           <CodeBlock title="Python (requests)" code={`import requests
 r = requests.get(
-    "${getApiBase()}/api/v1/public/topics",
+    "${apiBase}/api/v1/public/topics",
     headers={"X-API-Key": os.environ["KONGZI_KEY"]},
 )
 topics = r.json()`} />
@@ -209,7 +211,7 @@ topics = r.json()`} />
         <div className="mb-3 flex items-center justify-between">
           <div className="text-sm font-medium text-fg">{t("dev.openEndpoints", lang)}</div>
           <a
-            href={`${getApiBase()}/docs`}
+            href={`${apiBase}/docs`}
             target="_blank"
             rel="noreferrer"
             className="text-xs text-accent hover:underline"
@@ -227,7 +229,7 @@ topics = r.json()`} />
             ["GET", "/public/cases", t("dev.ep.cases", lang)],
             ["GET", "/public/corpus/stats", t("dev.ep.corpus", lang)],
           ].map(([m, ep, d], i) => {
-            const fullUrl = `${getApiBase()}/api/v1${ep}`;
+            const fullUrl = `${apiBase}/api/v1${ep}`;
             return (
               <Reveal key={ep} delay={i * 60}>
                 <div className="overflow-hidden rounded-xl border border-line bg-surface-2/30 transition hover:border-accent/40">
@@ -265,6 +267,22 @@ topics = r.json()`} />
         </div>
       </Reveal>
 
+      {/* 覆盖范围入口 → /reach（About 区链接） */}
+      <Reveal as="section" delay={300} className="rounded-2xl border border-line bg-surface p-5">
+        <div className="mb-3 text-sm font-medium text-fg">{t("developers.reachEntry.title", lang)}</div>
+        <p className="mb-3 text-xs leading-relaxed text-muted">{t("developers.reachEntry.sub", lang)}</p>
+        <CollectionCard
+          className="h-full text-start"
+          href="/reach"
+          title={t("nav.reach", lang)}
+          accession="/reach"
+          thumb={
+            <span className="flex h-full items-center justify-center font-serif text-base tracking-[0.25em] text-accent">
+              AR
+            </span>
+          }
+        />
+      </Reveal>
     </div>
   );
 }

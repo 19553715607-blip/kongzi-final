@@ -17,7 +17,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 
 from ..config import get_settings
-from ..models import Book, Chapter, Concept, Passage
+from ..models import Concept, Passage
 
 settings = get_settings()
 
@@ -165,11 +165,7 @@ def _terms(text: str) -> List[str]:
 def _passage_map(db: Session) -> Dict[str, Passage]:
     rows = (
         db.execute(
-            select(Passage).where(
-                Passage.is_published.is_(True),
-                Passage.chapter.has(Chapter.is_published.is_(True)),
-                Passage.chapter.has(Chapter.book.has(Book.is_published.is_(True))),
-            ).options(
+            select(Passage).options(
                 selectinload(Passage.translations), selectinload(Passage.chapter)
             )
         )
