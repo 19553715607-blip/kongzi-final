@@ -128,6 +128,13 @@ const DICT: Dict = {
     es: "Servicio backend no disponible. Inténtalo de nuevo en un momento.",
     ar: "خدمة الخادم غير متاحة حاليًا. أعد المحاولة بعد قليل.",
   },
+  "read.refNotFound": {
+    zh: "未找到该条经文，已为你打开默认篇章。",
+    en: "That passage could not be found; the default chapter is shown.",
+    fr: "Ce passage est introuvable ; le chapitre par défaut est affiché.",
+    es: "No se encontró ese pasaje; se muestra el capítulo por defecto.",
+    ar: "لم يُعثر على هذا النص؛ عُرض الفصل الافتراضي.",
+  },
   "read.saved": {
     zh: "★ 已收藏", en: "★ Saved", fr: "★ Enregistré",
     es: "★ Guardado", ar: "★ محفوظ",

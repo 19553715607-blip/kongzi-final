@@ -236,10 +236,14 @@ export default function LiDilemma() {
                         {gt("经典依据")}
                       </div>
                       {chosen.refs.map((r) => (
-                        <div key={r.ref_id} className="text-[11px] leading-relaxed">
+                        <Link
+                          key={r.ref_id}
+                          href={`/read?ref=${encodeURIComponent(r.ref_id)}`}
+                          className="block rounded text-[11px] leading-relaxed transition hover:bg-surface hover:underline"
+                        >
                           <span className="text-accent">{r.ref_label}</span>
                           <span className="ms-1 text-muted">{r.text}</span>
-                        </div>
+                        </Link>
                       ))}
                     </div>
                   )}

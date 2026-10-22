@@ -37,6 +37,8 @@ def _to_passage_out(p: Passage, lang: str) -> PassageOut:
     return PassageOut(
         id=p.id,
         ref_label=localize_ref_label(p.ref_label, lang),
+        chapter_id=p.chapter_id,
+        book_id=(p.chapter.book_id if p.chapter else None),
         original_text=p.original_text,
         pinyin=p.pinyin,
         concepts=list(p.concepts or []),

@@ -22,6 +22,9 @@ class AnnotationOut(BaseModel):
 class PassageOut(BaseModel):
     id: str
     ref_label: Optional[str]
+    # 定位字段：供 /read?ref=xxx 深链跳转（前端据此定位到书 → 篇 → 句）
+    chapter_id: Optional[str] = None
+    book_id: Optional[str] = None
     original_text: str
     pinyin: Optional[str]
     concepts: List[str] = []

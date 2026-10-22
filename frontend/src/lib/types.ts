@@ -35,6 +35,9 @@ export interface Annotation {
 export interface Passage {
   id: string;
   ref_label: string | null;
+  /** 定位字段：供 /read?ref=xxx 深链跳转 */
+  chapter_id?: string | null;
+  book_id?: string | null;
   original_text: string;
   pinyin: string | null;
   concepts: string[];

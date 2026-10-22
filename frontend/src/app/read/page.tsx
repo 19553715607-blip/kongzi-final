@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import {
   addFavorite,
   getBooks,
@@ -30,7 +31,9 @@ const FONT_SCALE_MIN = 0.85;
 const FONT_SCALE_MAX = 1.4;
 const FONT_STEP = 0.1;
 
-export default function ReadPage() {
+function ReadContent() {
+  const params = useSearchParams();
+  const refParam = params.get("ref");
   const [books, setBooks] = useState<Book[]>([]);
   const [bookId, setBookId] = useState("");
   const [chapters, setChapters] = useState<Chapter[]>([]);
@@ -72,30 +75,95 @@ export default function ReadPage() {
     return c.i18n?.[lang] || c.zh;
   };
 
+  // ── 深链：/read?ref=lunyu.yanyuan.12.1 ──────────────────────────────
+  // 先解析出该条所属「书 → 篇 → 句」，再让下面三个 effect 优先采用它；
+  // 只应用一次（appliedRef），之后用户手动切换篇章不再被拉回。
+  const [refTarget, setRefTarget] = useState<{
+    book_id: string;
+    chapter_id: string;
+    id: string;
+  } | null>(null);
+  const appliedRef = useRef(false);
+
   useEffect(() => {
+    if (!refParam) return;
+    let alive = true;
+    getPassage(refParam, lang)
+      .then((p) => {
+        if (!alive) return;
+        if (!p.chapter_id && !p.book_id) {
+          toast(t("read.refNotFound", lang));
+          return;
+        }
+        setRefTarget({
+          book_id: p.book_id ?? "",
+          chapter_id: p.chapter_id ?? "",
+          id: p.id,
+        });
+      })
+      .catch(() => {
+        if (alive) toast(t("read.refNotFound", lang));
+      });
+    return () => {
+      alive = false;
+    };
+    // lang 变化时重新解析，保证译文层跟着切
+  }, [refParam, lang]);
+
+  // 三个列表请求都带 alive 守卫：深链解析会触发一轮重取，
+  // 旧请求若晚到，不能覆盖已经定位到的新篇章/新句子。
+  useEffect(() => {
+    let alive = true;
     getBooks(lang)
       .then((bs) => {
+        if (!alive) return;
         setBooks(bs);
-        if (bs[0]) setBookId(bs[0].id);
+        const preferred = refTarget?.book_id || bs[0]?.id;
+        if (preferred) setBookId(preferred);
       })
-      .catch((e) => setErr(isAuthError(e) ? t("common.loginRequired", lang) : t("read.noBackend", lang)));
-  }, [lang]);
+      .catch((e) => {
+        if (alive) setErr(isAuthError(e) ? t("common.loginRequired", lang) : t("read.noBackend", lang));
+      });
+    return () => {
+      alive = false;
+    };
+  }, [lang, refTarget]);
 
   useEffect(() => {
     if (!bookId) return;
+    let alive = true;
     getChapters(bookId, lang).then((cs) => {
+      if (!alive) return;
       setChapters(cs);
-      if (cs[0]) setChapterId(cs[0].id);
+      const preferred = refTarget?.chapter_id || cs[0]?.id;
+      if (preferred) setChapterId(preferred);
     });
-  }, [bookId, lang]);
+    return () => {
+      alive = false;
+    };
+  }, [bookId, lang, refTarget]);
 
   useEffect(() => {
     if (!chapterId) return;
+    let alive = true;
     getPassages(chapterId, lang).then((ps) => {
+      if (!alive) return;
       setPassages(ps);
-      if (ps[0]) setActiveId(ps[0].id);
+      const hit =
+        !appliedRef.current && refTarget?.id && ps.some((x) => x.id === refTarget.id)
+          ? refTarget.id
+          : null;
+      if (hit) {
+        setActiveId(hit);
+        appliedRef.current = true;
+      } else if (ps[0]) {
+        setActiveId(ps[0].id);
+      }
     });
-  }, [chapterId, lang]);
+    return () => {
+      alive = false;
+    };
+  }, [chapterId, lang, refTarget]);
 
   useEffect(() => {
     if (!activeId) return;
@@ -503,5 +571,14 @@ export default function ReadPage() {
         </Reveal>
       </section>
     </div>
+  );
+}
+
+/** useSearchParams 需要 Suspense 边界，故把内容组件包一层。 */
+export default function ReadPage() {
+  return (
+    <Suspense fallback={<div className="mx-auto max-w-5xl px-4 py-10 text-sm text-faint">…</div>}>
+      <ReadContent />
+    </Suspense>
   );
 }
