@@ -16,6 +16,7 @@ import type { LiHostRoundDetail } from "./liHostData";
 import { geomTotal } from "./liHostLogic";
 import { t, useLang } from "@/lib/i18n";
 import { gt, useGT } from "@/lib/gameDict";
+import LiDilemma from "./LiDilemma";
 
 function LiLoading() {
   const g = useGT();
@@ -266,6 +267,9 @@ function HubView({
           })}
         </div>
       </section>
+
+      {/* 日常情境抉择：li_scenarios 内容层的入口（此前无任何页面取用） */}
+      <LiDilemma />
 
       {/* 排行 */}
       {board && board.items.length > 0 && (
