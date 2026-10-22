@@ -73,9 +73,9 @@ export default function ShuWritePage() {
 
   // 启动
   useEffect(() => {
-    getShuToday().then((d) => setCards(d.cards)).catch(() => setErr(gt("无法加载题库", getLang())));
+    getShuToday(lang).then((d) => setCards(d.cards)).catch(() => setErr(gt("无法加载题库", getLang())));
     getShuProgress().then(setProgress).catch(() => {});
-  }, []);
+  }, [lang]);
 
   const current = cards[idx];
 

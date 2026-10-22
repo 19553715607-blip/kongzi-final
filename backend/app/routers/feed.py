@@ -7,6 +7,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 
 from ..db import get_db
+from ..services.i18n import localize_ref_label
 from ..models import Passage
 
 router = APIRouter(prefix="/api/v1", tags=["feed"])
@@ -57,7 +58,7 @@ def feed(
         items.append(
             {
                 "ref_id": p.id,
-                "ref_label": p.ref_label,
+                "ref_label": localize_ref_label(p.ref_label, lang),
                 "book": p.chapter.book_id if p.chapter else "",
                 "original_text": p.original_text,
                 "translation": trans,

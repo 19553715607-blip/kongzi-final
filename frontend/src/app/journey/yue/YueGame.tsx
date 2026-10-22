@@ -15,6 +15,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { useGT } from "@/lib/gameDict";
+import { useLang } from "@/lib/i18n";
 import { Reveal, CountUp, Pressable } from "@/lib/motion";
 import { TactileButton, ProvenanceCaption } from "@/components/museum";
 import { getYueProgress, getYueToday, playYueScenario, errorHint } from "@/lib/api";
@@ -70,6 +71,7 @@ const KEY_NOTE: Record<string, YueNote> = {
 
 export default function YueGame() {
   const tr = useGT();
+  const [lang] = useLang();
   const [today, setToday] = useState<YueTodayResp | null>(null);
   const [progress, setProgress] = useState<YueProgressResp | null>(null);
   const [loadErr, setLoadErr] = useState("");
@@ -90,9 +92,9 @@ export default function YueGame() {
   const playTimer = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const loadAll = useCallback(() => {
-    getYueToday().then(setToday).catch((e) => setLoadErr(tr("无法加载乐艺题库，请稍后重试") + `（${errorHint(e)}）`));
+    getYueToday(lang).then(setToday).catch((e) => setLoadErr(tr("无法加载乐艺题库，请稍后重试") + `（${errorHint(e)}）`));
     getYueProgress().then(setProgress).catch(() => {});
-  }, []);
+  }, [lang]);
   useEffect(() => { loadAll(); }, [loadAll]);
 
   const tick = useCallback(() => setSeqTick((t) => t + 1), []);
@@ -206,18 +208,18 @@ export default function YueGame() {
     sfx.submitBell();
     setPhase("submitting");
     try {
-      const res = await playYueScenario(current.id, finalizeSequence(refs.engine) as YueNote[]);
+      const res = await playYueScenario(current.id, finalizeSequence(refs.engine) as YueNote[], lang);
       setResult(res);
       sfx.finish(res.score);
       setPhase("scored");
       getYueProgress().then(setProgress).catch(() => {});
-      getYueToday().then(setToday).catch(() => {});
+      getYueToday(lang).then(setToday).catch(() => {});
     } catch {
       say(tr("提交失败 — 请检查登录/网络"), false);
       setPhase("playing");
       refs.running = true;
     }
-  }, [current, refs, say]);
+  }, [current, refs, say, lang]);
   submitRef.current = submit;
 
   // ── 调试钩子（CDP 测试用） ──

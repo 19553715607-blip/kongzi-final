@@ -61,7 +61,7 @@ MATH_PASSAGES = [
             "en": "Suppose grain is to be transported equitably: County A has 10,000 households, 8 days journey; County B has 9,500 households, 10 days; County C has 12,350 households, 13 days; County D has 12,200 households, 20 days. Four counties together must transport 250,000 hu.",
             "fr": "Soit le transport équitable de grain : comté A, 10 000 foyers, 8 jours de route ; B, 9 500 foyers, 10 jours ; C, 12 350 foyers, 13 jours ; D, 12 200 foyers, 20 jours. Les quatre comtés ensemble transportent 250 000 hu.",
             "es": "Supongamos transporte equitativo de grano: condado A, 10 000 hogares, 8 días de viaje; B, 9 500 hogares, 10 días; C, 12 350 hogares, 13 días; D, 12 200 hogares, 20 días. Los cuatro condados transportan 250 000 hu en total.",
-            "ar": "ولنفرض نقلاً عادلاً للحبوب: مقاطعة (أ) عشرة آلاف بيت ومسافة ثمانية أيام؛ (ب) تسعة آلاف وخمسمائة بيت وعشرة أيام؛ (ج) اثنا عشر ألفاً وثلاثمائة وخمسون بيتاً وثلاثة عشر يوماً؛ (د) اثنا عشر ألفاً ومئتا بيت وعشرون يوماً. والمقاطعات الأربع تنقل مجتمعةً خمساً وعشرين ألفِ مائة هو.",
+            "ar": "ولنفرض نقلاً عادلاً للحبوب: مقاطعة (أ) عشرة آلاف بيت ومسافة ثمانية أيام؛ (ب) تسعة آلاف وخمسمائة بيت وعشرة أيام؛ (ج) اثنا عشر ألفاً وثلاثمائة وخمسون بيتاً وثلاثة عشر يوماً؛ (د) اثنا عشر ألفاً ومئتا بيت وعشرون يوماً. والمقاطعات الأربع تنقل مجتمعةً مئتين وخمسين ألفًا من الهو.",
         },
         "anno_classical": ("刘徽注", "均输者，齐其劳费之差也。"),
         "anno_modern": "中国最早的运筹学问题：四县按户数与路程公平分摊运粮负担。算法核心是按「户数 ÷ 路程」反比配权——路远的少分摊。",

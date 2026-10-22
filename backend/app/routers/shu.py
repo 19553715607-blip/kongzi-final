@@ -17,6 +17,7 @@ from sqlalchemy.orm.attributes import flag_modified
 from ..db import get_db
 from ..models import Passage, ShuAnswer, ShuCard, User
 from ..services.auth import get_current_user
+from ..services.i18n import localize_ref_label, pick_i18n
 
 router = APIRouter(prefix="/api/v1/shu", tags=["shu-game"])
 
@@ -31,8 +32,9 @@ METHOD_LABELS = {
 }
 
 
-def _card_brief(c: ShuCard) -> dict:
+def _card_brief(c: ShuCard, lang: str = "zh") -> dict:
     """答前：只露问题与 4 选项，藏正确答案、本义、字源故事（防剧透）。"""
+    options_i18n = c.options_i18n or {}
     return {
         "id": c.id,
         "char": c.char,
@@ -41,28 +43,38 @@ def _card_brief(c: ShuCard) -> dict:
         "category": c.category,
         "category_label": CATEGORY_LABELS.get(c.category, c.category),
         "difficulty": c.difficulty,
-        "options": [{"key": o["key"], "text": o["text"]} for o in (c.options or [])],
+        "options": [
+            {
+                "key": o["key"],
+                "text": pick_i18n(o["text"], (options_i18n.get(o["key"]) or {}).get("text"), lang),
+            }
+            for o in (c.options or [])
+        ],
     }
 
 
-def _ref_full(db: Session, ref_id: str) -> Optional[dict]:
+def _ref_full(db: Session, ref_id: str, lang: str = "zh") -> Optional[dict]:
     p = db.get(Passage, ref_id)
     if not p:
         return None
-    return {"ref_id": p.id, "ref_label": p.ref_label or p.id, "text": p.original_text}
+    return {
+        "ref_id": p.id,
+        "ref_label": localize_ref_label(p.ref_label or p.id, lang),
+        "text": p.original_text,
+    }
 
 
-def _card_full(db: Session, c: ShuCard) -> dict:
+def _card_full(db: Session, c: ShuCard, lang: str = "zh") -> dict:
     """答后：附正确答案、本义、字源故事、造字法、关联经典。"""
     return {
-        **_card_brief(c),
+        **_card_brief(c, lang),
         "answer_key": c.answer_key,
-        "benyi": c.benyi,
-        "jinyi": c.jinyi,
-        "story": c.story,
+        "benyi": pick_i18n(c.benyi, c.benyi_i18n, lang),
+        "jinyi": pick_i18n(c.jinyi, c.jinyi_i18n, lang),
+        "story": pick_i18n(c.story, c.story_i18n, lang),
         "method": c.method,
         "method_label": METHOD_LABELS.get(c.method, c.method),
-        "refs": [r for r in (_ref_full(db, rid) for rid in (c.refs or [])) if r],
+        "refs": [r for r in (_ref_full(db, rid, lang) for rid in (c.refs or [])) if r],
     }
 
 
@@ -70,6 +82,7 @@ def _card_full(db: Session, c: ShuCard) -> dict:
 def today(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
+    lang: str = Query("zh"),
 ) -> dict:
     """今日 3 张：优先未答过的（按难度+sort_order），不够则复习已答的。"""
     today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
@@ -92,10 +105,10 @@ def today(
     ).scalars().all()
     new_ones = [c for c in all_c if c.id not in ever_answered][:DAILY_LIMIT]
 
-    result = [{"answered": False, **_card_brief(c)} for c in new_ones]
+    result = [{"answered": False, **_card_brief(c, lang)} for c in new_ones]
     if len(result) < DAILY_LIMIT:
         review = [c for c in all_c if c.id in ever_answered][: DAILY_LIMIT - len(result)]
-        result.extend([{"answered": True, **_card_brief(c)} for c in review])
+        result.extend([{"answered": True, **_card_brief(c, lang)} for c in review])
 
     return {
         "cards": result,
@@ -114,6 +127,7 @@ def answer(
     body: AnswerIn,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
+    lang: str = Query("zh"),
 ) -> dict:
     c = db.get(ShuCard, card_id)
     if not c:
@@ -164,14 +178,14 @@ def answer(
 
     db.commit()
     db.refresh(user)
-    full = _card_full(db, c)
+    full = _card_full(db, c, lang)
 
     return {
         "correct": correct,
         "score_applied": score_applied,
         "chosen_key": body.option_key,
         "card": full,
-        "new_unlocked_refs": [_ref_full(db, r) for r in new_unlocked if _ref_full(db, r)],
+        "new_unlocked_refs": [_ref_full(db, r, lang) for r in new_unlocked if _ref_full(db, r, lang)],
         "progress": {
             "liuyi_shu": (user.liuyi or {}).get("shu", 0),
             "xp": user.xp or 0,
@@ -189,6 +203,7 @@ def assemble(
     body: AssembleIn,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
+    lang: str = Query("zh"),
 ) -> dict:
     """拼字模式：玩家提交部件列表，后端校验 set 相等。"""
     c = db.get(ShuCard, card_id)
@@ -244,9 +259,9 @@ def assemble(
     return {
         "correct": correct,
         "score_applied": score_applied,
-        "card": _card_full(db, c),
+        "card": _card_full(db, c, lang),
         "correct_parts": correct_parts,
-        "new_unlocked_refs": [_ref_full(db, r) for r in new_unlocked if _ref_full(db, r)],
+        "new_unlocked_refs": [_ref_full(db, r, lang) for r in new_unlocked if _ref_full(db, r, lang)],
         "progress": {
             "liuyi_shu": (user.liuyi or {}).get("shu", 0),
             "xp": user.xp or 0,
@@ -286,6 +301,7 @@ def trace(
     body: TraceIn,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
+    lang: str = Query("zh"),
 ) -> dict:
     """描红写字：前端提交描字质量分（precision × recall × 100），后端按 5 品给分。"""
     c = db.get(ShuCard, card_id)
@@ -339,8 +355,8 @@ def trace(
         "xp_delta": xp_inc if score_applied else 0,
         "precision": round(body.precision, 3),
         "recall": round(body.recall, 3),
-        "card": _card_full(db, c),
-        "new_unlocked_refs": [_ref_full(db, r) for r in new_unlocked if _ref_full(db, r)],
+        "card": _card_full(db, c, lang),
+        "new_unlocked_refs": [_ref_full(db, r, lang) for r in new_unlocked if _ref_full(db, r, lang)],
         "progress": {
             "liuyi_shu": (user.liuyi or {}).get("shu", 0),
             "xp": user.xp or 0,

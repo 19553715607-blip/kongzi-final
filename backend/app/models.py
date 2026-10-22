@@ -342,6 +342,10 @@ class LiScenario(Base):
     ai_generated: Mapped[bool] = mapped_column(default=True)
     reviewer: Mapped[Optional[str]] = mapped_column(String)
     sort_order: Mapped[int] = mapped_column(Integer, default=0)
+    # 多语：{lang: 译文}，由 services/i18n.pick_i18n() 取值，缺译回落中文
+    title_i18n: Mapped[dict] = mapped_column(JSON, default=dict)
+    setting_i18n: Mapped[dict] = mapped_column(JSON, default=dict)
+    options_i18n: Mapped[dict] = mapped_column(JSON, default=dict)  # {选项key: {lang: 文本}}
 
 
 class LiChoice(Base):
@@ -397,6 +401,11 @@ class ShuCard(Base):
     category: Mapped[str] = mapped_column(String, default="wuchang")     # wuchang/lunli/xiushen/zhixue/zhexue
     difficulty: Mapped[int] = mapped_column(Integer, default=1)          # 1-5
     sort_order: Mapped[int] = mapped_column(Integer, default=0)
+    # 多语：{lang: 译文}，由 services/i18n.pick_i18n() 取值，缺译回落中文
+    benyi_i18n: Mapped[dict] = mapped_column(JSON, default=dict)
+    jinyi_i18n: Mapped[dict] = mapped_column(JSON, default=dict)
+    story_i18n: Mapped[dict] = mapped_column(JSON, default=dict)
+    options_i18n: Mapped[dict] = mapped_column(JSON, default=dict)  # {选项key: {lang: 文本}}
 
 
 class ShuAnswer(Base):
@@ -432,6 +441,11 @@ class YuScenario(Base):
     target_duration_ms: Mapped[int] = mapped_column(Integer, default=30000)
     refs: Mapped[list] = mapped_column(JSON, default=list)
     sort_order: Mapped[int] = mapped_column(Integer, default=0)
+    # 多语：{lang: 译文}，由 services/i18n.pick_i18n() 取值，缺译回落中文
+    title_i18n: Mapped[dict] = mapped_column(JSON, default=dict)
+    kind_label_i18n: Mapped[dict] = mapped_column(JSON, default=dict)
+    setting_i18n: Mapped[dict] = mapped_column(JSON, default=dict)
+    hint_i18n: Mapped[dict] = mapped_column(JSON, default=dict)
 
 
 class YuAnswer(Base):
@@ -471,6 +485,13 @@ class MathScenario(Base):
     unit: Mapped[str] = mapped_column(String, default="担")
     refs: Mapped[list] = mapped_column(JSON, default=list)
     sort_order: Mapped[int] = mapped_column(Integer, default=0)
+    # 多语：{lang: 译文}，由 services/i18n.pick_i18n() 取值，缺译回落中文
+    title_i18n: Mapped[dict] = mapped_column(JSON, default=dict)
+    kind_label_i18n: Mapped[dict] = mapped_column(JSON, default=dict)
+    setting_i18n: Mapped[dict] = mapped_column(JSON, default=dict)
+    hint_i18n: Mapped[dict] = mapped_column(JSON, default=dict)
+    unit_i18n: Mapped[dict] = mapped_column(JSON, default=dict)
+    items_i18n: Mapped[dict] = mapped_column(JSON, default=dict)  # {明细name: {lang: {name/attrs/principle}}}
 
 
 class MathAnswer(Base):
@@ -505,6 +526,11 @@ class YueScenario(Base):
     # ideal_distribution = {"gong":0.3,"shang":0.3,"jue":0.1,"zhi":0.15,"yu":0.15}
     refs: Mapped[list] = mapped_column(JSON, default=list)  # 关联经典 ref_ids（答完解锁）
     sort_order: Mapped[int] = mapped_column(Integer, default=0)
+    # 多语：{lang: 译文}，由 services/i18n.pick_i18n() 取值，缺译回落中文
+    title_i18n: Mapped[dict] = mapped_column(JSON, default=dict)
+    mood_label_i18n: Mapped[dict] = mapped_column(JSON, default=dict)
+    setting_i18n: Mapped[dict] = mapped_column(JSON, default=dict)
+    hint_i18n: Mapped[dict] = mapped_column(JSON, default=dict)
 
 
 class YueAnswer(Base):

@@ -21,6 +21,7 @@ from sqlalchemy.orm.attributes import flag_modified
 from ..db import get_db
 from ..models import Passage, User, YueAnswer, YueScenario
 from ..services.auth import get_current_user
+from ..services.i18n import localize_ref_label, pick_i18n
 
 router = APIRouter(prefix="/api/v1/yue", tags=["yue-game"])
 
@@ -48,28 +49,32 @@ def _grade_for(score: int) -> tuple[str, int, int]:
     return "学律", 1, 3
 
 
-def _ref(db: Session, ref_id: str) -> Optional[dict]:
+def _ref(db: Session, ref_id: str, lang: str = "zh") -> Optional[dict]:
     p = db.get(Passage, ref_id)
     if not p:
         return None
-    return {"ref_id": p.id, "ref_label": p.ref_label or p.id, "text": p.original_text}
+    return {
+        "ref_id": p.id,
+        "ref_label": localize_ref_label(p.ref_label or p.id, lang),
+        "text": p.original_text,
+    }
 
 
-def _scenario_brief(s: YueScenario, answered: bool = False) -> dict:
+def _scenario_brief(s: YueScenario, answered: bool = False, lang: str = "zh") -> dict:
     return {
         "id": s.id,
-        "title": s.title,
+        "title": pick_i18n(s.title, s.title_i18n, lang),
         "mood": s.mood,
-        "mood_label": s.mood_label,
-        "setting": s.setting,
-        "hint": s.hint,
+        "mood_label": pick_i18n(s.mood_label, s.mood_label_i18n, lang),
+        "setting": pick_i18n(s.setting, s.setting_i18n, lang),
+        "hint": pick_i18n(s.hint, s.hint_i18n, lang),
         "answered": answered,
     }
 
 
-def _scenario_full(s: YueScenario) -> dict:
+def _scenario_full(s: YueScenario, lang: str = "zh") -> dict:
     return {
-        **_scenario_brief(s),
+        **_scenario_brief(s, lang=lang),
         "ideal_distribution": s.ideal_distribution or {},
     }
 
@@ -157,6 +162,7 @@ def score_sequence(seq: list[str], ideal: dict) -> dict:
 def today(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
+    lang: str = Query("zh"),
 ) -> dict:
     today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
     today_done = {
@@ -178,10 +184,10 @@ def today(
     new_ones = [s for s in all_s if s.id not in ever_answered]
     review = [s for s in all_s if s.id in ever_answered]
     cards = [
-        {**_scenario_brief(s, False), "done_today": s.id in today_done}
+        {**_scenario_brief(s, False, lang), "done_today": s.id in today_done}
         for s in new_ones
     ] + [
-        {**_scenario_brief(s, True), "done_today": s.id in today_done}
+        {**_scenario_brief(s, True, lang), "done_today": s.id in today_done}
         for s in review
     ]
     return {
@@ -201,6 +207,7 @@ def play(
     body: PlayIn,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
+    lang: str = Query("zh"),
 ) -> dict:
     s = db.get(YueScenario, sid)
     if not s:
@@ -253,7 +260,7 @@ def play(
     db.commit()
     db.refresh(user)
     return {
-        "scenario": _scenario_full(s),
+        "scenario": _scenario_full(s, lang),
         "sequence": seq,
         "score": ev["score"],
         "grade": grade,
@@ -264,8 +271,8 @@ def play(
         "yue_delta": yue_inc if score_applied else 0,
         "xp_delta": xp_inc if score_applied else 0,
         "score_applied": score_applied,
-        "new_unlocked_refs": [_ref(db, r) for r in new_unlocked if _ref(db, r)],
-        "refs": [_ref(db, r) for r in (s.refs or []) if _ref(db, r)],
+        "new_unlocked_refs": [_ref(db, r, lang) for r in new_unlocked if _ref(db, r, lang)],
+        "refs": [_ref(db, r, lang) for r in (s.refs or []) if _ref(db, r, lang)],
         "progress": {
             "liuyi_yue": (user.liuyi or {}).get("yue", 0),
             "xp": user.xp or 0,

@@ -44,16 +44,16 @@ export default function ShuJourneyPage() {
   const [err, setErr] = useState("");
 
   const load = () => {
-    getShuToday().then(setToday).catch((e) => setErr(gt("无法加载书艺内容，请稍后重试", getLang()) + `（${errorHint(e)}）`));
+    getShuToday(lang).then(setToday).catch((e) => setErr(gt("无法加载书艺内容，请稍后重试", getLang()) + `（${errorHint(e)}）`));
     getShuProgress().then(setProgress).catch(() => {});
   };
-  useEffect(load, []);
+  useEffect(load, [lang]);
 
   const onAnswer = async (card: ShuCardBrief, optionKey: string) => {
     if (busy === card.id || results[card.id]) return;
     setBusy(card.id);
     try {
-      const r = await answerShuCard(card.id, optionKey);
+      const r = await answerShuCard(card.id, optionKey, lang);
       setResults((prev) => ({ ...prev, [card.id]: r }));
       // 异步刷新 progress
       getShuProgress().then(setProgress).catch(() => {});

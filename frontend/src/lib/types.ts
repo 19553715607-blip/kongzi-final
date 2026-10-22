@@ -2,11 +2,15 @@ export interface Book {
   id: string;
   title_zh: string;
   title_i18n: Record<string, string>;
+  /** 后端按 lang 解析好的书名；缺译时与 title_zh 相同 */
+  title?: string;
 }
 
 export interface Chapter {
   id: string;
   title_zh: string;
+  /** 后端按 lang 解析好的篇名；缺译时与 title_zh 相同 */
+  title?: string;
 }
 
 export interface PassageBrief {
@@ -518,6 +522,8 @@ export interface YuProgressResp {
 // ── 数艺·均输衰分 ──────────────────────────────────────────────
 export interface MathItemBrief {
   name: string;
+  /** 多语显示名；缺译时后端回落到中文，与 name 相同 */
+  name_display?: string;
   attrs: string;
   metrics?: Record<string, number>;
 }

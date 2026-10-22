@@ -110,6 +110,50 @@ def _lightweight_migrations() -> None:
             ("source_i18n", "JSON"),
         ],
     )
+    # 六艺场景：补多语列。场景文案（标题/情境/提示/选项/明细）原先只有中文，
+    # 由 seed_scenario_i18n.apply_scenario_i18n() 在启动时按 JSON 列写入译文。
+    _add_columns_if_missing(
+        "li_scenarios",
+        [("title_i18n", "JSON"), ("setting_i18n", "JSON"), ("options_i18n", "JSON")],
+    )
+    _add_columns_if_missing(
+        "yue_scenarios",
+        [
+            ("title_i18n", "JSON"),
+            ("mood_label_i18n", "JSON"),
+            ("setting_i18n", "JSON"),
+            ("hint_i18n", "JSON"),
+        ],
+    )
+    _add_columns_if_missing(
+        "yu_scenarios",
+        [
+            ("title_i18n", "JSON"),
+            ("kind_label_i18n", "JSON"),
+            ("setting_i18n", "JSON"),
+            ("hint_i18n", "JSON"),
+        ],
+    )
+    _add_columns_if_missing(
+        "math_scenarios",
+        [
+            ("title_i18n", "JSON"),
+            ("kind_label_i18n", "JSON"),
+            ("setting_i18n", "JSON"),
+            ("hint_i18n", "JSON"),
+            ("unit_i18n", "JSON"),
+            ("items_i18n", "JSON"),
+        ],
+    )
+    _add_columns_if_missing(
+        "shu_cards",
+        [
+            ("benyi_i18n", "JSON"),
+            ("jinyi_i18n", "JSON"),
+            ("story_i18n", "JSON"),
+            ("options_i18n", "JSON"),
+        ],
+    )
 
     # Comment：楼中楼评论表。create_all 已按模型建表；这里用原生 DDL 兜底，
     # 确保既有库升级时表与复合索引（target_type,target_id,status）、(root_id) 一定存在。

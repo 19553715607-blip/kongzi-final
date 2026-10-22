@@ -88,9 +88,9 @@ export default function Brush3DGame() {
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const loadAll = useCallback(() => {
-    getShuToday().then(setToday).catch(() => setLoadErr(gt("无法加载书艺字卡，请稍后重试", getLang())));
+    getShuToday(lang).then(setToday).catch(() => setLoadErr(gt("无法加载书艺字卡，请稍后重试", getLang())));
     getShuProgress().then(setProgress).catch(() => {});
-  }, []);
+  }, [lang]);
   useEffect(() => { loadAll(); }, [loadAll]);
 
   const tick = useCallback(() => setInkTick((t) => t + 1), []);
@@ -160,13 +160,13 @@ export default function Brush3DGame() {
       sfx.finish(res.score);
       setPhase("scored");
       getShuProgress().then(setProgress).catch(() => {});
-      getShuToday().then(setToday).catch(() => {});
+      getShuToday(lang).then(setToday).catch(() => {});
     } catch {
       say(gt("提交失败 — 请检查登录/网络", getLang()), false);
       setPhase("writing");
       g.running = true;
     }
-  }, [current, g, say]);
+  }, [current, g, say, lang]);
   submitRef.current = submit;
 
   // ── 调试钩子（CDP 测试用） ──

@@ -41,6 +41,49 @@ async def lifespan(app: FastAPI):
             _db.close()
     except Exception as exc:  # noqa: BLE001
         print(f"[startup] lang pack skipped ({exc})")
+    # 六艺场景层：关卡标题/情境/提示/选项/明细的多语补丁（乐·御·数·书·礼）
+    try:
+        from .db import SessionLocal
+        from .seed_scenario_i18n import apply_scenario_i18n
+
+        _db = SessionLocal()
+        try:
+            _counts = apply_scenario_i18n(_db)
+            _db.commit()
+            if any(_counts.values()):
+                print(f"[startup] scenario i18n applied: {_counts}")
+        finally:
+            _db.close()
+    except Exception as exc:  # noqa: BLE001
+        print(f"[startup] scenario i18n skipped ({exc})")
+    # 经典层短字段：书目 / 篇名 / 人物 / 学派 / 命题的多语补齐
+    try:
+        from .db import SessionLocal
+        from .seed_ref_i18n import apply_ref_i18n
+
+        _db = SessionLocal()
+        try:
+            _counts = apply_ref_i18n(_db)
+            if any(_counts.values()):
+                print(f"[startup] ref i18n applied: {_counts}")
+        finally:
+            _db.close()
+    except Exception as exc:  # noqa: BLE001
+        print(f"[startup] ref i18n skipped ({exc})")
+    # 已知错译的定点修复（幂等，仅在错译仍在库中时替换）
+    try:
+        from .db import SessionLocal
+        from .repair_i18n import repair_translations
+
+        _db = SessionLocal()
+        try:
+            _counts = repair_translations(_db)
+            if _counts["repaired"]:
+                print(f"[startup] translations repaired: {_counts}")
+        finally:
+            _db.close()
+    except Exception as exc:  # noqa: BLE001
+        print(f"[startup] translation repair skipped ({exc})")
     # 向量后端：启动时确保索引就绪（auto/vector 模式且集合为空时构建）
     s = get_settings()
     # LLM 提供方自检：hunao 缺 key 时明确告警，避免首问才在流中报错

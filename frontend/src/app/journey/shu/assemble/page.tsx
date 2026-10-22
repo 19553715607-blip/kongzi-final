@@ -71,9 +71,9 @@ export default function ShuAssemblePage() {
 
   // 启动：拉今日卡
   useEffect(() => {
-    getShuToday().then((d) => setCards(d.cards)).catch(() => setErr(t("jrn.noBank", lang)));
+    getShuToday(lang).then((d) => setCards(d.cards)).catch(() => setErr(t("jrn.noBank", lang)));
     getShuProgress().then(setProgress).catch(() => {});
-  }, []);
+  }, [lang]);
 
   const current = cards[idx];
   const correctParts = useMemo(

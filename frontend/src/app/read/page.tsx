@@ -73,7 +73,7 @@ export default function ReadPage() {
   };
 
   useEffect(() => {
-    getBooks()
+    getBooks(lang)
       .then((bs) => {
         setBooks(bs);
         if (bs[0]) setBookId(bs[0].id);
@@ -83,19 +83,19 @@ export default function ReadPage() {
 
   useEffect(() => {
     if (!bookId) return;
-    getChapters(bookId).then((cs) => {
+    getChapters(bookId, lang).then((cs) => {
       setChapters(cs);
       if (cs[0]) setChapterId(cs[0].id);
     });
-  }, [bookId]);
+  }, [bookId, lang]);
 
   useEffect(() => {
     if (!chapterId) return;
-    getPassages(chapterId).then((ps) => {
+    getPassages(chapterId, lang).then((ps) => {
       setPassages(ps);
       if (ps[0]) setActiveId(ps[0].id);
     });
-  }, [chapterId]);
+  }, [chapterId, lang]);
 
   useEffect(() => {
     if (!activeId) return;
@@ -204,7 +204,7 @@ export default function ReadPage() {
             className="flex-1 rounded-lg border border-line bg-surface px-2 py-1.5 text-sm text-fg"
           >
             {books.map((b) => (
-              <option key={b.id} value={b.id}>{b.title_zh}</option>
+              <option key={b.id} value={b.id}>{b.title ?? b.title_zh}</option>
             ))}
           </select>
           <select
@@ -213,7 +213,7 @@ export default function ReadPage() {
             className="flex-1 rounded-lg border border-line bg-surface px-2 py-1.5 text-sm text-fg"
           >
             {chapters.map((c) => (
-              <option key={c.id} value={c.id}>{c.title_zh}</option>
+              <option key={c.id} value={c.id}>{c.title ?? c.title_zh}</option>
             ))}
           </select>
         </div>
@@ -253,7 +253,7 @@ export default function ReadPage() {
                   className={`w-[132px] sm:w-[150px] ${
                     c.id === chapterId ? "ring-2 ring-accent" : ""
                   }`}
-                  title={c.title_zh}
+                  title={c.title ?? c.title_zh}
                   accession={`CH-${String(i + 1).padStart(2, "0")}`}
                   onClick={() => setChapterId(c.id)}
                 />

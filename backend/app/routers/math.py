@@ -21,6 +21,7 @@ from sqlalchemy.orm.attributes import flag_modified
 from ..db import get_db
 from ..models import MathAnswer, MathScenario, Passage, User
 from ..services.auth import get_current_user
+from ..services.i18n import localize_ref_label, pick_i18n
 
 router = APIRouter(prefix="/api/v1/math", tags=["math-game"])
 
@@ -42,15 +43,20 @@ def _grade_for(score: int) -> tuple[str, int, int]:
     return "学算", 1, 3
 
 
-def _ref(db: Session, ref_id: str) -> Optional[dict]:
+def _ref(db: Session, ref_id: str, lang: str = "zh") -> Optional[dict]:
     p = db.get(Passage, ref_id)
     if not p:
         return None
-    return {"ref_id": p.id, "ref_label": p.ref_label or p.id, "text": p.original_text}
+    return {
+        "ref_id": p.id,
+        "ref_label": localize_ref_label(p.ref_label or p.id, lang),
+        "text": p.original_text,
+    }
 
 
-def _scenario_brief(s: MathScenario, answered: bool = False) -> dict:
+def _scenario_brief(s: MathScenario, answered: bool = False, lang: str = "zh") -> dict:
     items = list(s.items or [])
+    items_i18n = s.items_i18n or {}
     metric_labels: dict[str, str] = {}
     default_weights: dict[str, float] = {}
     for it in items:
@@ -61,34 +67,44 @@ def _scenario_brief(s: MathScenario, answered: bool = False) -> dict:
         for key in (it.get("metrics") or {}).keys():
             metric_labels.setdefault(key, key)
             default_weights.setdefault(key, 1.0)
+    def _item_loc(it: dict) -> dict:
+        return items_i18n.get(it.get("name")) or {}
+
+    first_loc = _item_loc(items[0]) if items else {}
     return {
         "id": s.id,
-        "title": s.title,
+        "title": pick_i18n(s.title, s.title_i18n, lang),
         "kind": s.kind,
-        "kind_label": s.kind_label,
-        "setting": s.setting,
-        "hint": s.hint,
+        "kind_label": pick_i18n(s.kind_label, s.kind_label_i18n, lang),
+        "setting": pick_i18n(s.setting, s.setting_i18n, lang),
+        "hint": pick_i18n(s.hint, s.hint_i18n, lang),
         "items": [
             {
+                # name 是前后端协议键（作答提交用），保持中文不变；显示名走 name_display
                 "name": it["name"],
-                "attrs": it["attrs"],
+                "name_display": pick_i18n(it["name"], _item_loc(it).get("name"), lang),
+                "attrs": pick_i18n(it["attrs"], _item_loc(it).get("attrs"), lang),
                 "metrics": it.get("metrics", {}),
             }
             for it in items
         ],
         "metric_labels": metric_labels,
         "default_weights": default_weights,
-        "principle": (items[0].get("principle") if items else None) or "",
+        "principle": pick_i18n(
+            (items[0].get("principle") if items else None) or "",
+            first_loc.get("principle"),
+            lang,
+        ),
         # 不暴露 ideal_share — 答完再揭晓
         "total": s.total,
-        "unit": s.unit,
+        "unit": pick_i18n(s.unit, s.unit_i18n, lang),
         "answered": answered,
     }
 
 
-def _scenario_full(s: MathScenario) -> dict:
+def _scenario_full(s: MathScenario, lang: str = "zh") -> dict:
     return {
-        **_scenario_brief(s),
+        **_scenario_brief(s, lang=lang),
         "ideal_shares": [
             {"name": it["name"], "ideal_share": it.get("ideal_share", 0)}
             for it in (s.items or [])
@@ -170,6 +186,7 @@ def _feedback(score: int, sum_match: float, fairness: float, moderation: float) 
 def today(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
+    lang: str = Query("zh"),
 ) -> dict:
     ever_answered = {
         a.scenario_id for a in db.execute(
@@ -190,10 +207,10 @@ def today(
     new_ones = [s for s in all_s if s.id not in ever_answered]
     review = [s for s in all_s if s.id in ever_answered]
     cards = [
-        {**_scenario_brief(s, False), "done_today": s.id in today_done}
+        {**_scenario_brief(s, False, lang), "done_today": s.id in today_done}
         for s in new_ones
     ] + [
-        {**_scenario_brief(s, True), "done_today": s.id in today_done}
+        {**_scenario_brief(s, True, lang), "done_today": s.id in today_done}
         for s in review
     ]
     return {
@@ -213,6 +230,7 @@ def solve(
     body: SolveIn,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
+    lang: str = Query("zh"),
 ) -> dict:
     s = db.get(MathScenario, sid)
     if not s:
@@ -263,7 +281,7 @@ def solve(
     db.commit()
     db.refresh(user)
     return {
-        "scenario": _scenario_full(s),
+        "scenario": _scenario_full(s, lang),
         "allocations": allocs,
         "score": ev["score"],
         "grade": grade,
@@ -274,8 +292,8 @@ def solve(
         "shu_delta": sh_inc if score_applied else 0,
         "xp_delta": xp_inc if score_applied else 0,
         "score_applied": score_applied,
-        "new_unlocked_refs": [_ref(db, r) for r in new_unlocked if _ref(db, r)],
-        "refs": [_ref(db, r) for r in (s.refs or []) if _ref(db, r)],
+        "new_unlocked_refs": [_ref(db, r, lang) for r in new_unlocked if _ref(db, r, lang)],
+        "refs": [_ref(db, r, lang) for r in (s.refs or []) if _ref(db, r, lang)],
         "progress": {
             "liuyi_shu2": (user.liuyi or {}).get("shu2", 0),
             "xp": user.xp or 0,
@@ -287,6 +305,7 @@ def solve(
 def progress(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
+    lang: str = Query("zh"),
 ) -> dict:
     answers = db.execute(
         select(MathAnswer).where(MathAnswer.user_id == user.id).order_by(MathAnswer.id.desc())
@@ -307,7 +326,7 @@ def progress(
     all_scenarios = db.execute(select(MathScenario).order_by(MathScenario.sort_order)).scalars().all()
     scenarios = [
         {
-            **_scenario_brief(s, s.id in played_ids),
+            **_scenario_brief(s, s.id in played_ids, lang),
             "best_score": max((a.score for a in answers if a.scenario_id == s.id), default=0),
         }
         for s in all_scenarios

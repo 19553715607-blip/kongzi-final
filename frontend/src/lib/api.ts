@@ -91,11 +91,11 @@ async function getJSON<T>(path: string): Promise<T> {
 }
 
 // ── 经典内容 ──────────────────────────────────────────────────
-export const getBooks = () => getJSON<Book[]>("/api/v1/books");
-export const getChapters = (bookId: string) =>
-  getJSON<Chapter[]>(`/api/v1/books/${bookId}/chapters`);
-export const getPassages = (chapterId: string) =>
-  getJSON<PassageBrief[]>(`/api/v1/chapters/${chapterId}/passages`);
+export const getBooks = (lang = "zh") => getJSON<Book[]>(`/api/v1/books?lang=${lang}`);
+export const getChapters = (bookId: string, lang = "zh") =>
+  getJSON<Chapter[]>(`/api/v1/books/${bookId}/chapters?lang=${lang}`);
+export const getPassages = (chapterId: string, lang = "zh") =>
+  getJSON<PassageBrief[]>(`/api/v1/chapters/${chapterId}/passages?lang=${lang}`);
 export const getPassage = (refId: string, lang = "zh") =>
   getJSON<Passage>(`/api/v1/passages/${refId}?lang=${lang}`);
 export const getConcept = (id: string, lang = "zh") =>
@@ -192,12 +192,12 @@ export const listPlugins = () => getJSON<{ total: number; items: PluginItem[] }>
 export const getReachStats = () => getJSON<ReachStats>("/api/v1/reach/stats");
 
 // ── 礼之器游戏 ─────────────────────────────────────────────────
-export const getLiToday = () =>
-  authJSON<import("./types").LiTodayResp>("/api/v1/li/today");
+export const getLiToday = (lang = "zh") =>
+  authJSON<import("./types").LiTodayResp>(`/api/v1/li/today?lang=${lang}`);
 export const getLiProgress = () =>
   authJSON<import("./types").LiProgressResp>("/api/v1/li/progress");
-export const chooseLiOption = (sid: number, optionKey: string) =>
-  authJSON<import("./types").LiChooseResp>(`/api/v1/li/scenario/${sid}/choose`, {
+export const chooseLiOption = (sid: number, optionKey: string, lang = "zh") =>
+  authJSON<import("./types").LiChooseResp>(`/api/v1/li/scenario/${sid}/choose?lang=${lang}`, {
     method: "POST",
     body: JSON.stringify({ option_key: optionKey }),
   });
@@ -212,10 +212,10 @@ export const getLiHostLeaderboard = (limit = 10) =>
   authJSON<import("./types").LiHostLeaderboardResp>(`/api/v1/li/host/leaderboard?limit=${limit}`);
 
 // ── 书艺游戏 ───────────────────────────────────────────────────
-export const getShuToday = () =>
-  authJSON<import("./types").ShuTodayResp>("/api/v1/shu/today");
-export const answerShuCard = (cardId: number, optionKey: string) =>
-  authJSON<import("./types").ShuAnswerResp>(`/api/v1/shu/card/${cardId}/answer`, {
+export const getShuToday = (lang = "zh") =>
+  authJSON<import("./types").ShuTodayResp>(`/api/v1/shu/today?lang=${lang}`);
+export const answerShuCard = (cardId: number, optionKey: string, lang = "zh") =>
+  authJSON<import("./types").ShuAnswerResp>(`/api/v1/shu/card/${cardId}/answer?lang=${lang}`, {
     method: "POST",
     body: JSON.stringify({ option_key: optionKey }),
   });
@@ -254,14 +254,15 @@ export const getJourneyLeaderboard = (limit = 20) =>
   authJSON<import("./types").JourneyLeaderboardResp>(`/api/v1/journey/leaderboard?limit=${limit}`);
 
 // ── 御艺·五御 ──────────────────────────────────────────────────
-export const getYuToday = () =>
-  authJSON<import("./types").YuTodayResp>("/api/v1/yu/today");
+export const getYuToday = (lang = "zh") =>
+  authJSON<import("./types").YuTodayResp>(`/api/v1/yu/today?lang=${lang}`);
 export const driveYuScenario = (
   sid: number,
   trajectory: import("./types").YuTrajectoryPoint[],
   events: import("./types").YuEvent[],
+  lang = "zh",
 ) =>
-  authJSON<import("./types").YuDriveResp>(`/api/v1/yu/scenario/${sid}/drive`, {
+  authJSON<import("./types").YuDriveResp>(`/api/v1/yu/scenario/${sid}/drive?lang=${lang}`, {
     method: "POST",
     body: JSON.stringify({ trajectory, events }),
   });
@@ -269,13 +270,14 @@ export const getYuProgress = () =>
   authJSON<import("./types").YuProgressResp>("/api/v1/yu/progress");
 
 // ── 数艺·均输衰分 ──────────────────────────────────────────────
-export const getMathToday = () =>
-  authJSON<import("./types").MathTodayResp>("/api/v1/math/today");
+export const getMathToday = (lang = "zh") =>
+  authJSON<import("./types").MathTodayResp>(`/api/v1/math/today?lang=${lang}`);
 export const solveMathScenario = (
   sid: number,
   allocations: Record<string, number>,
+  lang = "zh",
 ) =>
-  authJSON<import("./types").MathSolveResp>(`/api/v1/math/scenario/${sid}/solve`, {
+  authJSON<import("./types").MathSolveResp>(`/api/v1/math/scenario/${sid}/solve?lang=${lang}`, {
     method: "POST",
     body: JSON.stringify({ allocations }),
   });
@@ -283,10 +285,10 @@ export const getMathProgress = () =>
   authJSON<import("./types").MathProgressResp>("/api/v1/math/progress");
 
 // ── 乐艺·五音合鸣 ──────────────────────────────────────────────
-export const getYueToday = () =>
-  authJSON<import("./types").YueTodayResp>("/api/v1/yue/today");
-export const playYueScenario = (sid: number, sequence: import("./types").YueNote[]) =>
-  authJSON<import("./types").YuePlayResp>(`/api/v1/yue/scenario/${sid}/play`, {
+export const getYueToday = (lang = "zh") =>
+  authJSON<import("./types").YueTodayResp>(`/api/v1/yue/today?lang=${lang}`);
+export const playYueScenario = (sid: number, sequence: import("./types").YueNote[], lang = "zh") =>
+  authJSON<import("./types").YuePlayResp>(`/api/v1/yue/scenario/${sid}/play?lang=${lang}`, {
     method: "POST",
     body: JSON.stringify({ sequence }),
   });

@@ -74,7 +74,7 @@ export default function YuGame() {
   const [lang] = useLang();
   const reload = useCallback(() => {
     setLoadErr("");
-    getYuToday().then(setToday).catch((e) => setLoadErr(tr("无法加载御艺场景，请稍后重试") + `（${errorHint(e)}）`));
+    getYuToday(lang).then(setToday).catch((e) => setLoadErr(tr("无法加载御艺场景，请稍后重试") + `（${errorHint(e)}）`));
     getYuProgress().then(setProgress).catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lang]);
@@ -143,7 +143,7 @@ export default function YuGame() {
     sfx.stopAll();
     setPhase("submitting");
     try {
-      const res = await driveYuScenario(current.id, refs.run.trajectory, finalizeEvents(refs.run));
+      const res = await driveYuScenario(current.id, refs.run.trajectory, finalizeEvents(refs.run), lang);
       setResult(res);
       sfx.finish(res.score);
       setPhase("scored");
@@ -153,7 +153,7 @@ export default function YuGame() {
       setPhase("playing");
       refs.running = true;
     }
-  }, [current, refs, say]);
+  }, [current, refs, say, lang]);
   onFinishRef.current = onFinish;
 
   // ── 键盘 ──

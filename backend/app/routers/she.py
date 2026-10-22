@@ -19,6 +19,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.orm.attributes import flag_modified
 
 from ..db import get_db
+from ..services.i18n import localize_ref_label
 from ..models import Passage, ShootRound, User
 from ..services.auth import get_current_user
 
@@ -31,13 +32,13 @@ REF_ZHUPI = "lunyu.bayi.3.16"               # 射不主皮
 REF_DEEP = "mengzi.gongsunchou.shang.7"     # 仁者如射
 
 
-def _ref(db: Session, ref_id: str) -> Optional[dict]:
+def _ref(db: Session, ref_id: str, lang: str = "zh") -> Optional[dict]:
     p = db.get(Passage, ref_id)
     if not p:
         return None
     return {
         "ref_id": p.id,
-        "ref_label": p.ref_label or p.id,
+        "ref_label": localize_ref_label(p.ref_label or p.id, lang),
         "text": p.original_text,
     }
 

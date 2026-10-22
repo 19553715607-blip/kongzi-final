@@ -20,6 +20,7 @@ from sqlalchemy.orm.attributes import flag_modified
 from ..db import get_db
 from ..models import Passage, User, YuAnswer, YuScenario
 from ..services.auth import get_current_user
+from ..services.i18n import localize_ref_label, pick_i18n
 
 router = APIRouter(prefix="/api/v1/yu", tags=["yu-game"])
 
@@ -41,21 +42,25 @@ def _grade_for(score: int) -> tuple[str, int, int]:
     return "学驭", 1, 3
 
 
-def _ref(db: Session, ref_id: str) -> Optional[dict]:
+def _ref(db: Session, ref_id: str, lang: str = "zh") -> Optional[dict]:
     p = db.get(Passage, ref_id)
     if not p:
         return None
-    return {"ref_id": p.id, "ref_label": p.ref_label or p.id, "text": p.original_text}
+    return {
+        "ref_id": p.id,
+        "ref_label": localize_ref_label(p.ref_label or p.id, lang),
+        "text": p.original_text,
+    }
 
 
-def _scenario_brief(s: YuScenario, answered: bool = False) -> dict:
+def _scenario_brief(s: YuScenario, answered: bool = False, lang: str = "zh") -> dict:
     return {
         "id": s.id,
-        "title": s.title,
+        "title": pick_i18n(s.title, s.title_i18n, lang),
         "kind": s.kind,
-        "kind_label": s.kind_label,
-        "setting": s.setting,
-        "hint": s.hint,
+        "kind_label": pick_i18n(s.kind_label, s.kind_label_i18n, lang),
+        "setting": pick_i18n(s.setting, s.setting_i18n, lang),
+        "hint": pick_i18n(s.hint, s.hint_i18n, lang),
         "road_config": s.road_config or {},
         "target_speed": s.target_speed,
         "target_duration_ms": s.target_duration_ms,
@@ -174,6 +179,7 @@ def score_trajectory(
 def today(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
+    lang: str = Query("zh"),
 ) -> dict:
     ever_answered = {
         a.scenario_id for a in db.execute(
@@ -194,11 +200,11 @@ def today(
     new_ones = [s for s in all_s if s.id not in ever_answered]
     review = [s for s in all_s if s.id in ever_answered]
     cards = [
-        {**_scenario_brief(s, False), "done_today": s.id in today_done}
+        {**_scenario_brief(s, False, lang), "done_today": s.id in today_done}
         for s in new_ones
     ]
     cards.extend([
-        {**_scenario_brief(s, True), "done_today": s.id in today_done}
+        {**_scenario_brief(s, True, lang), "done_today": s.id in today_done}
         for s in review
     ])
     return {
@@ -219,6 +225,7 @@ def drive(
     body: DriveIn,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
+    lang: str = Query("zh"),
 ) -> dict:
     s = db.get(YuScenario, sid)
     if not s:
@@ -269,7 +276,7 @@ def drive(
     db.commit()
     db.refresh(user)
     return {
-        "scenario": _scenario_brief(s),
+        "scenario": _scenario_brief(s, lang=lang),
         "score": ev["score"],
         "grade": grade,
         "jie": ev["jie"],
@@ -279,8 +286,8 @@ def drive(
         "yu_delta": yu_inc if score_applied else 0,
         "xp_delta": xp_inc if score_applied else 0,
         "score_applied": score_applied,
-        "new_unlocked_refs": [_ref(db, r) for r in new_unlocked if _ref(db, r)],
-        "refs": [_ref(db, r) for r in (s.refs or []) if _ref(db, r)],
+        "new_unlocked_refs": [_ref(db, r, lang) for r in new_unlocked if _ref(db, r, lang)],
+        "refs": [_ref(db, r, lang) for r in (s.refs or []) if _ref(db, r, lang)],
         "progress": {
             "liuyi_yu": (user.liuyi or {}).get("yu", 0),
             "xp": user.xp or 0,
@@ -292,6 +299,7 @@ def drive(
 def progress(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
+    lang: str = Query("zh"),
 ) -> dict:
     answers = db.execute(
         select(YuAnswer).where(YuAnswer.user_id == user.id).order_by(YuAnswer.id.desc())
@@ -312,7 +320,7 @@ def progress(
     all_scenarios = db.execute(select(YuScenario).order_by(YuScenario.sort_order)).scalars().all()
     scenarios = [
         {
-            **_scenario_brief(s, s.id in played_ids),
+            **_scenario_brief(s, s.id in played_ids, lang),
             "best_score": max((a.score for a in answers if a.scenario_id == s.id), default=0),
         }
         for s in all_scenarios

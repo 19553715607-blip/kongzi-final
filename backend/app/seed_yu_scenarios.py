@@ -21,9 +21,9 @@ YU_PASSAGES = [
         "concepts": ["yu", "li"],
         "i18n": {
             "en": "Then teach them the Six Arts: rites, music, archery, charioteering, calligraphy, mathematics. The Five Charioteering techniques: harmonizing the bells, following the winding river, passing the lord's pillar, dancing through crossroads, hunting with game to the left.",
-            "fr": "Puis enseigne-leur les Six Arts. Les Cinq techniques du char : faire sonner les clochettes en cadence, suivre la courbe de l'eau, passer la stèle du seigneur, danser au carrefour, chasser le gibier à gauche.",
-            "es": "Enséñales luego las Seis Artes. Las Cinco técnicas de carro: hacer sonar las campanillas en ritmo, seguir la curva del río, pasar la estela del señor, danzar en la encrucijada, cazar con la presa a la izquierda.",
-            "ar": "ثم تُعلَّم الفنون الستة. خمس تقنيات للقيادة: ضبط جرس العربة بإيقاع، اتباع منعطف النهر، المرور بنُصب الأمير، الرقص في مفترق الطرق، الصيد بالطريدة إلى اليسار.",
+            "fr": "Puis on leur enseigne les Six Arts : les cinq sortes de rites, les six sortes de musique, les cinq sortes de tir à l'arc, les cinq manières de conduire un char, les six sortes de calligraphie, les neuf procédés de calcul. Les Cinq techniques du char : faire sonner les clochettes en cadence, suivre la courbe de l'eau, passer la stèle du seigneur, danser au carrefour, chasser le gibier à gauche.",
+            "es": "Enséñales luego las Seis Artes: primero los cinco tipos de ritos, segundo los seis tipos de música, tercero los cinco tipos de tiro con arco, cuarto las cinco técnicas de carro, quinto los seis tipos de escritura, sexto los nueve procedimientos de cálculo. Las Cinco técnicas de carro: hacer sonar las campanillas en ritmo, seguir la curva del río, pasar la estela del señor, danzar en la encrucijada, cazar con la presa a la izquierda.",
+            "ar": "ثم تُعلَّم الفنون الستة: أولًا أنواع الطقوس الخمسة، وثانيًا أنواع الموسيقى الستة، وثالثًا أنواع الرماية الخمسة، ورابعًا فنون قيادة العربة الخمسة، وخامسًا أنواع الكتابة الستة، وسادسًا طرق الحساب التسعة. أما فنون القيادة الخمسة فهي: ضبط جرس العربة بالإيقاع، واتباع منعطف النهر، والمرور بنُصب الأمير، والرقص في مفترق الطرق، والصيد بالطريدة إلى اليسار.",
         },
         "anno_classical": ("郑玄注", "鸣和鸾，谓登车则马动而鸾鸣；逐水曲，谓御车随逐水势之屈曲；过君表，谓君表已设而过；舞交衢，谓御车于交道交衢之上；逐禽左，谓田猎之时禽兽奔逸于左则不复射。"),
         "anno_modern": "五御 = 御车的五种礼仪化技法。核心是「礼以行之，不极不躁」——驾车不只是技术，更是礼乐节制的修身工夫。",
@@ -75,7 +75,7 @@ YU_PASSAGES = [
         "concepts": ["yu", "li"],
         "i18n": {
             "en": "Even a charioteer feels ashamed to ally with an unworthy archer; allying with him to bag game, even mountains of it, he would not.",
-            "fr": "Même un cocher rougit de s'associer à un mauvais archer ; même pour gibier en montagnes, il refuse.",
+            "fr": "Même un cocher rougit de s'associer à un archer indigne ; dût-il, en s'y associant, prendre du gibier par montagnes entières, il ne le ferait pas.",
             "es": "Incluso el cochero se avergüenza de aliarse con un arquero indigno; aunque cazaran montañas de presas, no lo haría.",
             "ar": "حتى السائق يأنف أن يحالف رامياً وضيعاً، ولو أصاب صيداً كالجبل لما رضي.",
         },

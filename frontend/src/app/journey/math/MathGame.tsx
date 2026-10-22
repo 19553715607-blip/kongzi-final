@@ -63,7 +63,7 @@ export default function MathGame() {
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const loadAll = useCallback(() => {
-    getMathToday().then(setToday).catch((e) => setLoadErr(gt("无法加载数艺题库，请稍后重试", lang) + `（${errorHint(e)}）`));
+    getMathToday(lang).then(setToday).catch((e) => setLoadErr(gt("无法加载数艺题库，请稍后重试", lang) + `（${errorHint(e)}）`));
     getMathProgress().then(setProgress).catch(() => {});
   }, [lang]);
   useEffect(() => { loadAll(); }, [loadAll]);
@@ -105,12 +105,12 @@ export default function MathGame() {
     sfx.bell();
     setPhase("submitting");
     try {
-      const res = await solveMathScenario(current.id, finalizeAllocations(g.engine));
+      const res = await solveMathScenario(current.id, finalizeAllocations(g.engine), lang);
       setResult(res);
       sfx.finish(res.score);
       setPhase("scored");
       getMathProgress().then(setProgress).catch(() => {});
-      getMathToday().then(setToday).catch(() => {});
+      getMathToday(lang).then(setToday).catch(() => {});
     } catch {
       say(gt("提交失败 — 请检查登录/网络", lang), false);
       setPhase("playing");
@@ -446,7 +446,7 @@ function VillageMeters({ g, scenario }: { g: MathRefs; scenario: MathScenarioBri
       {scenario.items.map((it, i) => (
         <div key={it.name}>
           <div className="flex justify-between text-[10px] text-white/80">
-            <span className="font-medium">{it.name}</span>
+            <span className="font-medium">{it.name_display ?? it.name}</span>
             <span ref={(el) => { txtRefs.current[i] = el; }} className="text-white/60" />
           </div>
           <div className="mt-0.5 h-1.5 overflow-hidden rounded-full bg-white/20">
@@ -502,7 +502,7 @@ function ResultCard({ result, onRetry, onBack }: { result: MathSolveResp; onRetr
                 const diff = Math.abs(mine - ideal);
                 return (
                   <tr key={it.name} className="border-t border-line/60">
-                    <td className="px-2 py-1 text-fg">{it.name}</td>
+                    <td className="px-2 py-1 text-fg">{it.name_display ?? it.name}</td>
                     <td className="px-2 py-1 text-end text-fg">{Math.round(mine * 10) / 10} {sc.unit}</td>
                     <td className={`px-2 py-1 text-end ${diff / Math.max(1, sc.total) > 0.1 ? "text-amber-700" : "text-muted"}`}>
                       {Math.round(ideal * 10) / 10} {sc.unit}

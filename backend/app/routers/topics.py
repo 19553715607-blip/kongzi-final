@@ -5,6 +5,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 
 from ..db import get_db
+from ..services.i18n import localize_ref_label
 from ..models import Passage, Topic
 from ..services import topics as topics_svc
 
@@ -61,7 +62,7 @@ def topic_passages(
         items.append(
             {
                 "id": p.id,
-                "ref_label": p.ref_label,
+                "ref_label": localize_ref_label(p.ref_label, lang),
                 "original_text": p.original_text,
                 "translation": tr.text if tr else None,
             }

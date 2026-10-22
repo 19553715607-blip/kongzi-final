@@ -9,6 +9,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 
 from ..db import get_db
+from ..services.i18n import localize_ref_label, pick_i18n
 from ..models import Book, Chapter, Passage
 from ..schemas import AnnotationOut, PassageOut, TranslationOut
 
@@ -35,7 +36,7 @@ def _to_passage_out(p: Passage, lang: str) -> PassageOut:
     """把 Passage 序列化为 PassageOut（与 get_passage 同构，供多接口复用）。"""
     return PassageOut(
         id=p.id,
-        ref_label=p.ref_label,
+        ref_label=localize_ref_label(p.ref_label, lang),
         original_text=p.original_text,
         pinyin=p.pinyin,
         concepts=list(p.concepts or []),
@@ -100,6 +101,7 @@ def today_passage(
 @router.get("/passages/{ref_id}/neighbors")
 def passage_neighbors(
     ref_id: str,
+    lang: str = Query("zh"),
     db: Session = Depends(get_db),
 ) -> dict:
     """同一部经典内上一条 / 下一条（按章序 + 句序），读经页键盘导航用。"""
@@ -115,7 +117,14 @@ def passage_neighbors(
         .where(Chapter.book_id == chapter.book_id)
         .order_by(Chapter.sort_order, Passage.sort_order)
     ).all()
-    items = [{"id": r[0].id, "ref_label": r[0].ref_label, "original_text": r[0].original_text} for r in rows]
+    items = [
+        {
+            "id": r[0].id,
+            "ref_label": localize_ref_label(r[0].ref_label, lang),
+            "original_text": r[0].original_text,
+        }
+        for r in rows
+    ]
     idx = next((i for i, it in enumerate(items) if it["id"] == ref_id), -1)
     return {
         "current": items[idx] if idx >= 0 else None,
@@ -165,16 +174,28 @@ def related_passages(
 
 
 @router.get("/books")
-def list_books(db: Session = Depends(get_db)) -> List[dict]:
+def list_books(
+    lang: str = Query("zh"),
+    db: Session = Depends(get_db),
+) -> List[dict]:
     books = db.execute(select(Book).order_by(Book.sort_order)).scalars().all()
     return [
-        {"id": b.id, "title_zh": b.title_zh, "title_i18n": b.title_i18n}
+        {
+            "id": b.id,
+            "title_zh": b.title_zh,
+            "title_i18n": b.title_i18n,
+            "title": pick_i18n(b.title_zh, b.title_i18n, lang),
+        }
         for b in books
     ]
 
 
 @router.get("/books/{book_id}/chapters")
-def list_chapters(book_id: str, db: Session = Depends(get_db)) -> List[dict]:
+def list_chapters(
+    book_id: str,
+    lang: str = Query("zh"),
+    db: Session = Depends(get_db),
+) -> List[dict]:
     chapters = (
         db.execute(
             select(Chapter).where(Chapter.book_id == book_id).order_by(Chapter.sort_order)
@@ -182,11 +203,22 @@ def list_chapters(book_id: str, db: Session = Depends(get_db)) -> List[dict]:
         .scalars()
         .all()
     )
-    return [{"id": c.id, "title_zh": c.title_zh} for c in chapters]
+    return [
+        {
+            "id": c.id,
+            "title_zh": c.title_zh,
+            "title": pick_i18n(c.title_zh, c.title_i18n, lang),
+        }
+        for c in chapters
+    ]
 
 
 @router.get("/chapters/{chapter_id}/passages")
-def list_passages(chapter_id: str, db: Session = Depends(get_db)) -> List[dict]:
+def list_passages(
+    chapter_id: str,
+    lang: str = Query("zh"),
+    db: Session = Depends(get_db),
+) -> List[dict]:
     rows = (
         db.execute(
             select(Passage)
@@ -196,7 +228,10 @@ def list_passages(chapter_id: str, db: Session = Depends(get_db)) -> List[dict]:
         .scalars()
         .all()
     )
-    return [{"id": p.id, "ref_label": p.ref_label, "original_text": p.original_text} for p in rows]
+    return [
+        {"id": p.id, "ref_label": localize_ref_label(p.ref_label, lang), "original_text": p.original_text}
+        for p in rows
+    ]
 
 
 @router.get("/passages/{ref_id}", response_model=PassageOut)
@@ -222,7 +257,7 @@ def search(
     return [
         {
             "ref_id": r.ref_id,
-            "ref_label": r.ref_label,
+            "ref_label": localize_ref_label(r.ref_label, lang),
             "original_text": r.original_text,
             "translation": r.translation,
             "score": r.score,

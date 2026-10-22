@@ -55,7 +55,7 @@ const DICT: Dict = {
     en: "Ask the agents; get traceable classical interpretations.",
     fr: "Interrogez les agents pour une exégèse traçable des classiques.",
     es: "Pregunta a los agentes y obtén interpretaciones clásicas trazables.",
-    ar: "اسأل العملاء واحصل على تفسيرات كلاسيكية يمكن تتبعها.",
+    ar: "اسأل الوكلاء واحصل على تفسيرات كلاسيكية يمكن تتبعها.",
   },
   "home.entry.read": {
     zh: "读一读", en: "Read the classics",
@@ -159,7 +159,7 @@ const DICT: Dict = {
     en: "AI readings are generated at runtime by agents (distinct from authoritative annotations).",
     fr: "Les lectures par IA sont générées à l'exécution par des agents (à distinguer des annotations faisant autorité).",
     es: "Las lecturas por IA se generan en tiempo de ejecución por agentes (distintas de las anotaciones autorizadas).",
-    ar: "تُولَّد القراءات الآلية أثناء التشغيل بواسطة العملاء (وهي مختلفة عن الشروح المعتمدة).",
+    ar: "تُولَّد القراءات الآلية أثناء التشغيل بواسطة الوكلاء (وهي مختلفة عن الشروح المعتمدة).",
   },
   "read.askPrefix": {
     zh: "请解读：", en: "Please interpret: ", fr: "Veuillez interpréter : ",

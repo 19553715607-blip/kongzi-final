@@ -30,7 +30,7 @@
 | 乐 yue | `YueScenario` | title / mood_label / setting / hint | ✅ 试点 |
 | 御 yu | `YuScenario` | title / kind_label / setting / hint | ✅ |
 | 数 math | `MathScenario` | 同上 + `unit` + `items_i18n`（明细行） | ✅ |
-| 礼 li | `LiScenario` | title / setting + 选项 JSON | 待做 |
+| 礼 li | `LiScenario` | title / setting + 选项 JSON | ✅ |
 | 书 shu | `ShuCard` | benyi / jinyi / story + `options`（选项） | ✅ |
 
 **射艺无内容层缺口** —— 它的场景是前端常量，不经数据库。
@@ -62,7 +62,8 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.attributes import flag_modified
 
-from .models import MathScenario, ShuCard, YueScenario, YuScenario
+from .models import LiScenario, MathScenario, ShuCard, YueScenario, YuScenario
+from .scenario_i18n_li import LI_SCENARIO_I18N
 from .scenario_i18n_math import MATH_SCENARIO_I18N
 from .scenario_i18n_shu import SHU_CARD_I18N
 
@@ -362,6 +363,13 @@ ARTS: list[tuple] = [
         ("benyi", "jinyi", "story"),
         SHU_CARD_I18N,
         # 选项：以 ASCII 选项 key（"A".."D"）为键 —— 它本就是身份，无需 name_display 那类分离
+        ("options_i18n", "options", "options", "key", ("text",)),
+    ),
+    (
+        LiScenario,
+        "title",  # 以中文情境标题为键（与 seed_li_scenarios.py 的 upsert 键一致）
+        ("title", "setting"),
+        LI_SCENARIO_I18N,
         ("options_i18n", "options", "options", "key", ("text",)),
     ),
 ]

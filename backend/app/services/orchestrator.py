@@ -17,6 +17,7 @@ from ..models import Concept
 from .llm import get_llm
 from .retrieval import Evidence, retrieve
 from . import topics as topics_svc
+from .i18n import localize_ref_label
 
 Event = Tuple[str, object]
 
@@ -160,7 +161,7 @@ async def run_chat(
                 "ref_id": ev.ref_id,
                 "book": ev.book,
                 "chapter": ev.chapter,
-                "ref_label": ev.ref_label,
+                "ref_label": localize_ref_label(ev.ref_label, lang),
                 "text": ev.original_text,
             },
         )

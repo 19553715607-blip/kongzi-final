@@ -13,45 +13,54 @@ from sqlalchemy.orm.attributes import flag_modified
 from ..db import get_db
 from ..models import LiChoice, LiHostRound, LiScenario, Passage, User
 from ..services.auth import get_current_user
+from ..services.i18n import localize_ref_label, pick_i18n
 
 router = APIRouter(prefix="/api/v1/li", tags=["li-game"])
 
 DAILY_LIMIT = 3   # 每日最多 3 个新场景
 
 
-def _scenario_card(s: LiScenario) -> dict:
+def _scenario_card(s: LiScenario, lang: str = "zh") -> dict:
     """玩之前：只露情境，藏选项的儒分/情分（防止剧透）。"""
+    options_i18n = s.options_i18n or {}
     return {
         "id": s.id,
-        "title": s.title,
+        "title": pick_i18n(s.title, s.title_i18n, lang),
         "category": s.category,
-        "setting": s.setting,
+        "setting": pick_i18n(s.setting, s.setting_i18n, lang),
         "options": [
-            {"key": o["key"], "text": o["text"]}
+            {
+                "key": o["key"],
+                "text": pick_i18n(o["text"], (options_i18n.get(o["key"]) or {}).get("text"), lang),
+            }
             for o in (s.options or [])
         ],
         "related_concepts": list(s.related_concepts or []),
     }
 
 
-def _option_full(o: dict, db: Session) -> dict:
-    """玩之后：展开选项的完整点评 + 经典依据。"""
+def _option_full(o: dict, db: Session, lang: str = "zh", loc: Optional[dict] = None) -> dict:
+    """玩之后：展开选项的完整点评 + 经典依据。
+
+    loc = 该选项的多语条目 {field: {lang: text}}；缺译回落中文（pick_i18n 语义）。
+    """
     refs = []
     for ref_id in o.get("ref_ids") or []:
         p = db.get(Passage, ref_id)
         if p:
             refs.append({
                 "ref_id": p.id,
-                "ref_label": p.ref_label or p.id,
+                "ref_label": localize_ref_label(p.ref_label or p.id, lang),
                 "text": p.original_text,
             })
+    loc = loc or {}
     return {
         "key": o["key"],
-        "text": o["text"],
+        "text": pick_i18n(o["text"], loc.get("text"), lang),
         "ru_delta": o.get("ru_delta", 0),
         "qing_delta": o.get("qing_delta", 0),
-        "comment_ru": o.get("comment_ru", ""),
-        "comment_others": o.get("comment_others", ""),
+        "comment_ru": pick_i18n(o.get("comment_ru", ""), loc.get("comment_ru"), lang),
+        "comment_others": pick_i18n(o.get("comment_others", ""), loc.get("comment_others"), lang),
         "refs": refs,
     }
 
@@ -60,6 +69,7 @@ def _option_full(o: dict, db: Session) -> dict:
 def today(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
+    lang: str = Query("zh"),
 ) -> dict:
     """今日 3 个场景。已玩过的优先排后或不出现；按用户进度。"""
     # 今日已选过的 scenario id
@@ -83,13 +93,13 @@ def today(
     new_ones = [s for s in all_s if s.id not in ever_done][:DAILY_LIMIT]
 
     today_results = [
-        {"played": False, **_scenario_card(s)} for s in new_ones
+        {"played": False, **_scenario_card(s, lang)} for s in new_ones
     ]
     # 如果今天的新场景不够 3 个，补已玩过的（可复习）
     if len(today_results) < DAILY_LIMIT:
         recent_review = [s for s in all_s if s.id in ever_done][: DAILY_LIMIT - len(today_results)]
         today_results.extend(
-            [{"played": True, **_scenario_card(s)} for s in recent_review]
+            [{"played": True, **_scenario_card(s, lang)} for s in recent_review]
         )
 
     return {
@@ -104,11 +114,12 @@ def get_scenario(
     sid: int,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
+    lang: str = Query("zh"),
 ) -> dict:
     s = db.get(LiScenario, sid)
     if not s:
         raise HTTPException(404, "scenario not found")
-    return {"played": False, **_scenario_card(s)}
+    return {"played": False, **_scenario_card(s, lang)}
 
 
 class ChooseIn(BaseModel):
@@ -121,6 +132,7 @@ def choose(
     body: ChooseIn,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
+    lang: str = Query("zh"),
 ) -> dict:
     """提交选择，返回点评 + 经典依据 + 新分数 + 新解锁。"""
     s = db.get(LiScenario, sid)
@@ -177,8 +189,11 @@ def choose(
 
     return {
         "score_applied": score_applied,
-        "chosen": _option_full(chosen, db),
-        "all_options": [_option_full(o, db) for o in (s.options or [])],
+        "chosen": _option_full(chosen, db, lang, (s.options_i18n or {}).get(chosen.get("key"))),
+        "all_options": [
+            _option_full(o, db, lang, (s.options_i18n or {}).get(o.get("key")))
+            for o in (s.options or [])
+        ],
         "new_unlocked_refs": new_unlocked,
         "progress": {
             "ru_score": user.ru_score or 0,
@@ -206,7 +221,7 @@ HOST_SCENARIOS: dict[str, dict] = {
 UNLOCK_THRESHOLD = 55   # 总分达到即解锁该场景经典
 
 
-def _host_ref(db: Session, ref_id: str) -> Optional[dict]:
+def _host_ref(db: Session, ref_id: str, lang: str = "zh") -> Optional[dict]:
     p = db.get(Passage, ref_id)
     if not p:
         return None
@@ -426,7 +441,7 @@ def progress(
         if p:
             refs.append({
                 "ref_id": p.id,
-                "ref_label": p.ref_label or p.id,
+                "ref_label": localize_ref_label(p.ref_label or p.id, lang),
                 "text": p.original_text,
             })
     # 称号
