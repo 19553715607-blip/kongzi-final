@@ -43,6 +43,12 @@ async def lifespan(app: FastAPI):
         print(f"[startup] lang pack skipped ({exc})")
     # 向量后端：启动时确保索引就绪（auto/vector 模式且集合为空时构建）
     s = get_settings()
+    # LLM 提供方自检：hunao 缺 key 时明确告警，避免首问才在流中报错
+    if s.llm_provider.lower() == "hunao" and not s.hunao_api_key:
+        print(
+            "[startup] LLM_PROVIDER=hunao 但 HUNAO_API_KEY 为空："
+            "/api/v1/chat 将直接返回错误，请填写 backend/.env 后重启"
+        )
     if s.retrieval_backend.lower() in ("auto", "vector"):
         try:
             from .db import SessionLocal

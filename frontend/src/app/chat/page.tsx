@@ -337,17 +337,25 @@ export default function ChatPage() {
 
 function AssistantBubble({ msg, onCopy }: { msg: AssistantMsg; onCopy: (m: AssistantMsg) => void }) {
   const [lang] = useLang();
-  const [visibleLength, setVisibleLength] = useState(0);
+  // 已完整落地的历史消息直接全量显示，只有正在流式的消息才逐字揭示
+  const [visibleLength, setVisibleLength] = useState(() => (msg.streaming ? 0 : msg.text.length));
   const latestText = useRef(msg.text);
   latestText.current = msg.text;
+  const caughtUp = !msg.streaming && visibleLength >= msg.text.length;
 
+  // 打字机揭示：单个常驻定时器，按积压量自适应步长，避免流式速度超过揭示速度时长期滞后
   useEffect(() => {
-    if (!msg.streaming && visibleLength >= latestText.current.length) return;
+    if (caughtUp) return;
     const timer = window.setInterval(() => {
-      setVisibleLength((length) => Math.min(length + 1, latestText.current.length));
-    }, 18);
+      setVisibleLength((length) => {
+        const total = latestText.current.length;
+        if (length >= total) return length;
+        const backlog = total - length;
+        return Math.min(length + Math.max(1, Math.ceil(backlog / 24)), total);
+      });
+    }, 16);
     return () => window.clearInterval(timer);
-  }, [msg.streaming, visibleLength]);
+  }, [caughtUp]);
 
   const visibleText = msg.text.slice(0, visibleLength);
   const typing = msg.streaming || visibleLength < msg.text.length;

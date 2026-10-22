@@ -48,6 +48,9 @@ class Settings(BaseSettings):
     hunao_base_url: str = "https://ai.hunao.xin"
     # 可选；为空时请求体不发送 kb_id
     hunao_kb_id: str = ""
+    # true：把「提问 + 检索证据 + 作答语言」整体交给智能体（答案可溯源，默认）
+    # false：只发原始提问，由智能体自行发挥（本平台 citation 仅作相关经文展示）
+    hunao_grounding: bool = True
 
     # 千问（阿里 DashScope）—— OpenAI 兼容协议
     qwen_api_key: str = "sk-5d3bcd36eca94b8d8c3e49cb3b850b01"

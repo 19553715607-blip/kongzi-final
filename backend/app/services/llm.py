@@ -170,7 +170,9 @@ class HunaoLLM(LLMClient):
         user_message: str | None = None,
     ) -> AsyncIterator[str]:
         if not settings.hunao_api_key:
-            raise RuntimeError("HUNAO_API_KEY 未设置")
+            raise RuntimeError(
+                "LLM_PROVIDER=hunao 但未设置 HUNAO_API_KEY：请在 backend/.env 填写后重启"
+            )
 
         url = f"{settings.hunao_base_url.rstrip('/')}/chat/stream"
         headers = {"Authorization": f"Bearer {settings.hunao_api_key}"}
@@ -186,10 +188,15 @@ class HunaoLLM(LLMClient):
             digest = hashlib.sha256(session_id.encode("utf-8")).digest()
             hunao_session_id = int.from_bytes(digest[:4], "big") % max_session_id + 1
 
+        # 默认把「提问 + 检索证据 + 作答语言」整体交给智能体，
+        # 保证答案仍落在本平台召回的原典上（可溯源）；关闭后只发原始提问。
+        message = user_message or prompt
+        if settings.hunao_grounding and prompt:
+            message = prompt
+
         payload = {
-            "session_id": session_id,
             "session_id": hunao_session_id,
-            "message": user_message or prompt,
+            "message": message,
         }
         if settings.hunao_kb_id:
             payload["kb_id"] = settings.hunao_kb_id
@@ -221,6 +228,11 @@ class HunaoLLM(LLMClient):
 def get_llm() -> LLMClient:
     provider = settings.llm_provider.lower()
     if provider == "hunao":
+        if not settings.hunao_api_key:
+            # 提前失败：避免先推送 citation 事件、再在流中报错
+            raise RuntimeError(
+                "LLM_PROVIDER=hunao 但未设置 HUNAO_API_KEY：请在 backend/.env 填写后重启"
+            )
         return HunaoLLM()
     if provider == "qwen" and settings.qwen_api_key:
         return QwenLLM()
