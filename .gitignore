@@ -14,6 +14,7 @@ node_modules/
 .next/
 .next-build/
 .next.stale-*/
+.next-*/
 out/
 .npm/
 .npm-cache/
