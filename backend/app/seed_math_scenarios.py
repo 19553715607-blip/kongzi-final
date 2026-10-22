@@ -97,7 +97,7 @@ MATH_PASSAGES = [
             "en": "Land is the foundation of governance. Therefore land can rectify governance. If land is not equitably distributed and harmonized, governance cannot be rectified.",
             "fr": "La terre est le fondement du gouvernement. Aussi la terre peut-elle rectifier le gouvernement. Si la terre n'est ni équitablement répartie ni harmonisée, le gouvernement ne peut être rectifié.",
             "es": "La tierra es la base del gobierno. Por eso la tierra puede rectificar el gobierno. Si la tierra no se distribuye con equidad y armonía, el gobierno no puede rectificarse.",
-            "ar": "الأرض أساس الحكم، فإذا كانت الأرض موزعة بعدل وانسجام صحّ الحكم، وإلا لم يصح.",
+            "ar": "الأرض أساس الحكم، وبها يُقوَّم الحكم؛ فإن لم تكن الأرض موزعة بعدل ووفاق لم يستقم الحكم.",
         },
         "anno_classical": ("尹知章注", "地者税赋所出，分配不均则民不安、政不行。"),
         "anno_modern": "管仲论治国：土地分配是政治的根本——分得公平，则政可正；不均，则政不行。",

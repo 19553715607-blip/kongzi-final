@@ -370,7 +370,8 @@ ARTS: list[tuple] = [
         "title",  # 以中文情境标题为键（与 seed_li_scenarios.py 的 upsert 键一致）
         ("title", "setting"),
         LI_SCENARIO_I18N,
-        ("options_i18n", "options", "options", "key", ("text",)),
+        # 选项：文本 + 选后点评（儒家视角 / 他人反应）三个子字段
+        ("options_i18n", "options", "options", "key", ("text", "comment_ru", "comment_others")),
     ),
 ]
 

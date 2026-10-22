@@ -641,3 +641,16 @@ LI_SCENARIO_I18N: dict[str, dict] = {
         },
     },
 }
+
+
+# ── 合并「选后点评」译文（comment_ru / comment_others）───────────────────────
+# 点评单独成表（scenario_i18n_li_comments.py），此处合并进 options，保持
+# apply_scenario_i18n 的 item_cfg 只需读 LI_SCENARIO_I18N 一处数据。
+from .scenario_i18n_li_comments import LI_COMMENT_I18N  # noqa: E402
+
+_merged = 0
+for (_title, _key), _fields in LI_COMMENT_I18N.items():
+    _opt = (LI_SCENARIO_I18N.get(_title) or {}).get("options", {}).get(_key)
+    if _opt is not None:
+        _opt.update(_fields)
+        _merged += 1

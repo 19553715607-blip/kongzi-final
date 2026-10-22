@@ -31,6 +31,12 @@ _CJK = re.compile(r"[\u4e00-\u9fff]")
 
 # ── 书目（id → {lang: 书名}）────────────────────────────────────────────────
 BOOK_I18N: dict[str, dict[str, str]] = {
+    "lunyu": {
+        "en": "The Analects",
+        "fr": "Entretiens de Confucius",
+        "es": "Analectas",
+        "ar": "الحوارات",
+    },
     "liji": {
         "en": "Records of Ritual",
         "fr": "Mémoires sur les rites",

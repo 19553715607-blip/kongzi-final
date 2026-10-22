@@ -70,6 +70,34 @@ async def lifespan(app: FastAPI):
             _db.close()
     except Exception as exc:  # noqa: BLE001
         print(f"[startup] ref i18n skipped ({exc})")
+    # 注疏（Annotation）多语补齐：按 (passage_id, type) 补，古注与编者按各译各的
+    try:
+        from .db import SessionLocal
+        from .seed_annotation_i18n import apply_annotation_i18n
+
+        _db = SessionLocal()
+        try:
+            _counts = apply_annotation_i18n(_db)
+            if _counts["updated"]:
+                print(f"[startup] annotation i18n applied: {_counts}")
+        finally:
+            _db.close()
+    except Exception as exc:  # noqa: BLE001
+        print(f"[startup] annotation i18n skipped ({exc})")
+    # 中文（现代汉语）译文补齐：缺 zh 行的经文补一条
+    try:
+        from .db import SessionLocal
+        from .seed_zh_translations import apply_zh_translations
+
+        _db = SessionLocal()
+        try:
+            _counts = apply_zh_translations(_db)
+            if _counts["added"]:
+                print(f"[startup] zh translations added: {_counts}")
+        finally:
+            _db.close()
+    except Exception as exc:  # noqa: BLE001
+        print(f"[startup] zh translations skipped ({exc})")
     # 已知错译的定点修复（幂等，仅在错译仍在库中时替换）
     try:
         from .db import SessionLocal

@@ -57,6 +57,10 @@ FIXES: dict[tuple[str, str], tuple[str, str]] = {
         "بالإيقاع، واتباع منعطف النهر، والمرور بنُصب الأمير، والرقص في مفترق الطرق، "
         "والصيد بالطريدة إلى اليسار.",
     ),
+    ("guanzi.chengma.1", "ar"): (
+        "الأرض أساس الحكم، فإذا كانت الأرض موزعة بعدل وانسجام صحّ الحكم، وإلا لم يصح.",
+        "الأرض أساس الحكم، وبها يُقوَّم الحكم؛ فإن لم تكن الأرض موزعة بعدل ووفاق لم يستقم الحكم.",
+    ),
     ("mengzi.tengwengong.xia.6", "fr"): (
         "même pour gibier en montagnes",
         "Même un cocher rougit de s'associer à un archer indigne ; dût-il, en s'y associant, "

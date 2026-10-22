@@ -1056,7 +1056,7 @@ const DICT: Dict = {
   "jrn.art.li": { zh: "礼", en: "Rites", fr: "Rites", es: "Ritos", ar: "الطقوس" },
   "jrn.art.yue": { zh: "乐", en: "Music", fr: "Musique", es: "Música", ar: "الموسيقى" },
   "jrn.art.she": { zh: "射", en: "Archery", fr: "Tir à l'arc", es: "Arquería", ar: "الرماية" },
-  "jrn.art.yu": { zh: "御", en: "Charioteering", fr: "Conduite", es: "Carruaje", ar: "قيادة المركبات" },
+  "jrn.art.yu": { zh: "御", en: "Charioteering", fr: "Conduite", es: "Conducción de carros", ar: "قيادة المركبات" },
   "jrn.art.shu": { zh: "书", en: "Calligraphy", fr: "Calligraphie", es: "Caligrafía", ar: "الخط" },
   "jrn.art.shu2": { zh: "数", en: "Mathematics", fr: "Mathématiques", es: "Matemáticas", ar: "الحساب" },
   // 段位等级（神·妙·中·试·未起）
@@ -1667,10 +1667,10 @@ const DICT: Dict = {
   },
   "home.hero.title": {
     zh: "读中国 · 思中国 · 与中国同行",
-    en: "Read China. Think. Live with China.",
-    fr: "Lire la Chine. Penser. Vivre avec la Chine.",
-    es: "Lee China. Piensa. Vive con China.",
-    ar: "اقرأ الصين. فكّر. عِش مع الصين.",
+    en: "Read China. Think China. Walk with China.",
+    fr: "Lire la Chine. Penser la Chine. Cheminer avec la Chine.",
+    es: "Leer China. Pensar China. Caminar con China.",
+    ar: "اقرأ الصين. فكّر في الصين. سِر مع الصين.",
   },
   "home.hero.desc": {
     zh: "一间安静的现代学院：原文、译文、注释与多语释义并陈，每一句都可追溯出处。",
