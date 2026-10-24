@@ -65,7 +65,7 @@ export default function LoginGate({ open, onClose, titleKey = "gate.title" }: Pr
         <div className="mt-4 flex items-center gap-2">
           <Link
             href={`/login?next=${next}`}
-            className="pressable flex-1 rounded-full bg-accent px-4 py-2.5 text-center text-sm text-white transition hover:brightness-110"
+            className="pressable flex-1 rounded-full bg-accent px-4 py-2.5 text-center text-sm text-on-accent transition hover:brightness-110"
           >
             {t("gate.login", lang)}
           </Link>

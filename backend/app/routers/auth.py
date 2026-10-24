@@ -70,6 +70,7 @@ def _user_public(u: User) -> dict:
         "is_guest": u.is_guest,
         "is_admin": u.is_admin,
         "display_name": u.display_name,
+        "avatar_url": u.avatar_url,
         "lang": u.lang,
         "theme": u.theme,
         "ai_persona": u.ai_persona,

@@ -10,6 +10,11 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 # 让 docker 构建用 standalone 输出（更小、可独立运行）
 ENV NEXT_TELEMETRY_DISABLED=1
+# 反代目标必须在构建期传入：rewrites() 会在 next build 时求值并固化进
+# routes-manifest.json，运行期环境变量改不了它。默认本机直连，
+# docker compose 通过 build args 传 http://backend:8000（服务名）。
+ARG BACKEND_ORIGIN=http://127.0.0.1:8000
+ENV BACKEND_ORIGIN=$BACKEND_ORIGIN
 # 确保 public 目录存在（Next.js 标准位，create-next-app 可能不生成）
 RUN mkdir -p public && npm run build
 

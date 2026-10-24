@@ -191,6 +191,7 @@ class User(Base):
     is_admin: Mapped[bool] = mapped_column(default=False)
     is_banned: Mapped[bool] = mapped_column(Boolean, default=False, server_default="0")
     display_name: Mapped[str] = mapped_column(String, default="小君子")
+    avatar_url: Mapped[Optional[str]] = mapped_column(String)  # 自定义头像(相对路径);空=默认玉璧头像
     created_at: Mapped[datetime] = mapped_column(default=func.now())
 
     # 偏好
@@ -649,6 +650,8 @@ class DialogCase(Base):
     title: Mapped[str] = mapped_column(String, default="")
     question: Mapped[str] = mapped_column(Text)
     question_i18n: Mapped[dict] = mapped_column(JSON, default=dict)  # {lang: 译文}
+    # 长答案的多语版本(生成时由五语立场拼装;缺语回落 zh 原文)
+    answer_i18n: Mapped[dict] = mapped_column(JSON, default=dict)
     confucian_answer: Mapped[str] = mapped_column(Text)
     cross_civ_views: Mapped[list] = mapped_column(JSON, default=list)
     citations: Mapped[list] = mapped_column(JSON, default=list)

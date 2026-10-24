@@ -13,7 +13,7 @@ export default function LangSwitcher({ compact = false }: { compact?: boolean })
           title={l.native}
           className={`rounded-full px-2 py-0.5 text-[11px] transition ${
             lang === l.code
-              ? "bg-accent text-white"
+              ? "bg-accent text-on-accent"
               : "text-muted hover:bg-surface-2"
           }`}
         >

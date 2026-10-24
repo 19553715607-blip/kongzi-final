@@ -458,7 +458,7 @@ function ResultCard({ result, onRetry, onBack }: { result: ShuTraceResp; onRetry
         {/* 字源故事 */}
         <div className="mt-3 rounded-lg bg-surface-2/60 p-3 text-[11px] leading-relaxed text-muted">
           <div className="mb-1 flex items-center gap-2">
-            <span className="rounded-full bg-accent px-2 py-0.5 text-[10px] text-white">{card.method_label}</span>
+            <span className="rounded-full bg-accent px-2 py-0.5 text-[10px] text-on-accent">{card.method_label}</span>
             <span className="text-faint">{gt("本义", lang)}</span>
             <span className="font-medium text-fg">{card.benyi}</span>
           </div>
@@ -473,7 +473,7 @@ function ResultCard({ result, onRetry, onBack }: { result: ShuTraceResp; onRetry
                 <span className="opacity-70">{r.ref_label}：</span>
                 <span className="font-serif">{r.text}</span>
                 {result.new_unlocked_refs.some((u) => u.ref_id === r.ref_id) && (
-                  <span className="ms-1 rounded-full bg-gold px-1.5 text-[9px] text-white">{gt("新解锁", lang)}</span>
+                  <span className="ms-1 rounded-full bg-gold px-1.5 text-[9px] text-on-accent">{gt("新解锁", lang)}</span>
                 )}
               </div>
             ))}

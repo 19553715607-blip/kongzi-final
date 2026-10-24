@@ -68,3 +68,7 @@ htmlcov/
 # ─── 本地 Agent 配置（不进共享仓库） ──────────────────
 .claude/
 .cursor/
+
+# 运行时数据(TTS 音频缓存 / 用户上传头像)
+backend/audio_cache/
+backend/uploads/

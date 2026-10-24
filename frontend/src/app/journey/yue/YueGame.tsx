@@ -582,7 +582,7 @@ function ResultCard({ result, onRetry, onBack }: { result: YuePlayResp; onRetry:
                 <span className="opacity-70">{r.ref_label}：</span>
                 <span className="font-serif">{r.text}</span>
                 {result.new_unlocked_refs.some((u) => u.ref_id === r.ref_id) && (
-                  <span className="ml-1 rounded-full bg-gold px-1.5 text-[9px] text-white">{tr("新解锁")}</span>
+                  <span className="ml-1 rounded-full bg-gold px-1.5 text-[9px] text-on-accent">{tr("新解锁")}</span>
                 )}
               </div>
             ))}

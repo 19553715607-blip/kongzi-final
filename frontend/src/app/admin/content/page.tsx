@@ -365,7 +365,7 @@ export default function AdminContentPage() {
                   setSelected(null);
                 }}
                 className={`pressable rounded-full px-3 py-1 text-xs ${
-                  tab === k ? "bg-accent text-white" : "border border-line text-muted"
+                  tab === k ? "bg-accent text-on-accent" : "border border-line text-muted"
                 }`}
               >
                 {t(`admin.content.tab.${k}`, lang)}

@@ -527,7 +527,7 @@ function ResultCard({ result, onRetry, onBack }: { result: YuDriveResp; onRetry:
                 <span className="opacity-70">{r.ref_label}：</span>
                 <span className="font-serif">{r.text}</span>
                 {result.new_unlocked_refs.some((u) => u.ref_id === r.ref_id) && (
-                  <span className="ml-1 rounded-full bg-gold px-1.5 text-[9px] text-white">{tr("新解锁")}</span>
+                  <span className="ml-1 rounded-full bg-gold px-1.5 text-[9px] text-on-accent">{tr("新解锁")}</span>
                 )}
               </div>
             ))}
@@ -576,7 +576,7 @@ function HoldBtn({ label, sub, accent, onHold }: { label: string; sub?: string; 
       onPointerLeave={() => onHold(false)}
       onPointerCancel={() => onHold(false)}
       className={`flex h-14 min-w-[64px] touch-none flex-col items-center justify-center rounded-2xl px-4 font-medium shadow-lg backdrop-blur ${
-        accent ? "bg-accent/90 text-white" : "bg-black/50 text-white"
+        accent ? "bg-accent/90 text-on-accent" : "bg-black/50 text-white"
       }`}
     >
       <span className="text-sm leading-none">{label}</span>

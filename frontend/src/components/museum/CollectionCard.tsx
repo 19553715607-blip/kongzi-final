@@ -9,6 +9,7 @@ export function CollectionCard({
   title,
   note,
   accession,
+  badgeRaw,
   href,
   onClick,
   className = "",
@@ -18,6 +19,8 @@ export function CollectionCard({
   /** 标题下的一行说明，用来填掉等高布局留下的空白 */
   note?: string;
   accession?: string;
+  /** 原样徽标:直接渲染该文本,不加 ACC. 前缀(用于引用编号等自有格式的值) */
+  badgeRaw?: string;
   href?: string;
   onClick?: () => void;
   className?: string;
@@ -28,7 +31,11 @@ export function CollectionCard({
       <span className="cc-body">
         <span className="cc-title">{title}</span>
         {note && <span className="cc-note">{note}</span>}
-        {accession && <span className="cc-acc">ACC. {accession}</span>}
+        {badgeRaw ? (
+          <span className="cc-acc">{badgeRaw}</span>
+        ) : (
+          accession && <span className="cc-acc">ACC. {accession}</span>
+        )}
       </span>
     </>
   );

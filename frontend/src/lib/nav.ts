@@ -44,16 +44,13 @@ export const SITE_MAP: PageDef[] = [
   // 学习
   { href: "/paths", labelKey: "nav.paths", area: "learn", tab: true },
   { href: "/read", labelKey: "nav.read", area: "learn" },
+  { href: "/essays", labelKey: "essays.title", area: "learn" },
   { href: "/chat", labelKey: "nav.chat", area: "learn" },
   { href: "/terms", labelKey: "nav.terms", area: "learn" },
   { href: "/quiz", labelKey: "nav.quiz", area: "learn" },
 
   // 关于
-  { href: "/developers", labelKey: "nav.developers", area: "about" },
-  { href: "/teach", labelKey: "nav.teach", area: "about" },
-  { href: "/co-create", labelKey: "nav.cocreate", area: "about" },
-  { href: "/plugins", labelKey: "nav.plugins", area: "about" },
-  { href: "/reach", labelKey: "nav.reach", area: "about" },
+  { href: "/about", labelKey: "about.title", area: "about" },
   { href: "/kiosk", labelKey: "nav.kiosk", area: "about" },
 ];
 
@@ -61,7 +58,18 @@ export const SITE_MAP: PageDef[] = [
  * 不进导航的系统页。登录页由未登录态入口承载，个人中心由右上角头像菜单
  * 与移动端底部 tab 承载 —— 若同时进下拉会造成重复入口。
  */
-export const SYSTEM_ROUTES: string[] = ["/login", "/me", "/api-diag"];
+export const SYSTEM_ROUTES: string[] = [
+  "/login",
+  "/privacy",
+  "/me",
+  "/api-diag",
+  // 参与者入口:仅从 /about 枢纽页可达,不占一级导航(见 about 页「参与方式」节)
+  "/developers",
+  "/teach",
+  "/co-create",
+  "/plugins",
+  "/reach",
+];
 
 export function isActive(path: string, href: string): boolean {
   if (href === "/") return path === "/";

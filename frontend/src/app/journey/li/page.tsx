@@ -413,7 +413,7 @@ function ResultView({
         >
           {t("分享成绩")}
         </button>
-        <button type="button" onClick={onBack} className="flex-1 rounded-lg bg-accent py-3 text-sm font-medium text-white">
+        <button type="button" onClick={onBack} className="flex-1 rounded-lg bg-accent py-3 text-sm font-medium text-on-accent">
           {t("回到修行场")}
         </button>
       </div>

@@ -385,7 +385,7 @@ function ReadContent() {
           <button
             onClick={() => go(neighbors.prev?.id ?? null)}
             disabled={!neighbors.prev}
-            className="pressable rounded-full border border-line px-3 py-1 text-muted transition hover:bg-surface-2 disabled:opacity-30"
+            className="pressable rounded-full border border-line px-3 py-1 text-muted transition hover:border-accent hover:text-accent disabled:opacity-30"
           >
             ← {t("read.prev", lang)}
           </button>
@@ -393,7 +393,7 @@ function ReadContent() {
           <button
             onClick={() => go(neighbors.next?.id ?? null)}
             disabled={!neighbors.next}
-            className="pressable rounded-full border border-line px-3 py-1 text-muted transition hover:bg-surface-2 disabled:opacity-30"
+            className="pressable rounded-full border border-line px-3 py-1 text-muted transition hover:border-accent hover:text-accent disabled:opacity-30"
           >
             {t("read.next", lang)} →
           </button>
@@ -554,7 +554,7 @@ function ReadContent() {
                     key={r.id}
                     className="w-[220px] sm:w-[240px]"
                     title={r.original_text}
-                    accession={r.ref_label ?? r.id}
+                    badgeRaw={r.ref_label ?? r.id}
                     onClick={() => go(r.id)}
                   />
                 );

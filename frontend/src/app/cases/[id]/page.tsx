@@ -28,7 +28,8 @@ export default function CaseDetailPage({
   const [toast, setToast] = useState("");
 
   useEffect(() => {
-    getCase(Number(id)).then(setC).catch(() => setC(null));
+    // id 兼容 "626-climate-governance" slug 形式,取前导数字
+    getCase(Number.parseInt(id, 10), lang).then(setC).catch(() => setC(null));
     getTopics(lang).then(setTopics).catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, lang]);

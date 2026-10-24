@@ -200,9 +200,15 @@ export default function ChatPage() {
     <div className="flex h-[calc(100dvh-11rem)] flex-col md:h-[calc(100dvh-7.5rem)]">
       {/* AI 人格名片 */}
       <Reveal className="mb-3 flex items-center gap-3 rounded-xl border border-line bg-surface px-4 py-2.5">
-        <span className="flex h-9 w-9 items-center justify-center rounded-full bg-celadon font-serif text-celadon-deep">
-          {t("chat.avatar", lang)}
-        </span>
+        {/* 子曰君形象：青铜孔子浮雕，与站点晨光金视觉一致 */}
+        {/* eslint-disable-next-line @next/next/no-img-element -- 静态小图，直接 img 即可 */}
+        <img
+          src="/avatars/ziyue.webp"
+          alt={t("chat.personaName", lang)}
+          width={36}
+          height={36}
+          className="h-9 w-9 shrink-0 rounded-full object-cover"
+        />
         <div className="flex-1">
           <div className="flex items-center gap-1.5 text-sm font-medium text-fg">
             {t("chat.personaName", lang)} <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
@@ -233,7 +239,7 @@ export default function ChatPage() {
           <button
             onClick={() => setTopicHint(null)}
             className={`shrink-0 rounded-full px-2.5 py-1 text-xs ${topicHint === null
-              ? "bg-accent text-white"
+              ? "bg-accent text-on-accent"
               : "border border-line text-muted"
               }`}
           >

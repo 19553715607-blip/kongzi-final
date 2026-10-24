@@ -209,7 +209,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <div className="font-serif text-lg text-fg">{t("admin.guard.needLogin", lang)}</div>
           <Link
             href="/login"
-            className="rounded-lg bg-accent px-4 py-2 text-sm text-white hover:opacity-90"
+            className="rounded-lg bg-accent px-4 py-2 text-sm text-on-accent hover:opacity-90"
           >
             {t("admin.guard.loginLink", lang)}
           </Link>
@@ -300,7 +300,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 href={n.href}
                 className={`whitespace-nowrap rounded-full px-3 py-1 text-xs transition ${
                   isActive(n.href, n.exact)
-                    ? "bg-accent text-white"
+                    ? "bg-accent text-on-accent"
                     : "border border-line text-muted hover:bg-surface-2 hover:text-fg"
                 }`}
               >

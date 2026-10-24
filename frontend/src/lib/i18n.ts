@@ -307,6 +307,21 @@ const DICT: Dict = {
   "me.guestName": {
     zh: "君", en: "Guest", fr: "Invité", es: "Invitado", ar: "زائر",
   },
+  "me.avatar.change": {
+    zh: "更换头像", en: "Change avatar", fr: "Changer l'avatar", es: "Cambiar avatar", ar: "تغيير الصورة",
+  },
+  "me.avatar.changeHint": {
+    zh: "更换", en: "Change", fr: "Changer", es: "Cambiar", ar: "تغيير",
+  },
+  "me.avatar.busy": {
+    zh: "上传中…", en: "Uploading…", fr: "Envoi…", es: "Subiendo…", ar: "جارٍ الرفع…",
+  },
+  "me.avatar.fail": {
+    zh: "头像上传失败（需 jpg/png/webp，≤6MB）", en: "Avatar upload failed (jpg/png/webp, ≤6MB)", fr: "Échec de l'envoi (jpg/png/webp, ≤6 Mo)", es: "Error al subir (jpg/png/webp, ≤6 MB)", ar: "فشل الرفع (jpg/png/webp، ≤6 ميغابايت)",
+  },
+  "me.avatar.reset": {
+    zh: "恢复默认头像", en: "Reset avatar", fr: "Réinitialiser", es: "Restaurar", ar: "استعادة الافتراضية",
+  },
   "me.guest": {
     zh: "游客", en: "Guest", fr: "Invité", es: "Invitado", ar: "زائر",
   },
@@ -729,6 +744,9 @@ const DICT: Dict = {
   "kiosk.pause": { zh: "暂停", en: "Pause", fr: "Pause", es: "Pausa", ar: "إيقاف" },
 
   // ── 案例库 ───────────────────────────────────────────────────────────
+  "hud.streak": { zh: "连习 {a} 日", en: "{a}-day streak", fr: "série de {a} jours", es: "racha de {a} días", ar: "سلسلة {a} أيام" },
+  "hud.xp": { zh: "修行 {a} XP", en: "practice · {a} XP", fr: "pratique · {a} XP", es: "práctica · {a} XP", ar: "ممارسة · {a} XP" },
+  "hud.energy": { zh: "体力 {a}", en: "energy {a}", fr: "énergie {a}", es: "energía {a}", ar: "طاقة {a}" },
   "cases.noBackend": {
     zh: "后端服务暂时不可用，请稍后重试。", en: "Backend service is unavailable. Please try again shortly.",
     fr: "Service backend indisponible. Réessayez dans un instant.", es: "Servicio backend no disponible. Inténtalo de nuevo en un momento.",
@@ -741,20 +759,8 @@ const DICT: Dict = {
     ar: "مكتبة الحالات · ٥ موضوعات × ٥ حضارات",
   },
   "cases.published": { zh: "条已发布", en: "published", fr: "publiés", es: "publicados", ar: "منشور" },
-  "cases.desc1": {
-    zh: "申报书目标②的「跨文明对话案例库」。每条都引用经典原文与多文明立场，",
-    en: "The cross-civilizational dialogue case library of Goal ②. Every case cites the classical text and multi-civilizational stances,",
-    fr: "La bibliothèque de cas de dialogue inter-civilisationnel de l'objectif ②. Chaque cas cite le texte classique et les positions de plusieurs civilisations,",
-    es: "La biblioteca de casos de diálogo intercivilizacional del objetivo ②. Cada caso cita el texto clásico y posturas de varias civilizaciones,",
-    ar: "مكتبة حالات الحوار بين الحضارات في الهدف ②. كل حالة تستشهد بالنص الكلاسيكي وبمواقف حضارات متعددة،",
-  },
-  "cases.desc2": {
-    zh: "可用于课堂教学、跨文化对话与公开传播。",
-    en: "usable for classroom teaching, cross-cultural dialogue and public outreach.",
-    fr: "utilisable pour l'enseignement, le dialogue interculturel et la diffusion publique.",
-    es: "utilizable para la enseñanza, el diálogo intercultural y la divulgación pública.",
-    ar: "صالحة للتعليم الصفّي والحوار بين الثقافات والنشر العام.",
-  },
+  "cases.desc1": { zh: "真实世界的问题,先听儒家怎么说,再听斯多葛、启蒙与功利主义怎么说。每条案例都引用经典原文与多文明立场,", en: "Real-world questions, answered twice: what the Analects say, then what Stoicism, the Enlightenment and utilitarianism say. Every case cites the classical text and multi-civilizational stances —", fr: "Des questions du monde réel, répondues deux fois : ce que disent les Entretiens, puis le stoïcisme, les Lumières et l'utilitarisme. Chaque cas cite le texte classique et des positions multi-civilisationnelles —", es: "Preguntas del mundo real, respondidas dos veces: lo que dicen las Analectas y lo que dicen el estoicismo, la Ilustración y el utilitarismo. Cada caso cita el texto clásico y posturas multiculturales —", ar: "أسئلة من العالم الحقيقي تُجاب مرتين: ما تقوله «المنتخبات» ثم ما يقوله الرواقية والتنوير والنفعية. كل حالة تستشهد بالنص الكلاسيكي وبمواقف حضارات متعددة —" },
+  "cases.desc2": { zh: "可直接用于课堂讨论、论文写作与跨文化对话。", en: "ready for seminar debates, essays and cross-cultural dialogue.", fr: "prêtes pour les débats, les dissertations et le dialogue interculturel.", es: "listas para debates, ensayos y diálogo intercultural.", ar: "جاهزة للنقاش الصفّي والكتابة الأكاديمية والحوار بين الثقافات." },
   "cases.topic": { zh: "议题：", en: "Topics: ", fr: "Thèmes : ", es: "Temas: ", ar: "الموضوعات: " },
   "cases.all": { zh: "全部", en: "All", fr: "Tous", es: "Todos", ar: "الكل" },
   "cases.searchPlaceholder": { zh: "搜索关键词…", en: "Search keywords…", fr: "Rechercher des mots-clés…", es: "Buscar palabras clave…", ar: "ابحث بكلمات مفتاحية…" },
@@ -1080,6 +1086,15 @@ const DICT: Dict = {
   "home.quote.copied": { zh: "已复制", en: "Copied", fr: "Copié", es: "Copiado", ar: "تم النسخ" },
   "home.quote.copyFail": { zh: "复制失败", en: "Copy failed", fr: "Échec de copie", es: "Error al copiar", ar: "فشل النسخ" },
   "home.quote.listen": { zh: "朗读", en: "Listen", fr: "Écouter", es: "Escuchar", ar: "استمع" },
+  "home.quote.share": { zh: "分享卡", en: "Share card", fr: "Carte", es: "Tarjeta", ar: "بطاقة" },
+  "home.quote.shared": { zh: "分享卡已生成,请在下载中查看", en: "Share card generated — check your downloads", fr: "Carte générée — voir vos téléchargements", es: "Tarjeta generada — mira tus descargas", ar: "تم إنشاء البطاقة — راجع التنزيلات" },
+  "home.quote.shareFail": { zh: "分享卡生成失败", en: "Failed to generate card", fr: "Échec de génération", es: "Error al generar", ar: "فشل إنشاء البطاقة" },
+  "home.quote.cite": { zh: "引用", en: "Cite", fr: "Citer", es: "Citar", ar: "استشهاد" },
+  "home.quote.cited": { zh: "已复制学术引用", en: "Citation copied", fr: "Citation copiée", es: "Cita copiada", ar: "تم نسخ الاستشهاد" },
+  "home.quote.transBy": { zh: "译:", en: "Trans. ", fr: "Trad. ", es: "Trad. ", ar: "ترجمة: " },
+  "home.quote.transPlatform": { zh: "平台译本", en: "Platform translation", fr: "Traduction de la plateforme", es: "Traducción de la plataforma", ar: "ترجمة المنصة" },
+  "home.quote.stop": { zh: "停止", en: "Stop", fr: "Arrêter", es: "Detener", ar: "إيقاف" },
+  "home.quote.loading": { zh: "生成中", en: "Loading", fr: "Chargement", es: "Cargando", ar: "جارٍ التحميل" },
   "home.quote.noTts": { zh: "当前浏览器不支持朗读", en: "Speech not supported in this browser", fr: "Synthèse vocale non prise en charge", es: "Voz no compatible con este navegador", ar: "القراءة الصوتية غير مدعومة" },
   "home.quote.save": { zh: "收藏", en: "Save", fr: "Sauver", es: "Guardar", ar: "حفظ" },
   "home.quote.saved": { zh: "已收藏", en: "Saved", fr: "Sauvé", es: "Guardado", ar: "تم الحفظ" },
@@ -1690,6 +1705,29 @@ const DICT: Dict = {
   "home.hero.ctaChat": { zh: "向子曰君提问", en: "Ask the agent", fr: "Questionner l'agent", es: "Pregunta al agente", ar: "اسأل العميل" },
   "home.hero.ctaJourney": { zh: "开始六艺", en: "Enter the Six Arts", fr: "Entrer dans les six arts", es: "Entrar en las seis artes", ar: "ادخل الفنون الستة" },
 
+  // 夜游博物馆首屏（破晓底图）：大标题、装饰拉丁行、入口行标签
+  "home.night.title": {
+    zh: "切问近思",
+    en: "Inquire & Reflect",
+    fr: "Interroger & Réfléchir",
+    es: "Preguntar & Reflexionar",
+    ar: "اسأل وتأمّل",
+  },
+  "home.night.latin": {
+    zh: "Inquire & Reflect · Confucian Semantic Platform",
+    en: "Inquire & Reflect · Confucian Semantic Platform",
+    fr: "Inquire & Reflect · Confucian Semantic Platform",
+    es: "Inquire & Reflect · Confucian Semantic Platform",
+    ar: "Inquire & Reflect · Confucian Semantic Platform",
+  },
+  "home.night.explore": {
+    zh: "继续探索 —",
+    en: "Continue —",
+    fr: "Continuer —",
+    es: "Continuar —",
+    ar: "واصل —",
+  },
+
   // 首页首屏四主入口（唯一强入口区，其余区块降权）
   "home.primary.journey": { zh: "君子路 · 六艺", en: "Six Arts Journey", fr: "La Voie des six arts", es: "El Camino de las seis artes", ar: "سبيل الفنون الستة" },
   "home.primary.journey.desc": { zh: "礼乐射御书数六关，可玩、可评、可回溯。", en: "Ritual, music, archery, chariot, writing, math — playable and scored.", fr: "Rite, musique, tir, char, écriture, calcul : jouable et noté.", es: "Rito, música, tiro, carro, escritura, cálculo: jugable y puntuado.", ar: "الطقوس والموسيقى والرماية والعجلة والكتابة والحساب — قابلة للعب والتقييم." },
@@ -1721,7 +1759,9 @@ const DICT: Dict = {
   },
   "home.mode.enter": { zh: "进入", en: "Enter", fr: "Entrer", es: "Entrar", ar: "ادخل" },
 
-  "home.civ.title": { zh: "从一个文明问题开始", en: "Start with one civilization question", fr: "Partez d'une question de civilisation", es: "Empieza con una pregunta de civilización", ar: "ابدأ بسؤال حضاري واحد" },
+  "home.civ.title": { zh: "当孔子遇见苏格拉底", en: "When Confucius meets Socrates", fr: "Quand Confucius rencontre Socrate", es: "Cuando Confucio conoce a Sócrates", ar: "حين يلتقي كونفوشيوس بسقراط" },
+  "home.civ.desc": { zh: "把《论语》放进世界思想的坐标系:与斯多葛、启蒙、功利主义正面对话,看共鸣,也看分歧。", en: "Place the Analects in the coordinate system of world thought — dialogues with Stoicism, the Enlightenment and utilitarianism: echoes, and productive disagreements.", fr: "Situez les Entretiens dans la pensée mondiale — dialogues avec le stoïcisme, les Lumières et l'utilitarisme : échos et désaccords féconds.", es: "Sitúa las Analectas en el pensamiento mundial: diálogos con el estoicismo, la Ilustración y el utilitarismo; ecos y desacuerdos fértiles.", ar: "ضع «المنتخبات» في خريطة الفكر العالمي: حوارات مع الرواقية والتنوير والنفعية؛ أصداء واختلافات مثمرة." },
+  "home.civ.cta": { zh: "进入跨文明对话", en: "Enter the dialogue", fr: "Entrer dans le dialogue", es: "Entrar al diálogo", ar: "ادخل الحوار" },
   "home.civ.q1": {
     zh: "「己所不欲，勿施于人」与全球伦理是否相通？",
     en: "Does \"do not impose on others what you do not desire\" connect with global ethics?",
@@ -1853,6 +1893,13 @@ const DICT: Dict = {
   },
 
   "terms.kicker": { zh: "术语索引 · Glossary", en: "Glossary", fr: "Glossaire", es: "Glosario", ar: "مسرد المصطلحات" },
+  "terms.overview.title": { zh: "三十秒读懂五个核心概念", en: "Five core ideas in 30 seconds", fr: "Cinq idées clés en 30 secondes", es: "Cinco ideas clave en 30 segundos", ar: "خمسة مفاهيم أساسية في ثلاثين ثانية" },
+  "terms.overview.note": { zh: "刚接触儒家思想?先记住这五个词,再看下面的术语表就轻松了。", en: "New to Confucian thought? These five words first — the glossary below will feel easy.", fr: "Nouveau en pensée confucéenne ? Ces cinq mots d'abord — le glossaire sera plus clair.", es: "¿Nuevo en el pensamiento confuciano? Primero estas cinco palabras; el glosario será fácil.", ar: "جديد على الفكر الكونفوشيوسي؟ ابدأ بهذه الكلمات الخمس، وسيصبح المسرد سهلاً." },
+  "terms.ov.ren.def": { zh: "仁爱:把人当人,推己及人", en: "Humaneness: treat others as fully human", fr: "Humanité : traiter autrui en humain", es: "Humanidad: tratar al otro como persona", ar: "الإنسانية: عامل الآخرين كبشر" },
+  "terms.ov.li.def": { zh: "礼:恰到好处的言行分寸", en: "Ritual: acting with proper measure", fr: "Rite : agir avec justesse", es: "Rito: actuar con la medida justa", ar: "الطقس: التصرف بقدر مناسب" },
+  "terms.ov.junzi.def": { zh: "君子:不断自我完善的人", en: "Exemplary person: one who keeps refining the self", fr: "L'homme de bien : se perfectionner sans cesse", es: "Persona ejemplar: quien se perfecciona", ar: "الإنسان النبيل: من يُكمّل نفسه" },
+  "terms.ov.yi.def": { zh: "义:该做就做的正当性", en: "Righteousness: doing what is right", fr: "Justice : faire ce qui est juste", es: "Rectitud: hacer lo correcto", ar: "الاستقامة: فعل ما هو صواب" },
+  "terms.ov.zhi.def": { zh: "智:明辨是非的判断力", en: "Wisdom: discerning right from wrong", fr: "Sagesse : discerner le bien du mal", es: "Sabiduría: discernir el bien", ar: "الحكمة: التمييز بين الصواب والخطأ" },
   "terms.title": { zh: "儒家核心术语", en: "Core Confucian terms", fr: "Termes confucéens essentiels", es: "Términos confucianos clave", ar: "المصطلحات الكونفوشيوسية الأساسية" },
   "terms.desc": { zh: "外文解释在前，原文中文与出处并列。可搜索、可按学派筛选。", en: "Foreign explanation first; original Chinese and source beside it. Searchable and filterable by school.", fr: "Explication en langue étrangère d'abord ; original chinois et source à côté. Recherche et filtre par école.", es: "Explicación en primer lugar; chino original y fuente al lado. Buscable y filtrable por escuela.", ar: "الشرح باللغة الأجنبية أولًا؛ والأصل الصيني والمصدر بجانبه. قابل للبحث والتصفية حسب المدرسة." },
   "terms.search": { zh: "搜索术语…", en: "Search terms…", fr: "Rechercher un terme…", es: "Buscar término…", ar: "ابحث عن مصطلح…" },
@@ -2063,21 +2110,124 @@ const DICT: Dict = {
   "comments.minutesAgo": { zh: "{n} 分钟前", en: "{n} min ago", fr: "il y a {n} min", es: "hace {n} min", ar: "قبل {n} دقيقة" },
   "comments.hoursAgo": { zh: "{n} 小时前", en: "{n} h ago", fr: "il y a {n} h", es: "hace {n} h", ar: "قبل {n} ساعة" },
   "comments.daysAgo": { zh: "{n} 天前", en: "{n} d ago", fr: "il y a {n} j", es: "hace {n} d", ar: "قبل {n} يومًا" },
+  // ── 隐私政策(与 /privacy 页一一对应)──
+  "essays.kicker": { zh: "ESSAY STARTER PACKS", en: "ESSAY STARTER PACKS", fr: "KIT À DISSERTATION", es: "KIT PARA ENSAYOS", ar: "حِزَم بدء المقال" },
+  "essays.title": { zh: "论文起手包", en: "Essay starter packs", fr: "Kits pour dissertations", es: "Kits para ensayos", ar: "حِزَم بدء المقال" },
+  "essays.lead": { zh: "四个最常被写进论文的主题,每组三句核心章句配一句西方经典对照——原文、译文、出处齐备,一键复制引用,点章句去深读。", en: "Four essay-ready themes. Each pairs three key passages with one Western classic — original text, translation and reference included. Copy citations in one click; open a passage to go deeper.", fr: "Quatre thèmes prêts pour la dissertation : trois passages clés et un classique occidental — texte original, traduction et référence. Copiez les citations en un clic.", es: "Cuatro temas listos para tu ensayo: tres pasajes clave y un clásico occidental — texto original, traducción y referencia. Copia las citas en un clic.", ar: "أربعة موضوعات جاهزة لمقالك: ثلاثة مقاطع رئيسية مقابل نص غربي كلاسيكي، مع النص الأصلي والترجمة والمرجع، وانسخ الاستشهادات بضغطة." },
+  "essays.citeAll": { zh: "复制整组引用", en: "Copy all citations", fr: "Copier toutes les citations", es: "Copiar todas las citas", ar: "نسخ كل الاستشهادات" },
+  "essays.westLabel": { zh: "西方对照", en: "The West reads this", fr: "L'Occident le lit ainsi", es: "Occidente lo lee así", ar: "الغرب يقرأه هكذا" },
+  "essays.justice.title": { zh: "义:正义与推己及人", en: "Justice & reciprocity", fr: "Justice et réciprocité", es: "Justicia y reciprocidad", ar: "العدل والمعاملة بالمثل" },
+  "essays.justice.west.quote": { zh: "要只按照你同时能够愿意它成为普遍法则的准则去行动。", en: "Act only according to that maxim which you can at the same time will to become a universal law.", fr: "Agis uniquement d'après la maxime qui peut valoir en même temps comme loi universelle.", es: "Obra solo según la máxima que puedas querer que sea ley universal.", ar: "اعمل وفق القاعدة التي تستطيع أن تريدها قانونًا كونيًا." },
+  "essays.justice.west.src": { zh: "康德《道德形而上学奠基》", en: "Immanuel Kant, Groundwork of the Metaphysics of Morals", fr: "Kant, Fondements de la métaphysique des mœurs", es: "Kant, Fundamentación de la metafísica de las costumbres", ar: "كانط، أسس ميتافيزيقا الأخلاق" },
+  "essays.self.title": { zh: "修身:日日新的自己", en: "Self-cultivation", fr: "Culture de soi", es: "Cultivo de sí", ar: "تهذيب النفس" },
+  "essays.self.west.quote": { zh: "美德由习惯养成:我们通过做正义的事成为正义的人。", en: "Moral virtue is formed by habit: we become just by doing just acts.", fr: "La vertu s'acquiert par l'habitude : on devient juste en faisant des actes justes.", es: "La virtud se adquiere por el hábito: nos hacemos justos haciendo actos justos.", ar: "تتكون الفضيلة بالعادة: نصير عادلين بأفعال عادلة." },
+  "essays.self.west.src": { zh: "亚里士多德《尼各马可伦理学》", en: "Aristotle, Nicomachean Ethics II", fr: "Aristote, Éthique à Nicomaque II", es: "Aristóteles, Ética a Nicómaco II", ar: "أرسطو، أخلاق نيقوماخوس" },
+  "essays.ritual.title": { zh: "礼:仪式与好的生活", en: "Ritual & the good life", fr: "Rite et vie bonne", es: "Rito y vida buena", ar: "الطقس والحياة الطيبة" },
+  "essays.ritual.west.quote": { zh: "仪式不是迷信的残余,而是社会凝聚力的引擎。", en: "Ritual is not the residue of superstition but the engine of social solidarity.", fr: "Le rite n'est pas un résidu de superstition mais le moteur de la solidarité sociale.", es: "El rito no es residuo de superstición sino motor de la solidaridad social.", ar: "الطقس ليس بقايا خرافة بل محرّك التضامن الاجتماعي." },
+  "essays.ritual.west.src": { zh: "涂尔干《宗教生活的基本形式》", en: "Émile Durkheim, The Elementary Forms of Religious Life", fr: "Durkheim, Les Formes élémentaires de la vie religieuse", es: "Durkheim, Las formas elementales de la vida religiosa", ar: "دوركهايم، الصور الأولية للحياة الدينية" },
+  "essays.friendship.title": { zh: "友:友谊与信任", en: "Friendship & trust", fr: "Amitié et confiance", es: "Amistad y confianza", ar: "الصداقة والثقة" },
+  "essays.friendship.west.quote": { zh: "朋友是另一个自我。", en: "A friend is a second self.", fr: "L'ami est un autre soi-même.", es: "El amigo es otro yo.", ar: "الصديق نفسٌ أخرى." },
+  "essays.friendship.west.src": { zh: "亚里士多德《尼各马可伦理学》卷八", en: "Aristotle, Nicomachean Ethics VIII", fr: "Aristote, Éthique à Nicomaque VIII", es: "Aristóteles, Ética a Nicómaco VIII", ar: "أرسطو، أخلاق نيقوماخوس، الكتاب الثامن" },
+  "about.community.title": { zh: "参与方式", en: "Get involved", fr: "Participer", es: "Participa", ar: "شارك" },
+  "about.community.lead": { zh: "本站由社群共建:教师、开发者与内容贡献者各有入口。", en: "This platform is built with its community — educators, developers and contributors each have an entry point.", fr: "Cette plateforme se construit avec sa communauté : enseignants, développeurs et contributeurs ont chacun leur entrée.", es: "La plataforma se construye con su comunidad: docentes, desarrolladores y contribuidores tienen su entrada.", ar: "تُبنى المنصّة مع مجتمعها: للمعلّمين والمطورين والمساهمين مداخلهم الخاصة." },
+  "about.comm.teach.desc": { zh: "共建教学课件与课堂材料", en: "Co-build teaching materials for the classroom", fr: "Co-construire des supports de classe", es: "Co-crear materiales para el aula", ar: "شارك في بناء مواد التعليم" },
+  "about.comm.cocreate.desc": { zh: "参与译文、注释与案例的共建评审", en: "Contribute to translations, annotations and case review", fr: "Contribuer aux traductions, annotations et relecture des cas", es: "Contribuye a traducciones, anotaciones y revisión de casos", ar: "ساهم في الترجمات والشروح ومراجعة الحالات" },
+  "about.comm.developers.desc": { zh: "开放 API:检索语料与概念图谱", en: "Open API: query the corpus and concept graph", fr: "API ouverte : interroger corpus et graphe de concepts", es: "API abierta: consulta el corpus y el grafo conceptual", ar: "واجهة مفتوحة: استعلم النصوص وشبكة المفاهيم" },
+  "about.comm.plugins.desc": { zh: "把本站接入你自己的工具链", en: "Plug the platform into your own tools", fr: "Intégrez la plateforme à vos outils", es: "Integra la plataforma en tus herramientas", ar: "ادمج المنصّة في أدواتك" },
+  "about.comm.reach.desc": { zh: "项目数据与成果一览", en: "Project metrics and milestones", fr: "Données et jalons du projet", es: "Datos e hitos del proyecto", ar: "بيانات المشروع ومراحله" },
+  "terms.viewGraph": { zh: "图谱", en: "Graph", fr: "Graphe", es: "Grafo", ar: "الرسم" },
+  "graph.toTerms": { zh: "查看术语表", en: "Open in glossary", fr: "Voir dans le glossaire", es: "Ver en el glosario", ar: "افتح في المسرد" },
+  "essays.allPaths": { zh: "查看全部学习路径 →", en: "See all learning paths →", fr: "Voir tous les parcours →", es: "Ver todas las rutas →", ar: "عرض كل مسارات التعلّم →" },
+  "paths.essays.banner": { zh: "写论文?四组主题起手包已备好:章句、译文、西方对照与一键引用。", en: "Writing an essay? Four themed starter packs: passages, translations, Western counterparts and one-click citations.", fr: "Une dissertation ? Quatre kits thématiques : passages, traductions, contrepoints occidentaux et citations en un clic.", es: "¿Escribes un ensayo? Cuatro kits temáticos: pasajes, traducciones, contrapuntos occidentales y citas en un clic.", ar: "تكتب مقالًا؟ أربع حِزَم موضوعية: مقاطع وترجمات ونصوص غربية مقابلة واستشهادات بضغطة." },
+  "about.kicker": { zh: "ABOUT", en: "ABOUT", fr: "À PROPOS", es: "SOBRE", ar: "حول" },
+  "about.title": { zh: "关于本项目", en: "About this project", fr: "À propos du projet", es: "Sobre el proyecto", ar: "عن المشروع" },
+  "about.lead": { zh: "面向全球读者的儒家经典语义平台:读原典、查术语、比文明、问子曰君,全部免费。", en: "A free semantic platform on Confucian classics for readers worldwide: read the source texts, look up key terms, compare civilisations, and ask questions.", fr: "Une plateforme sémantique libre sur les classiques confucéens : lire les textes sources, chercher les termes clés, comparer les civilisations, poser des questions.", es: "Una plataforma semántica gratuita sobre los clásicos confucianos: lee las fuentes, consulta términos clave, compara civilizaciones y pregunta.", ar: "منصّة دلالية مجانية للتراث الكونفوشيوسي: اقرأ النصوص الأصلية وابحث في المصطلحات وقارن الحضارات واسأل." },
+  "about.s1.title": { zh: "这是什么", en: "What this is", fr: "Ce que c'est", es: "Qué es", ar: "ما هذا" },
+  "about.s1.body": { zh: "《论语》《孟子》《大学》《中庸》及礼乐书数御射六艺的原文、拼音、多语译文与注释,以博物馆式的浏览体验组织;每句都有可追溯的出处编号,跨文明案例库把经典放进世界思想的坐标系。", en: "The Analects, Mencius, Great Learning, Doctrine of the Mean and the Six Arts — source text, pinyin, multilingual translations and annotations, curated like a museum collection. Every passage carries a traceable reference; the case library places the classics among world philosophies.", fr: "Les Entretiens, Mencius, la Grande Étude, l'Invariable Milieu et les Six Arts — texte source, pinyin, traductions multilingues et annotations, organisés comme une collection de musée. Chaque passage a une référence traçable.", es: "Analectas, Mencio, Gran Sabiduría, Doctrina del Justo Medio y las Seis Artes: texto fuente, pinyin, traducciones y anotaciones, curados como una colección de museo. Cada pasaje tiene una referencia rastreable.", ar: "«المنتخبات» و«منسيوس» و«التعليم الأعظم» و«الوسط الثابت» والفنون الستة: النص الأصلي والبينيين والترجمات والشروح، منظّمة كمجموعة متحفية، ولكل مقطع مرجع قابل للتتبع." },
+  "about.s2.title": { zh: "译文怎么来的", en: "How translations are made", fr: "Comment sont faites les traductions", es: "Cómo se hacen las traducciones", ar: "كيف تُصنع الترجمات" },
+  "about.s2.body": { zh: "原文以通行本为底本;多语译文由平台编辑部译出,参考学界通行译本并逐条核对语境,标注为「平台译本」。每句译文旁附原文与拼音,鼓励读者对照;学术引用建议同时注明本平台与所据原典。", en: "Source texts follow standard critical editions. Multilingual translations are produced by our editorial board with reference to established scholarly versions, checked passage by passage, and labelled 'Platform translation'. Original text and pinyin sit beside every translation — compare before you cite; for coursework, cite both this platform and the classical source.", fr: "Les textes sources suivent les éditions critiques courantes. Les traductions sont produites par notre comité éditorial, référencées aux versions savantes établies et vérifiées passage par passage (« Traduction de la plateforme »). Le texte original et le pinyin accompagnent chaque traduction.", es: "Los textos fuente siguen ediciones críticas estándar. Las traducciones multilingües las produce nuestro consejo editorial con referencia a versiones académicas establecidas, verificadas pasaje a pasaje («Traducción de la plataforma»). El original y el pinyin acompañan cada traducción.", ar: "تتبع النصوص الأصلية الطبعات النقدية المعتمدة؛ وتنتج الترجمات هيئة تحريرنا بالاستناد إلى الترجمات الأكاديمية الراسخة ومراجعة مقطعًا بمقطع («ترجمة المنصة»). النص الأصلي والبينيين بجانب كل ترجمة." },
+  "about.s3.title": { zh: "谁在维护", en: "Who maintains it", fr: "Qui le maintient", es: "Quién lo mantiene", ar: "من يشغّله" },
+  "about.s3.body": { zh: "由平台编辑部持续维护与审校,内容建设向共建者开放:教学场景可通过「教」入口共建课件,开发者可通过开放 API 检索语料。案例库内容经评审后发布。", en: "Maintained and reviewed by an editorial board. Content contribution is open: educators can co-build teaching materials via the Teach section; developers can query the corpus through the open API. Case-library entries are published after review.", fr: "Maintenu et relu par un comité éditorial. Les contributions sont ouvertes : les enseignants peuvent co-construire via la section Enseigner ; les développeurs interroger le corpus via l'API ouverte. Les cas sont publiés après relecture.", es: "Mantenido y revisado por un consejo editorial. Las contribuciones están abiertas: docentes via Enseñar; desarrolladores vía API abierta. Los casos se publican tras revisión.", ar: "تشغّله هيئة تحريرية تراجعه باستمرار. المساهمات مفتوحة: المعلّمون عبر باب «التعليم»، والمطورون عبر الواجهة البرمجية المفتوحة، وتُنشر الحالات بعد المراجعة." },
+  "about.s4.title": { zh: "联系与反馈", en: "Contact & feedback", fr: "Contact et retours", es: "Contacto y comentarios", ar: "التواصل والملاحظات" },
+  "about.s4.body": { zh: "译文勘误、内容建议与合作意向,欢迎通过共建入口或开发者页面与我们联系;数据权利相关事宜见隐私政策。", en: "For translation corrections, content suggestions or collaboration, reach us via the co-create or developers pages; for data-rights matters see the privacy policy.", fr: "Pour corrections, suggestions ou collaborations, écrivez-nous via les pages co-création ou développeurs ; pour vos données, voir la politique de confidentialité.", es: "Para correcciones, sugerencias o colaboración, escríbenos vía co-creación o desarrolladores; sobre tus datos, consulta la política de privacidad.", ar: "لتصحيح الترجمات أو الاقتراحات أو التعاون، تواصل معنا عبر صفحات المشاركة أو المطوّرين؛ ولشؤون بياناتك راجع سياسة الخصوصية." },
+  "about.cocreateLink": { zh: "参与共建", en: "Contribute", fr: "Contribuer", es: "Contribuir", ar: "شارك" },
+  "about.developersLink": { zh: "开发者 API", en: "Developer API", fr: "API développeurs", es: "API para desarrolladores", ar: "واجهة المطوّرين" },
+  "privacy.kicker": { zh: "PRIVACY", en: "PRIVACY", fr: "CONFIDENTIALITÉ", es: "PRIVACIDAD", ar: "الخصوصية" },
+  "privacy.title": { zh: "隐私政策", en: "Privacy Policy", fr: "Politique de confidentialité", es: "Política de privacidad", ar: "سياسة الخصوصية" },
+  "privacy.updated": { zh: "更新:2026 年 10 月", en: "Updated: October 2026", fr: "Mise à jour : octobre 2026", es: "Actualizado: octubre de 2026", ar: "آخر تحديث: أكتوبر 2026" },
+  "privacy.s1.title": { zh: "我们收集什么", en: "What we collect", fr: "Ce que nous collectons", es: "Qué recopilamos", ar: "ما نجمعه" },
+  "privacy.s1.body": {
+    zh: "本站仅收集必要数据:浏览器本地存储中的语言与主题偏好;游客身份令牌与学习进度(阅读、签到、游戏化经验);如您主动注册,收集邮箱与显示名称;如您上传头像,收集该图片。我们不收集证件信息、通讯录、精确位置,也不接入第三方广告或追踪器。",
+    en: "We collect only what is necessary: your language and theme preferences in browser local storage; a guest token and your learning progress (reading, check-ins, gamified XP); if you choose to register, your email and display name; and an image if you upload an avatar. We do not collect identity documents, contacts, precise location, and we run no third-party ads or trackers.",
+    fr: "Nous ne collectons que le nécessaire : vos préférences de langue et de thème stockées localement ; un jeton d'invité et votre progression (lectures, points, XP) ; si vous créez un compte, votre e-mail et votre nom affiché ; et une image si vous téléversez un avatar. Aucun document d'identité, aucun contact, aucune localisation précise, ni publicité ou traqueur tiers.",
+    es: "Solo recopilamos lo necesario: tus preferencias de idioma y tema en el almacenamiento local; un token de invitado y tu progreso de aprendizaje (lecturas, registros, XP); si te registras, tu correo y nombre visible; y una imagen si subes un avatar. No recopilamos documentos de identidad, contactos ni ubicación precisa, y no usamos publicidad ni rastreadores de terceros.",
+    ar: "نجمع فقط ما يلزم: تفضيلات اللغة والمظهر في التخزين المحلي للمتصفح؛ رمز ضيف وتقدّمك في التعلّم (القراءات، تسجيل الحضور، نقاط الخبرة)؛ وإذا سجّلت، بريدك الإلكتروني واسمك المعروض؛ وصورة إذا رفعت صورة رمزية. لا نجمع وثائق هوية ولا جهات اتصال ولا موقعًا دقيقًا، ولا نستخدم إعلانات أو متتبعات خارجية.",
+  },
+  "privacy.s2.title": { zh: "访问统计与匿名化", en: "Analytics & anonymisation", fr: "Statistiques et anonymisation", es: "Estadísticas y anonimización", ar: "الإحصاءات وإخفاء الهوية" },
+  "privacy.s2.body": {
+    zh: "为统计各地区的使用情况,我们记录页面访问事件,IP 地址仅用于推导国家/地区代码后即丢弃,不存储原始 IP,也不与任何身份关联。",
+    en: "To understand regional usage we log page-view events. IP addresses are used only to derive a country code and are then discarded — raw IPs are never stored or linked to any identity.",
+    fr: "Pour comprendre l'usage par région, nous consignons les pages vues. L'adresse IP sert uniquement à déduire un code pays, puis est abandonnée — aucune IP brute n'est conservée ni reliée à une identité.",
+    es: "Para conocer el uso por región registramos las páginas vistas. La IP solo se usa para deducir un código de país y luego se descarta: nunca se almacenan IPs en bruto ni se vinculan a una identidad.",
+    ar: "لفهم الاستخدام حسب المنطقة نسجّل مشاهدات الصفحات. يُستخدم عنوان IP فقط لاستنتاج رمز البلد ثم يُهمَل — لا تُخزَّن عناوين IP الخام ولا تُربط بأي هوية.",
+  },
+  "privacy.s3.title": { zh: "您的数据权利(GDPR/CCPA)", en: "Your rights (GDPR/CCPA)", fr: "Vos droits (RGPD/CCPA)", es: "Tus derechos (GDPR/CCPA)", ar: "حقوقك (GDPR/CCPA)" },
+  "privacy.s3.body": {
+    zh: "您可随时在「个人中心」一键导出全部数据(JSON),或删除账户及全部关联数据;游客身份清除浏览器存储即等同于删除。我们不在任何场景出售您的数据。",
+    en: "You can export all your data (JSON) or delete your account and everything linked to it at any time from your profile page; for guest identities, clearing browser storage is equivalent to deletion. We never sell your data.",
+    fr: "Vous pouvez exporter toutes vos données (JSON) ou supprimer votre compte et les données associées à tout moment depuis votre profil ; pour un compte invité, vider le stockage du navigateur équivaut à une suppression. Nous ne vendons jamais vos données.",
+    es: "Puedes exportar todos tus datos (JSON) o eliminar tu cuenta y todo lo asociado en cualquier momento desde tu perfil; para identidades de invitado, borrar el almacenamiento del navegador equivale a la eliminación. Nunca vendemos tus datos.",
+    ar: "يمكنك تصدير جميع بياناتك (JSON) أو حذف حسابك وكل ما يرتبط به في أي وقت من صفحة ملفك؛ وللهوية الضيف يمسح تخزين المتصفح المقابل للحذف. لا نبيع بياناتك أبدًا.",
+  },
+  "privacy.s4.title": { zh: "本地存储(Cookie 声明)", en: "Local storage (cookie notice)", fr: "Stockage local (cookies)", es: "Almacenamiento local (cookies)", ar: "التخزين المحلي (الكوكيز)" },
+  "privacy.s4.body": {
+    zh: "本站使用浏览器本地存储(而非追踪型 Cookie)保存语言偏好、明暗主题、登录令牌与「不再提示」状态,全部为功能必需,可随时在浏览器设置中清除。",
+    en: "This site uses browser local storage (not tracking cookies) for your language preference, theme, sign-in token and dismissal states — all strictly functional, and clearable from browser settings at any time.",
+    fr: "Ce site utilise le stockage local du navigateur (et non des cookies de suivi) pour la langue, le thème, le jeton de connexion et les préférences d'affichage — purement fonctionnels et effaçables à tout moment.",
+    es: "Este sitio usa almacenamiento local del navegador (no cookies de rastreo) para idioma, tema, token de sesión y estados de aviso — todos funcionales y borrables en cualquier momento.",
+    ar: "يستخدم هذا الموقع التخزين المحلي للمتصفح (لا كوكيز تتبّع) للغة والمظهر ورمز الدخول وحالات العرض — كلها وظيفية ويمسحها متى شئت.",
+  },
+  "privacy.s5.title": { zh: "联系方式", en: "Contact", fr: "Contact", es: "Contacto", ar: "التواصل" },
+  "privacy.s5.body": {
+    zh: "对数据问题有疑问或需行使上述权利,请通过页脚联系方式与我们沟通,我们将在 30 天内回应。",
+    en: "For any data question or to exercise the rights above, contact us via the footer. We respond within 30 days.",
+    fr: "Pour toute question sur les données ou pour exercer ces droits, contactez-nous via le pied de page. Réponse sous 30 jours.",
+    es: "Para cualquier cuestión sobre datos o para ejercer estos derechos, contáctanos desde el pie de página. Respondemos en 30 días.",
+    ar: "لأي سؤال عن البيانات أو لممارسة هذه الحقوق، تواصل معنا عبر تذييل الصفحة. نرد خلال 30 يومًا.",
+  },
+  "privacy.footerNote": { zh: "行使数据权利请前往", en: "To exercise your data rights, visit", fr: "Pour exercer vos droits, rendez-vous sur", es: "Para ejercer tus derechos, visita", ar: "لممارسة حقوقك، انتقل إلى" },
+  "privacy.meLink": { zh: "个人中心", en: "your profile", fr: "votre profil", es: "tu perfil", ar: "ملفك الشخصي" },
+  "privacy.cookie.text": {
+    zh: "本站使用本地存储保存语言与主题偏好等必要功能设置,不用于追踪。继续浏览即表示知悉。",
+    en: "We use local storage for essential preferences (language, theme). No tracking. Continuing means you're fine with this.",
+    fr: "Nous utilisons le stockage local pour vos préférences essentielles (langue, thème). Aucun suivi. Continuer vaut acceptation.",
+    es: "Usamos almacenamiento local para preferencias esenciales (idioma, tema). Sin rastreo. Continuar implica aceptación.",
+    ar: "نستخدم التخزين المحلي للتفضيلات الأساسية (اللغة والمظهر). بلا تتبّع. متابعة التصفح تعني الموافقة.",
+  },
+  "privacy.cookie.ok": { zh: "知道了", en: "Got it", fr: "Compris", es: "Entendido", ar: "فهمت" },
+
 };
 
 const STORAGE_KEY = "kongzi_lang";
 
 function detect(): Lang {
-  if (typeof window === "undefined") return "zh";
+  // 服务端渲染无法感知浏览器语言，兜底英语（本站面向海外大学生）
+  if (typeof window === "undefined") return "en";
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored && LANGS.some((l) => l.code === stored)) return stored as Lang;
   } catch {
     /* ignore */
   }
-  const nav = (navigator.language || "zh").slice(0, 2).toLowerCase();
-  const found = LANGS.find((l) => l.code === nav);
-  return (found?.code as Lang) ?? "zh";
+  // 无已存偏好：遍历浏览器语言偏好列表（navigator.languages 优先于首选项），
+  // 命中支持名单（zh/en/fr/es/ar）即用；名单外语言一律回落英语
+  const candidates = [...(navigator.languages || []), navigator.language || ""];
+  for (const c of candidates) {
+    const base = (c || "").slice(0, 2).toLowerCase();
+    const hit = LANGS.find((l) => l.code === base);
+    if (hit) return hit.code;
+  }
+  return "en";
 }
 
 const listeners = new Set<(l: Lang) => void>();
@@ -2107,7 +2257,9 @@ export function setLang(l: Lang) {
 }
 
 export function useLang(): [Lang, (l: Lang) => void] {
-  const [lang, setS] = useState<Lang>("zh");
+  // 初始种子用英语（面向海外的兜底语种），注水后 useEffect 立即校正为
+  // 已存偏好或浏览器检测结果，避免服务端/客户端注水不一致
+  const [lang, setS] = useState<Lang>("en");
   useEffect(() => {
     const initial = getLang();
     setS(initial);

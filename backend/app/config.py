@@ -57,6 +57,16 @@ class Settings(BaseSettings):
     qwen_base_url: str = "https://dashscope.aliyuncs.com/compatible-mode/v1"
     qwen_model: str = "qwen-plus"  # 可选: qwen-max / qwen-turbo / qwen-long / qwen2.5-72b-instruct
 
+    # 朗读音频（DashScope qwen-tts 非流式合成，复用 qwen_api_key）
+    tts_enabled: bool = True
+    tts_base_url: str = "https://dashscope.aliyuncs.com"
+    tts_model: str = "qwen3-tts-flash"  # ¥0.8/万字符，限流 3 QPM（有磁盘缓存兜底）
+    tts_voice: str = "Eldric Sage"  # 「沧明子」沉稳睿智老者，契合经典朗读
+    tts_cache_dir: str = "./audio_cache"
+
+    # 用户头像上传目录(相对后端工作目录)
+    avatars_dir: str = "./uploads/avatars"
+
     cors_origins: str = "http://localhost:3000,http://localhost:5173"
 
     @property

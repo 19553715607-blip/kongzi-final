@@ -23,7 +23,7 @@ export default function CasesPage() {
   const [err, setErr] = useState("");
 
   useEffect(() => {
-    getTopics().then(setTopics).catch((e) => setErr(isAuthError(e) ? t("common.loginRequired", lang) : t("cases.noBackend", lang)));
+    getTopics(lang).then(setTopics).catch((e) => setErr(isAuthError(e) ? t("common.loginRequired", lang) : t("cases.noBackend", lang)));
     getCaseStats().then(setStats).catch(() => {});
   }, [lang]);
 
@@ -35,13 +35,14 @@ export default function CasesPage() {
       page,
       page_size: PAGE_SIZE,
       status: "published",
+      lang, // 后端按语种取行,缺行时回落中文并本地化问题标题
     })
       .then((d) => {
         setItems(d.items);
         setTotal(d.total);
       })
       .finally(() => setLoading(false));
-  }, [topicId, q, page]);
+  }, [topicId, q, page, lang]);
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
@@ -94,7 +95,7 @@ export default function CasesPage() {
               setPage(1);
             }}
             className={`pressable rounded-full px-2.5 py-1 text-xs ${
-              topicId === null ? "bg-accent text-white" : "border border-line text-muted"
+              topicId === null ? "bg-accent text-on-accent" : "border border-line text-muted"
             }`}
           >
             {t("cases.all", lang)}
@@ -155,9 +156,9 @@ export default function CasesPage() {
               <Reveal key={c.id} delay={Math.min(i, 8) * 60}>
                 <CollectionCard
                   className="h-full text-start"
-                  href={`/cases/${c.id}`}
+                  href={`/cases/${c.slug ?? c.id}`}
                   title={c.question}
-                  accession={String(c.id)}
+                  
                   thumb={
                     topic ? (
                       <span

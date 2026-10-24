@@ -20,10 +20,20 @@ const TAB_ICONS: Record<string, string> = {
 };
 const TAB_ICON_FALLBACK = "M12 8a4 4 0 100 8 4 4 0 000-8z";
 
-export default function Nav() {
+export default function Nav({ ghost = false }: { ghost?: boolean }) {
   const path = usePathname();
   const [lang] = useLang();
   const [drawer, setDrawer] = useState(false);
+  // 首页透明导航：页面顶部压在 Hero 底图上，滚过一屏的 24px 后恢复实底
+  const [solid, setSolid] = useState(false);
+
+  useEffect(() => {
+    if (!ghost) return;
+    const onScroll = () => setSolid(window.scrollY > 24);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [ghost]);
 
   // 桌面下拉 / 移动抽屉 / 页脚 / 面包屑共用同一份分组，改归属只改 lib/nav.ts
   const groups = navGroups();
@@ -46,8 +56,12 @@ export default function Nav() {
 
   return (
     <>
-      <header className="sticky top-0 z-20 border-b border-line bg-bg/80 backdrop-blur">
-        <div className="mx-auto flex h-14 max-w-4xl items-center gap-3 px-4">
+      <header
+        className={`sticky top-0 z-20 border-b border-line bg-bg/80 backdrop-blur transition-colors ${
+          ghost && !solid ? "nav-ghost" : ""
+        }`}
+      >
+        <div className={`mx-auto flex h-14 items-center gap-3 px-4 md:px-6 ${ghost ? "max-w-6xl" : "max-w-4xl"}`}>
           <Link href="/" className="flex items-center gap-2">
             <span className="seal flex h-8 w-8 items-center justify-center rounded-md text-lg">
               孔

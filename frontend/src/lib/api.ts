@@ -117,6 +117,11 @@ export const getRelatedPassages = (refId: string, lang = "zh", k = 3) =>
 export const getTopicPassages = (topicId: string, lang = "zh") =>
   getJSON<TopicPassage[]>(`/api/v1/topics/${topicId}/passages?lang=${lang}`);
 
+// ── 朗读音频（后端按 id+lang 定位文本并缓存合成结果）──────────
+export function passageAudioUrl(refId: string, lang: string): string {
+  return `${apiBase()}/api/v1/passages/${encodeURIComponent(refId)}/audio?lang=${lang}`;
+}
+
 // ── 语料统计 ───────────────────────────────────────────────────
 export const getCorpusStats = () => getJSON<CorpusStats>("/api/v1/corpus/stats");
 
@@ -332,7 +337,8 @@ export const getCases = (params: {
   Object.entries(params).forEach(([k, v]) => v != null && qs.set(k, String(v)));
   return getJSON<CaseListResp>(`/api/v1/cases?${qs.toString()}`);
 };
-export const getCase = (id: number) => getJSON<CaseDetail>(`/api/v1/cases/${id}`);
+export const getCase = (id: number, lang = "zh") =>
+  getJSON<CaseDetail>(`/api/v1/cases/${id}?lang=${lang}`);
 export const getCaseStats = () => getJSON<CaseStats>("/api/v1/cases/stats");
 
 export const reviewCase = (
@@ -379,6 +385,21 @@ export const removeFavorite = (id: number) =>
   authJSON<{ ok: boolean }>(`/api/v1/gamify/favorites/${id}`, { method: "DELETE" });
 
 export const getMe = () => authJSON<AuthUser>("/api/v1/auth/me");
+
+// ── 用户头像（multipart 上传；不能走 authFetch——它会强设 JSON Content-Type）──
+export async function uploadAvatar(file: File): Promise<AuthUser> {
+  const token = await getToken();
+  const fd = new FormData();
+  fd.append("file", file);
+  const res = await fetch(`${apiBase()}/api/v1/me/avatar`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+    body: fd,
+  });
+  if (!res.ok) throw new ApiError(res.status);
+  return (await res.json()) as AuthUser;
+}
+export const deleteAvatar = () => authJSON<AuthUser>("/api/v1/me/avatar", { method: "DELETE" });
 export const exportMe = () => authJSON<Record<string, unknown>>("/api/v1/auth/me/export");
 export const upgradeAccount = (email: string, password: string, display_name?: string) =>
   authJSON<{ token: string; user: AuthUser }>("/api/v1/auth/upgrade", {

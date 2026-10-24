@@ -1,6 +1,7 @@
 "use client";
 
 import * as echarts from "echarts";
+import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { getNeighborhood, isAuthError } from "@/lib/api";
 import { t, useLang } from "@/lib/i18n";
@@ -78,6 +79,15 @@ export default function GraphPage() {
   const [depth, setDepth] = useState(2);
   const [data, setData] = useState<GraphData | null>(null);
   const [selected, setSelected] = useState<string>("ren");
+
+  // 深链 /graph?concept=ren:直接聚焦该概念(从术语页「图谱」入口进入)
+  useEffect(() => {
+    const c = new URLSearchParams(window.location.search).get("concept");
+    if (c) {
+      setCenter(c);
+      setSelected(c);
+    }
+  }, []);
   const [err, setErr] = useState("");
   const [dark, setDark] = useState(false);
   // 视口宽度：窄屏(<md)时画布容器被 hidden，需要在跨越断点时重新评估初始化
@@ -126,8 +136,8 @@ export default function GraphPage() {
       itemStyle: { color: TYPE_COLORS[ty] },
     }));
     const labelColor = dark ? "#ECE6DA" : "#2C2C2A";
-    const edgeColor = dark ? "#9C9486" : "#888780";
-    const lineColor = dark ? "rgba(255,255,255,0.16)" : "#c8c2b6";
+    const edgeColor = dark ? "#B4AB9C" : "#888780";
+    const lineColor = dark ? "rgba(216, 188, 126, 0.34)" : "#c8c2b6";
 
     chart.setOption({
       // 柔和进场：力导图缓缓铺开，切换节点时平滑过渡
@@ -171,7 +181,7 @@ export default function GraphPage() {
               t(EDGE_KEY[p.data.rel], lang) ?? p.data.rel,
           },
           emphasis: { focus: "adjacency", lineStyle: { width: 3 } },
-          lineStyle: { color: lineColor, curveness: 0.06 },
+          lineStyle: { color: lineColor, width: 1.6, curveness: 0.06 },
           data: data.nodes.map((n) => ({
             id: n.id,
             name: n.id,
@@ -244,7 +254,7 @@ export default function GraphPage() {
             key={n.id}
             onClick={() => setCenter(n.id)}
             className={`rounded-full px-2.5 py-1 text-xs transition ${
-              center === n.id ? "bg-accent text-white" : "border border-line text-muted hover:bg-surface-2"
+              center === n.id ? "bg-accent text-on-accent" : "border border-line text-muted hover:bg-surface-2"
             }`}
           >
             {t(n.key, lang)}
@@ -289,6 +299,12 @@ export default function GraphPage() {
               {nodeMap[selected].label_en && (
                 <div className="text-xs italic text-faint">{nodeMap[selected].label_en}</div>
               )}
+              <Link
+                href={`/terms?q=${selected}`}
+                className="mt-2 inline-block text-xs text-accent underline underline-offset-4"
+              >
+                {t("graph.toTerms", lang)} →
+              </Link>
             </Reveal>
           )}
           <div className="px-1 text-xs text-faint">{t("graph.relationsN", lang).replace("{n}", String(relations.length))}</div>

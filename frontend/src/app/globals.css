@@ -3,76 +3,87 @@
 @tailwind utilities;
 
 /* ── 语义化主题 token（CSS 变量驱动 light / dark）── */
-/* 主语言 = The Met 馆藏美学：米白纸感 + 墨色 + 衬线标题；强调沿用品牌朱砂 */
+/* 全站「夜游博物馆」双主题：暗色=破晓夜游（默认），浅色=破晓纸。
+   强调色统一为晨光金；--on-accent 是「金底上的文字色」，两主题相反。 */
 :root {
   color-scheme: light;
-  --paper: #F8F9FC;
-  --bg: #F8F9FC;
-  --surface: #FFFFFF;
-  --surface-2: #EEF1F8;
-  --ink: #141821;
-  --fg: #141821;
-  --muted: #4E5566;
-  --faint: #858C9B;
-  --line: #DDE2EC;
+  --paper: #F7F2E7;
+  --bg: #F8F4EB;
+  /* 英雄区底部渐隐目标色:--bg 按宣纸颗粒(body::before,~3.5% 灰噪)的均值压暗,
+     使英雄区底缘与页面实际底色(含颗粒)一致 */
+  --hero-fade: color-mix(in srgb, var(--bg) 96%, #000000 4%);
+  --surface: #FFFEF9;
+  --surface-2: #F0E9D9;
+  --ink: #26211A;
+  --fg: #26211A;
+  --muted: #5B5647;
+  --faint: #8B8574;
+  --line: #E2DAC7;
 
-  --accent: #35608F;
-  --accent-bright: #4A74AB;
-  --accent-soft: #E7EDF8;
-  --accent-ink: #1A2C48;
-  --accent-deep: #24406B;
+  --accent: #8A6D2F;
+  --accent-bright: #A8863F;
+  --accent-soft: #F1E7CE;
+  --accent-ink: #4A3B12;
+  --accent-deep: #6B551F;
 
-  /* 印章渐变：单独成对变量，换色调时与 --accent 一起调，避免印章固守朱砂 */
-  --seal-a: #35608F;
-  --seal-b: #24406B;
+  /* 金底上的文字：浅色主题配白 */
+  --on-accent: #FFFFFF;
+
+  /* 印章渐变：金章对，与 --accent 同族 */
+  --seal-a: #A8863F;
+  --seal-b: #7A5F26;
 
   --cel: #2F6F62;
-  --cel-soft: #E1F1EC;
+  --cel-soft: #E4EFE7;
   --cel-ink: #0B332B;
   --cel-deep: #1E5044;
 
-  --gold: #B8892E;
-  --gold-deep: #8A6420;
+  --gold: #A8863F;
+  --gold-deep: #7A5F26;
 
   --radius-sm: 6px;
   --radius: 10px;
   --radius-lg: 14px;
 
-  --shadow-card: 0 1px 2px rgba(20, 20, 20, 0.04), 0 4px 14px rgba(20, 20, 20, 0.06);
-  --shadow-card-hover: 0 2px 4px rgba(20, 20, 20, 0.05), 0 10px 26px rgba(20, 20, 20, 0.10);
+  --shadow-card: 0 1px 2px rgba(64, 54, 28, 0.05), 0 4px 14px rgba(64, 54, 28, 0.07);
+  --shadow-card-hover: 0 2px 4px rgba(64, 54, 28, 0.06), 0 10px 26px rgba(64, 54, 28, 0.12);
 }
 
 .dark {
   color-scheme: dark;
-  --paper: #0E1118;
-  --bg: #0E1118;
-  --surface: #161A23;
-  --surface-2: #1E232E;
-  --ink: #E4E8F0;
-  --fg: #E4E8F0;
-  --muted: #A5AEBE;
-  --faint: #7B8494;
-  --line: rgba(255, 255, 255, 0.12);
+  --paper: #070B13;
+  --bg: #0A0F1A;
+  --hero-fade: color-mix(in srgb, var(--bg) 96%, #FFFFFF 4%);
+  --surface: #131B2E;
+  --surface-2: #0F1728;
+  --ink: #F5F1E6;
+  --fg: #F5F1E6;
+  --muted: rgba(245, 241, 230, 0.80);
+  --faint: rgba(245, 241, 230, 0.58);
+  --line: rgba(245, 241, 230, 0.15);
 
-  --accent: #6E9BD6;
-  --accent-bright: #8AB2E4;
-  --accent-soft: #182A42;
-  --accent-ink: #BBD4F0;
-  --accent-deep: #3A5F8C;
+  --accent: #D8BC7E;
+  --accent-bright: #EAD9A8;
+  --accent-soft: rgba(216, 188, 126, 0.10);
+  --accent-ink: #F5E9C9;
+  --accent-deep: #A8863F;
 
-  --seal-a: #35608F;
-  --seal-b: #24406B;
+  /* 金底上的文字：暗色主题配深墨 */
+  --on-accent: #10141F;
 
-  --cel: #5DCAA5;
-  --cel-soft: #15302A;
-  --cel-ink: #9FE0C9;
-  --cel-deep: #2E7A5E;
+  --seal-a: #C9A86A;
+  --seal-b: #8A6D3B;
 
-  --gold: #E3C060;
-  --gold-deep: #A8842A;
+  --cel: #8FB8A8;
+  --cel-soft: rgba(143, 184, 168, 0.10);
+  --cel-ink: #CFE8DD;
+  --cel-deep: #5E8A7A;
 
-  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 14px rgba(0, 0, 0, 0.35);
-  --shadow-card-hover: 0 2px 4px rgba(0, 0, 0, 0.4), 0 10px 26px rgba(0, 0, 0, 0.5);
+  --gold: #D8BC7E;
+  --gold-deep: #A8863F;
+
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4), 0 4px 14px rgba(0, 0, 0, 0.45);
+  --shadow-card-hover: 0 2px 4px rgba(0, 0, 0, 0.45), 0 10px 26px rgba(0, 0, 0, 0.55);
 }
 
 html, body {
@@ -86,14 +97,14 @@ html, body {
 }
 * { transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease; }
 
-::selection { background: var(--accent); color: #fff; }
+::selection { background: var(--accent); color: var(--on-accent); }
 
 /* 印章式徽标（品牌常量：颜色由 --seal-a/--seal-b 控制，随色调统一调整） */
 .seal {
   font-family: "Songti SC", "STSong", serif;
   background: linear-gradient(135deg, var(--seal-a) 0%, var(--seal-b) 100%);
   color: #FAECE7;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 1px 3px rgba(74, 27, 12, 0.35);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 1px 3px rgba(58, 47, 20, 0.35);
 }
 
 /* 打字省略号动效 */
@@ -296,7 +307,7 @@ button.retry-btn {
   padding: 6px 18px;
   font-size: 12px;
   background: var(--accent);
-  color: #fff;
+  color: var(--on-accent);
 }
 .error-state button.retry-btn:hover,
 button.retry-btn:hover { filter: brightness(1.06); }
@@ -368,7 +379,7 @@ button.retry-btn:hover { filter: brightness(1.06); }
   display: inline-flex; align-items: center; justify-content: center; gap: 6px;
   padding: 11px 22px; border-radius: var(--radius-lg);
   font-size: 13px; font-weight: 700; letter-spacing: 0.04em;
-  background: var(--accent); color: #fff;
+  background: var(--accent); color: var(--on-accent);
   box-shadow: 0 4px 0 var(--accent-deep);
   border: none; cursor: pointer;
   transition: transform 0.08s ease, box-shadow 0.08s ease, filter 0.2s ease;
@@ -387,12 +398,13 @@ button.retry-btn:hover { filter: brightness(1.06); }
 
 /* 顶部公告条（Met 风格，墨底 + 朱砂新展标识） */
 .announcement-bar {
-  background: var(--ink); color: var(--paper);
+  background: var(--surface); color: var(--muted);
+  border-bottom: 1px solid var(--line);
   font-size: 11.5px; letter-spacing: 0.04em;
   padding: 8px 20px; display: flex; align-items: center; gap: 12px;
 }
 .announcement-bar .ab-tag {
-  background: var(--accent-bright); color: #fff;
+  background: var(--accent); color: var(--on-accent);
   font-weight: 700; padding: 1px 8px; border-radius: 3px; font-size: 10.5px;
   letter-spacing: 0.08em;
 }
@@ -436,17 +448,17 @@ button.retry-btn:hover { filter: brightness(1.06); }
   font-family: Georgia, "Songti SC", serif; font-size: 18px; font-weight: 700;
   flex: 0 0 auto; cursor: pointer; text-decoration: none;
 }
-.gp-node.node-done { background: var(--cel); color: #fff; box-shadow: 0 4px 0 var(--cel-deep); }
+.gp-node.node-done { background: var(--cel-soft); color: var(--cel-ink); border: 2px solid var(--cel); box-shadow: none; }
 .gp-node.node-cur { background: var(--surface); border: 3px solid var(--accent); color: var(--accent); animation: node-breathe 2s ease-in-out infinite; }
 .gp-node.node-lock { background: var(--surface-2); color: var(--faint); box-shadow: 0 4px 0 var(--line); cursor: pointer; }
 @keyframes node-breathe { 0%,100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 45%, transparent); } 50% { box-shadow: 0 0 0 8px color-mix(in srgb, var(--accent) 0%, transparent); } }
 .gp-link { flex: 1; height: 3px; background: var(--line); margin: 0 8px; border-radius: 2px; }
-.gp-link.link-done { background: var(--cel); }
+.gp-link.link-done { background: color-mix(in srgb, var(--cel) 60%, transparent); }
 
 /* HUD 资产（连续天数/经验/体力，可见资产） */
 .hud-assets { display: flex; gap: 18px; align-items: center; font-size: 12px; font-weight: 700; color: var(--muted); padding: 10px 4px; flex-wrap: wrap; }
 .hud-assets .ha-item { display: inline-flex; align-items: center; gap: 5px; }
-.hud-assets .ha-item b { color: var(--accent); font-size: 14px; }
+.hud-assets .ha-item b { color: var(--accent-bright); font-size: 14px; }
 .hud-assets .ha-bar { flex: 1; min-width: 120px; max-width: 200px; height: 14px; border-radius: 999px; background: var(--surface-2); overflow: hidden; }
 .hud-assets .ha-bar i { display: block; height: 100%; background: var(--gold); border-radius: 999px; transition: width 0.6s ease; }
 
@@ -636,7 +648,9 @@ body::after {
   background-size: 300px 300px;
   mix-blend-mode: multiply;
 }
-.dark body::after { opacity: 0.06; mix-blend-mode: screen; }
+/* 暗色不用 screen 混合:screen 层在合成层边界(如英雄区)会产生 1-2px
+   亮缝;普通叠加在 0.06 透明度下观感几乎一致 */
+.dark body::after { opacity: 0.06; }
 @media (prefers-reduced-motion: reduce) {
   body::after { animation: none !important; }
 }
@@ -671,4 +685,143 @@ body::after {
 @media (prefers-reduced-motion: reduce) {
   .like-stamp .stamp-seal, .like-stamp .stamp-ring { animation: none !important; }
   .like-stamp .stamp-seal { opacity: 0; }
+}
+
+/* ══ 首页作用域（随全局明暗主题：夜游 / 破晓纸·天亮版）════════════════
+   .kz-night 保留为首页外壳的样式钩子（历史类名），不再强制夜色令牌——
+   首页与全站一起跟随明暗主题：暗=夜游博物馆，明=天亮晨光版。
+   底图双份（hero-dawn 夜 / hero-morning 晨），由 .dark 切换显示。 */
+.kz-night { color: var(--fg); }
+
+/* 首页透明导航：页面顶部时压在 Hero 上，滚动后恢复实底 */
+.nav-ghost {
+  background: transparent !important;
+  border-color: transparent !important;
+  backdrop-filter: none !important;
+}
+
+/* 作用域内滚动后的实底导航（bg-bg/80 对 var 色不产出 alpha，这里兜底） */
+html:not(.dark) .kz-night header:not(.nav-ghost) { background: rgba(250, 247, 240, 0.86); }
+.dark .kz-night header:not(.nav-ghost) { background: rgba(10, 15, 26, 0.82); }
+
+/* ── Hero 底图：双份按主题显示（同一构图，夜/晨两个时辰）── */
+/* 底色兜底：英雄区因内含 backdrop-filter 成为独立合成层，高度落在小数
+   像素时层边缘的亚像素插值会把"上方几像素的内容"采样进边缘行，产生
+   1-2px 亮缝。给英雄区铺一层不透明底色，让边缘行采样到的永远是纯底色，
+   任何插值都发生在底色与页面底色之间（同族色，不可见）。 */
+.nz-hero { position: relative; overflow: hidden; background: var(--hero-fade); }
+.nz-img {
+  position: absolute !important; inset: 0 !important;
+  width: 100% !important; height: 100% !important;
+  object-fit: cover; object-position: 70% 38%;
+}
+.nz-img-light { display: none; }
+html:not(.dark) .nz-img-light { display: block; }
+html:not(.dark) .nz-img-dark { display: none; }
+
+/* ── Hero 遮罩：暗=墨蓝压深；明=米纸柔化，保证左侧文字可读 ──
+   底部把底图整段渐隐到页面底色。两个关键点：
+   1) 页面实际底色 = --bg + body::before 的宣纸颗粒(平均抬/压 ~4 亮度)，
+      故渐隐目标 --hero-fade 按颗粒均值校正，避免英雄区边缘出现平底色差；
+   2) 底部 14% 保持全不透明纯色——英雄区是合成层，小数高度下纹理边缘
+      会向上采样数十像素，全不透明段让任何采样结果都是同一颜色。 */
+.dark .nz-scrim {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background:
+    linear-gradient(270deg, rgba(6, 9, 16, 0) 30%, rgba(6, 9, 16, 0.42) 56%, rgba(6, 9, 16, 0.86) 84%),
+    linear-gradient(
+      0deg,
+      var(--hero-fade) 0%,
+      var(--hero-fade) 14%,
+      color-mix(in srgb, var(--hero-fade) 96%, transparent) 24%,
+      color-mix(in srgb, var(--hero-fade) 78%, transparent) 34%,
+      color-mix(in srgb, var(--hero-fade) 42%, transparent) 46%,
+      color-mix(in srgb, var(--hero-fade) 14%, transparent) 56%,
+      transparent 62%
+    ),
+    linear-gradient(180deg, rgba(6, 9, 16, 0.58) 0%, rgba(6, 9, 16, 0) 22%);
+}
+html:not(.dark) .nz-scrim {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background:
+    linear-gradient(270deg, rgba(250, 247, 240, 0) 30%, rgba(250, 247, 240, 0.5) 56%, rgba(250, 247, 240, 0.92) 84%),
+    linear-gradient(
+      0deg,
+      var(--hero-fade) 0%,
+      var(--hero-fade) 14%,
+      color-mix(in srgb, var(--hero-fade) 96%, transparent) 24%,
+      color-mix(in srgb, var(--hero-fade) 80%, transparent) 34%,
+      color-mix(in srgb, var(--hero-fade) 46%, transparent) 46%,
+      color-mix(in srgb, var(--hero-fade) 16%, transparent) 56%,
+      transparent 62%
+    ),
+    linear-gradient(180deg, rgba(250, 247, 240, 0.55) 0%, rgba(250, 247, 240, 0) 22%);
+}
+@media (max-width: 767px) {
+  /* 移动端雕像居右更靠边，遮罩整幅覆盖 + 底部整段渐隐(同桌面口径) */
+  .dark .nz-scrim {
+    background:
+      linear-gradient(0deg, var(--hero-fade) 0%, var(--hero-fade) 10%, rgba(6, 9, 16, 0.34) 38%, rgba(6, 9, 16, 0.12) 58%, rgba(6, 9, 16, 0.45) 100%);
+  }
+  html:not(.dark) .nz-scrim {
+    background:
+      linear-gradient(0deg, var(--hero-fade) 0%, var(--hero-fade) 10%, rgba(250, 247, 240, 0.46) 38%, rgba(250, 247, 240, 0.15) 58%, rgba(250, 247, 240, 0.5) 100%);
+  }
+}
+
+/* ── 大标题：暗=墨影浮起；明=纸色柔光衬托墨字 ── */
+.dark .nz-h1 { text-shadow: 0 2px 30px rgba(0, 0, 0, 0.55); }
+html:not(.dark) .nz-h1 { text-shadow: 0 1px 26px rgba(250, 247, 240, 0.85); }
+
+/* ── 金线 kicker：前置短横线（令牌驱动，随主题）── */
+.nz-kicker { display: flex; align-items: center; gap: 0.75rem; font-size: 0.6875rem; letter-spacing: 0.46em; color: var(--accent); }
+.nz-kicker::before { content: ""; width: 26px; height: 1px; background: linear-gradient(90deg, transparent, var(--accent)); flex: none; }
+
+/* ── CTA：金线描边按钮（hover 微填充），不做实心色块 ── */
+.nz-btn {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  font-family: var(--font-serif, inherit); font-size: 0.8125rem; letter-spacing: 0.3em;
+  padding: 0.8rem 1.9rem; border-radius: 2px; cursor: pointer;
+  color: var(--accent-bright);
+  background: color-mix(in srgb, var(--accent) 9%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 55%, transparent);
+  transition: background 0.25s ease, border-color 0.25s ease;
+}
+.nz-btn:hover { background: color-mix(in srgb, var(--accent) 18%, transparent); border-color: var(--accent); }
+
+/* ── 底部入口行：金点分隔的安静链接（令牌驱动）── */
+.nz-e { position: relative; padding: 0.375rem 1.05rem; font-size: 0.75rem; letter-spacing: 0.22em; color: color-mix(in srgb, var(--fg) 82%, transparent); text-decoration: none; transition: color 0.2s ease; }
+.nz-e:hover, .nz-e:focus-visible { color: var(--accent); }
+.nz-e + .nz-e::before {
+  content: ""; position: absolute; inset-inline-start: -2px; top: 50%; transform: translateY(-50%);
+  width: 1px; height: 12px; background: color-mix(in srgb, var(--accent) 35%, transparent);
+}
+[dir="rtl"] .nz-e + .nz-e::before { inset-inline-start: auto; inset-inline-end: -2px; }
+
+/* ── 玻璃金句面板：暗=墨玻璃；明=米纸玻璃 ── */
+.dark .nz-glass {
+  border-radius: 10px;
+  background: rgba(8, 12, 20, 0.46);
+  border: 1px solid rgba(245, 241, 230, 0.13);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+html:not(.dark) .nz-glass {
+  border-radius: 10px;
+  background: rgba(255, 253, 248, 0.62);
+  border: 1px solid rgba(38, 33, 26, 0.12);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* ── 公告细条：透明底（令牌驱动），不与导航争空间 ── */
+.nz-announce { display: inline-flex; align-items: center; gap: 0.625rem; font-size: 0.6875rem; letter-spacing: 0.12em; color: color-mix(in srgb, var(--fg) 66%, transparent); }
+.nz-announce .tag {
+  flex: none; padding: 0.125rem 0.5rem; border-radius: 2px;
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); color: var(--accent);
+  font-size: 0.625rem; letter-spacing: 0.28em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nz-hero *, .nz-btn, .nz-e { animation: none !important; transition: none !important; }
 }

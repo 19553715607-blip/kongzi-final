@@ -2,36 +2,68 @@
 
 import { getApiBase } from "@/lib/apiBase";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   exportMe,
   getFavorites,
   getGamifyProfile,
+  getMe,
   removeFavorite,
   upgradeAccount,
+  uploadAvatar,
+  deleteAvatar,
   isAuthError,
 } from "@/lib/api";
 import { clearToken, logout, setToken, switchGuest } from "@/lib/auth";
 import { t, useLang } from "@/lib/i18n";
 import { CountUp, Reveal } from "@/lib/motion";
+import Avatar from "@/components/Avatar";
 import { TactileButton } from "@/components/museum";
 import LoginGate from "@/components/LoginGate";
-import type { Favorite, GamifyProfile } from "@/lib/types";
+import type { AuthUser, Favorite, GamifyProfile } from "@/lib/types";
 
 
 export default function MePage() {
   const [lang] = useLang();
   const [p, setP] = useState<GamifyProfile | null>(null);
+  const [me, setMe] = useState<AuthUser | null>(null);
   const [favs, setFavs] = useState<Favorite[]>([]);
   const [email, setEmail] = useState("");
   const [pw, setPw] = useState("");
   const [msg, setMsg] = useState("");
+  const [avatarBusy, setAvatarBusy] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
   // 游客点到登录专属区（成就）时弹出解锁引导
   const [gateOpen, setGateOpen] = useState(false);
 
   const load = () => {
     getGamifyProfile().then(setP).catch((e) => setMsg(isAuthError(e) ? t("common.loginRequired", lang) : t("me.noBackend", lang)));
+    getMe().then(setMe).catch(() => setMe(null));
     getFavorites().then(setFavs).catch(() => {});
+  };
+
+  // 头像更换：选中即上传（服务端裁方压缩 256px），成功后即时刷新
+  const onPickAvatar = async (f: File | undefined) => {
+    if (!f || avatarBusy) return;
+    setAvatarBusy(true);
+    try {
+      setMe(await uploadAvatar(f));
+    } catch (e) {
+      setMsg(isAuthError(e) ? t("common.loginRequired", lang) : t("me.avatar.fail", lang));
+    } finally {
+      setAvatarBusy(false);
+    }
+  };
+  const onResetAvatar = async () => {
+    if (avatarBusy) return;
+    setAvatarBusy(true);
+    try {
+      setMe(await deleteAvatar());
+    } catch {
+      setMsg(t("me.avatar.fail", lang));
+    } finally {
+      setAvatarBusy(false);
+    }
   };
   useEffect(() => {
     load();
@@ -103,26 +135,57 @@ export default function MePage() {
         </Reveal>
       )}
 
-      {/* 头像名片 + KPI */}
+      {/* 头像名片 + KPI：点击头像即可更换（上传后服务端裁方压缩） */}
       <Reveal>
         <section className="flex items-center gap-4 rounded-2xl border border-line bg-surface p-5">
-          <span className="flex h-14 w-14 items-center justify-center rounded-full bg-celadon font-serif text-2xl text-celadon-deep">
-            {t("me.guestName", lang)}
-          </span>
+          <div className="relative shrink-0">
+            <button
+              onClick={() => fileRef.current?.click()}
+              disabled={avatarBusy}
+              title={t("me.avatar.change", lang)}
+              aria-label={t("me.avatar.change", lang)}
+              className="group relative block rounded-full focus-visible:outline-2 focus-visible:outline-accent"
+            >
+              <Avatar url={me?.avatar_url} name={p?.display_name} size={56} className={avatarBusy ? "opacity-50" : ""} />
+              <span className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 text-[10px] tracking-widest text-white opacity-0 transition group-hover:opacity-100">
+                {avatarBusy ? t("me.avatar.busy", lang) : t("me.avatar.changeHint", lang)}
+              </span>
+            </button>
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              className="hidden"
+              onChange={(e) => {
+                void onPickAvatar(e.target.files?.[0]);
+                e.target.value = ""; // 允许连续选同一文件
+              }}
+            />
+          </div>
           <div className="flex-1">
             <div className="font-serif text-lg text-fg">{p.display_name}</div>
-            <div className="mt-0.5 text-xs text-faint">
-              {p.level.name} ·{" "}
-              <CountUp value={p.level.xp} className="font-serif text-accent" />{" "}
-              XP ·{" "}
-              {t("me.streak", lang).replace(
-                "{n}",
-                String(p.streak_days),
-              )}
+            <div className="mt-0.5 flex flex-wrap items-center gap-x-2 text-xs text-faint">
+              <span>
+                {p.level.name} ·{" "}
+                <CountUp value={p.level.xp} className="font-serif text-accent" />{" "}
+                XP ·{" "}
+                {t("me.streak", lang).replace(
+                  "{n}",
+                  String(p.streak_days),
+                )}
+              </span>
               {p.is_guest && (
-                <span className="ms-2 rounded-full bg-surface-2 px-2 py-0.5 text-faint">
+                <span className="rounded-full bg-surface-2 px-2 py-0.5 text-faint">
                   {t("me.guest", lang)}
                 </span>
+              )}
+              {me?.avatar_url && !avatarBusy && (
+                <button
+                  onClick={() => void onResetAvatar()}
+                  className="pressable rounded-full border border-line px-2 py-0.5 text-[10px] text-faint transition hover:border-accent hover:text-accent"
+                >
+                  {t("me.avatar.reset", lang)}
+                </button>
               )}
             </div>
           </div>

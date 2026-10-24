@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { getConcepts } from "@/lib/api";
 import { useLang, t, type Lang } from "@/lib/i18n";
 import { Reveal } from "@/lib/motion";
@@ -36,6 +37,12 @@ export default function TermsPage() {
   const [concepts, setConcepts] = useState<Concept[]>([]);
   const [usedFallback, setUsedFallback] = useState(false);
   const [q, setQ] = useState("");
+
+  // 支持 /terms?q=ren 深链(从概念图谱跳转):预填搜索词
+  useEffect(() => {
+    const q0 = new URLSearchParams(window.location.search).get("q");
+    if (q0) setQ(q0);
+  }, []);
   const [school, setSchool] = useState<string>("");
 
   useEffect(() => {
@@ -83,6 +90,7 @@ export default function TermsPage() {
       if (school && c.school !== school) return false;
       if (!needle) return true;
       return (
+        c.id.toLowerCase().includes(needle) || // 概念 id(支持图谱深链 ?q=ren)
         c.zh.toLowerCase().includes(needle) ||
         termLabel(c, lang).toLowerCase().includes(needle) ||
         termDef(c, lang).toLowerCase().includes(needle)
@@ -96,6 +104,31 @@ export default function TermsPage() {
         <p className="text-xs tracking-[0.25em] text-accent">{t("terms.kicker", lang)}</p>
         <h1 className="mt-2 font-serif text-3xl leading-tight text-fg">{t("terms.title", lang)}</h1>
         <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted">{t("terms.desc", lang)}</p>
+      </Reveal>
+
+      {/* 新读者速览:五个核心概念先建立直觉,再看术语表 */}
+      <Reveal as="section" delay={60}>
+        <div className="rounded-2xl border border-line bg-surface p-5">
+          <div className="mb-1 font-serif text-sm font-semibold tracking-wide text-accent-ink">
+            {t("terms.overview.title", lang)}
+          </div>
+          <p className="mb-4 text-xs text-faint">{t("terms.overview.note", lang)}</p>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+            {[
+              { ch: "仁", py: "rén", key: "ren" },
+              { ch: "礼", py: "lǐ", key: "li" },
+              { ch: "君", py: "jūn zǐ", key: "junzi" },
+              { ch: "义", py: "yì", key: "yi" },
+              { ch: "智", py: "zhì", key: "zhi" },
+            ].map((c) => (
+              <div key={c.key} className="rounded-xl border border-line bg-surface-2 px-3 py-3.5 text-center">
+                <div className="font-serif text-3xl font-bold text-accent">{c.ch}</div>
+                <div className="mt-1 font-garamond text-[11px] uppercase tracking-widest text-faint">{c.py}</div>
+                <div className="mt-2 text-xs leading-relaxed text-muted">{t(`terms.ov.${c.key}.def`, lang)}</div>
+              </div>
+            ))}
+          </div>
+        </div>
       </Reveal>
 
       <Reveal as="section" delay={80} className="flex flex-wrap items-center gap-2">
@@ -112,7 +145,7 @@ export default function TermsPage() {
               onClick={() => setSchool(s)}
               className={`pressable rounded-full px-3 py-1.5 text-xs transition ${
                 school === s
-                  ? "bg-accent text-white"
+                  ? "bg-accent text-on-accent"
                   : "border border-line text-muted hover:bg-surface-2"
               }`}
             >
@@ -147,6 +180,12 @@ export default function TermsPage() {
               <div className="mt-2 flex items-center gap-2 text-[10px] text-faint">
                 {c.school && <span className="rounded bg-surface-2 px-2 py-0.5">{c.school}</span>}
                 <span>{t("terms.source", lang)} · {c.id}</span>
+                <Link
+                  href={`/graph?concept=${c.id}`}
+                  className="ms-auto pressable rounded-full border border-line px-2 py-0.5 text-[10px] text-faint transition hover:border-accent hover:text-accent"
+                >
+                  {t("terms.viewGraph", lang)}
+                </Link>
               </div>
             </Reveal>
           ))}

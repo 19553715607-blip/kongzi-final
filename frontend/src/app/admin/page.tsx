@@ -231,7 +231,7 @@ export default function AdminDashboardPage() {
             key={d}
             onClick={() => setDays(d)}
             className={`pressable rounded-full px-3 py-1 text-xs ${
-              days === d ? "bg-accent text-white" : "border border-line text-muted"
+              days === d ? "bg-accent text-on-accent" : "border border-line text-muted"
             }`}
           >
             {d === 7 ? t("admin.dash.days7", lang) : d === 30 ? t("admin.dash.days30", lang) : t("admin.dash.days90", lang)}

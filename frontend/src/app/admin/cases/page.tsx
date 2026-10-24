@@ -152,7 +152,7 @@ export default function AdminCasesPage() {
           {me.is_guest ? (
             <Link
               href="/login"
-              className="mt-3 inline-block rounded-lg bg-accent px-4 py-2 text-sm text-white hover:opacity-90"
+              className="mt-3 inline-block rounded-lg bg-accent px-4 py-2 text-sm text-on-accent hover:opacity-90"
             >
               {t("adm.loginAsAdmin", lang)}
             </Link>
@@ -271,7 +271,7 @@ export default function AdminCasesPage() {
                 setPage(1);
               }}
               className={`pressable rounded-full px-2.5 py-1 text-xs ${
-                topicId === null ? "bg-accent text-white" : "border border-line text-muted"
+                topicId === null ? "bg-accent text-on-accent" : "border border-line text-muted"
               }`}
             >
               {t("adm.all", lang)}
@@ -323,7 +323,7 @@ export default function AdminCasesPage() {
                   setPage(1);
                 }}
                 className={`pressable rounded-full px-2.5 py-1 text-xs ${
-                  review === r.v ? "bg-accent text-white" : "border border-line text-muted"
+                  review === r.v ? "bg-accent text-on-accent" : "border border-line text-muted"
                 }`}
               >
                 {t(r.key, lang)}

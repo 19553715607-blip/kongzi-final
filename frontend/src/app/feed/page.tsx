@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { addFavorite, getFeed, getFavorites, removeFavorite, isAuthError } from "@/lib/api";
 import { getApiBase } from "@/lib/apiBase";
 import { visitorHeaders } from "@/lib/visitor";
@@ -28,18 +28,25 @@ export default function FeedPage() {
   const [wall, setWall] = useState<{ dataUrl: string; filename: string } | null>(null);
   // 双击点赞爆裂动画信号：ref_id -> 自增计数
   const [bursts, setBursts] = useState<Record<string, number>>({});
+  // 语言切换竞态防护:慢响应不得覆盖新语言的数据
+  const feedSeq = useRef(0);
   // 当前打开的评论抽屉
   const [sheet, setSheet] = useState<{ targetId: string; title: string } | null>(null);
 
   useEffect(() => {
+    const seq = ++feedSeq.current;
     getFeed(lang, 20)
       .then((d) => {
+        if (seq !== feedSeq.current) return; // 旧语言的慢响应,丢弃
         setItems(d);
         setReady(true);
         // 进入卡片后拉取每条金句的真实点赞数与本人 liked
         void preloadLikes(d);
       })
-      .catch((e) => setErr(isAuthError(e) ? t("common.loginRequired", lang) : t("feed.noBackend", lang)));
+      .catch((e) => {
+        if (seq !== feedSeq.current) return;
+        setErr(isAuthError(e) ? t("common.loginRequired", lang) : t("feed.noBackend", lang));
+      });
   }, [lang]);
 
   // 已登录用户：拉取收藏列表，初始化星星状态

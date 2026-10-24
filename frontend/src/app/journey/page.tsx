@@ -114,6 +114,7 @@ export default function JourneyPage() {
     <div className="space-y-4">
       {/* HUD 资产：连续研读 / 经验 / 今日目标 */}
       <HudAssets
+        lang={lang}
         streak={p.streak_days}
         xp={p.level.xp}
         goalPct={goalPct}
@@ -167,7 +168,7 @@ export default function JourneyPage() {
             className={`rounded-full px-4 py-1.5 text-sm ${
               p.checked_in_today
                 ? "bg-surface-2 text-faint"
-                : "bg-accent text-white hover:opacity-90"
+                : "bg-accent text-on-accent hover:opacity-90"
             }`}
           >
             {p.checked_in_today ? t("jrn.checkedToday", lang) : t("jrn.checkin", lang)}
@@ -226,7 +227,7 @@ export default function JourneyPage() {
                   onClick={() => doTask(task.id)}
                   disabled={busy || task.done}
                   className={`rounded-full px-3 py-1.5 text-xs ${
-                    task.done ? "bg-cel-soft text-cel-ink" : "bg-accent text-white"
+                    task.done ? "bg-cel-soft text-cel-ink" : "bg-accent text-on-accent"
                   }`}
                 >
                   {task.done ? t("jrn.done", lang) : t("jrn.todo", lang)}

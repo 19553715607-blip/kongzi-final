@@ -21,6 +21,8 @@ const config: Config = {
           soft: "var(--accent-soft)",
           ink: "var(--accent-ink)",
         },
+        // 金底上的文字色（暗色主题深墨 / 浅色主题白）
+        onAccent: "var(--on-accent)",
         cel: {
           DEFAULT: "var(--cel)",
           soft: "var(--cel-soft)",
@@ -36,7 +38,8 @@ const config: Config = {
         celadon: { DEFAULT: "#5DCAA5", bg: "#E1F5EE", deep: "#04342C" },
       },
       fontFamily: {
-        serif: ['"Songti SC"', '"STSong"', '"Noto Serif SC"', "serif"],
+        serif: ['"Noto Serif SC"', '"Songti SC"', '"STSong"', "serif"],
+        garamond: ['"EB Garamond"', "Georgia", "serif"],
         sans: ['"PingFang SC"', '"Hiragino Sans GB"', "system-ui", "sans-serif"],
       },
     },

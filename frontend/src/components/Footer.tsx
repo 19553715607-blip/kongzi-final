@@ -35,6 +35,10 @@ export default function Footer() {
         <div className="ornament-rule mt-10 pt-6 text-center text-xs text-faint">
           <span className="font-serif">{t("brand.title", lang)}</span>
           <span className="hidden sm:inline">· {t("footer.tagline", lang)}</span>
+          <span className="mx-2 text-line">|</span>
+          <Link href="/privacy" className="underline underline-offset-4 transition hover:text-accent">
+            {t("privacy.title", lang)}
+          </Link>
         </div>
       </div>
     </footer>

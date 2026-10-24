@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import Avatar from "@/components/Avatar";
 import { getMe } from "@/lib/api";
 import { logout, switchGuest } from "@/lib/auth";
 import { t, useLang } from "@/lib/i18n";
@@ -22,7 +23,8 @@ export default function UserMenu() {
     return () => document.removeEventListener("mousedown", onDoc);
   }, []);
 
-  if (!me) {
+  // 游客态不展示头像按钮，恢复为「登录」入口；登录后才显示头像
+  if (!me || me.is_guest) {
     return (
       <Link
         href="/login"
@@ -40,9 +42,10 @@ export default function UserMenu() {
       <button
         onClick={() => setOpen((o) => !o)}
         aria-label={t("user.menu", lang)}
-        className="flex h-8 w-8 items-center justify-center rounded-full bg-celadon font-serif text-sm text-celadon-deep hover:opacity-90"
+        title={me.display_name || initial}
+        className="flex h-8 w-8 items-center justify-center rounded-full hover:opacity-90"
       >
-        {initial}
+        <Avatar url={me.avatar_url} name={me.display_name} size={32} />
       </button>
 
       {open && (

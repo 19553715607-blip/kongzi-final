@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import re
+
 from datetime import datetime
 from typing import Optional
 
@@ -16,13 +18,25 @@ router = APIRouter(prefix="/api/v1", tags=["cases"])
 
 
 # ── 公共：浏览 ────────────────────────────────────────────────────────────────
-def _brief(c: DialogCase) -> dict:
+def _slugify(text: str) -> str:
+    """英文短语 → URL slug;无英文素材时回落议题 id(本身为 ascii)。"""
+    sl = re.sub(r"[^a-z0-9]+", "-", (text or "").lower()).strip("-")
+    return sl or "case"
+
+
+def _brief(c: DialogCase, lang: str = "zh", topic_en: str = "") -> dict:
+    # 非中文时用预置四语问题译文展示(无译文回落中文原文)
+    q = c.question
+    if lang not in ("zh", "all"):
+        q = (c.question_i18n or {}).get(lang) or c.question
     return {
         "id": c.id,
+        # 分享友好 URL:/cases/{id}-{topic-en-slug};旧纯数字链接仍兼容(前端按前导数字解析)
+        "slug": f"{c.id}-{_slugify(topic_en or c.topic_id)}",
         "topic_id": c.topic_id,
         "lang": c.lang,
         "title": c.title,
-        "question": c.question,
+        "question": q,
         "status": c.status,
         "quality": c.quality,
         "ai_generated": c.ai_generated,
@@ -34,11 +48,23 @@ def _brief(c: DialogCase) -> dict:
     }
 
 
-def _full(c: DialogCase) -> dict:
+def _localize_view(v: dict, lang: str) -> dict:
+    """视图按 lang 取 i18n 字段(标签/摘要),缺译回落中文。"""
+    if lang in ("zh", "all"):
+        return v
     return {
-        **_brief(c),
-        "confucian_answer": c.confucian_answer,
-        "cross_civ_views": list(c.cross_civ_views or []),
+        **v,
+        "civ_label": (v.get("civ_label_i18n") or {}).get(lang) or v.get("civ_label"),
+        "headline": (v.get("headline_i18n") or {}).get(lang) or v.get("headline"),
+    }
+
+
+def _full(c: DialogCase, lang: str = "zh", topic_en: str = "") -> dict:
+    return {
+        **_brief(c, lang, topic_en),
+        # 长答案:优先该语版本,缺译回落中文
+        "confucian_answer": (c.answer_i18n or {}).get(lang) or c.confucian_answer,
+        "cross_civ_views": [_localize_view(v, lang) for v in (c.cross_civ_views or [])],
         "citations": list(c.citations or []),
         "reviewer": c.reviewer,
         "reviewed_at": c.reviewed_at.isoformat() if c.reviewed_at else None,
@@ -57,7 +83,17 @@ def list_cases(
     page_size: int = Query(20, ge=1, le=100),
     db: Session = Depends(get_db),
 ) -> dict:
+    topic_en_map = {
+        t.id: (t.name_i18n or {}).get("en", "") for t in db.execute(select(Topic)).scalars()
+    }
     stmt = select(DialogCase).where(DialogCase.lang == lang)
+    # 语种行缺失时回落中文行(标题按 question_i18n 本地化),保证任何语言都有内容
+    if lang not in ("zh", "all"):
+        has_rows = db.execute(
+            select(func.count()).select_from(DialogCase).where(DialogCase.lang == lang)
+        ).scalar_one()
+        if not has_rows:
+            stmt = select(DialogCase).where(DialogCase.lang == "zh")
     if topic_id:
         stmt = stmt.where(DialogCase.topic_id == topic_id)
     if status != "all":
@@ -98,7 +134,7 @@ def list_cases(
         "total": total,
         "page": page,
         "page_size": page_size,
-        "items": [_brief(c) for c in rows],
+        "items": [_brief(c, lang, topic_en_map.get(c.topic_id, "")) for c in rows],
     }
 
 
@@ -150,11 +186,13 @@ def stats(db: Session = Depends(get_db)) -> dict:
 
 
 @router.get("/cases/{case_id}")
-def get_case(case_id: int, db: Session = Depends(get_db)) -> dict:
+def get_case(case_id: int, lang: str = Query("zh"), db: Session = Depends(get_db)) -> dict:
     c = db.get(DialogCase, case_id)
     if not c:
         raise HTTPException(404, "case not found")
-    return _full(c)
+    topic = db.get(Topic, c.topic_id)
+    topic_en = (topic.name_i18n or {}).get("en", "") if topic else ""
+    return _full(c, lang, topic_en)
 
 
 # ── 管理：审核 / 发布 ──────────────────────────────────────────────────────────

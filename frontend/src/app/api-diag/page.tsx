@@ -118,7 +118,7 @@ export default function ApiDiagPage() {
             type="button"
             onClick={() => void run()}
             disabled={busy}
-            className="ms-auto rounded-full bg-accent px-3 py-1.5 text-xs text-white disabled:opacity-50"
+            className="ms-auto rounded-full bg-accent px-3 py-1.5 text-xs text-on-accent disabled:opacity-50"
           >
             {busy ? "检测中…" : "重新检测"}
           </button>

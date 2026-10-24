@@ -1,8 +1,10 @@
 "use client";
 
+import { t, type Lang } from "@/lib/i18n";
+
 /** HUD 资产（连续天数/经验/体力，可见资产）。
  *  streak/xp/energy 数字；goalPct 今日目标进度 0-100。
- *  不用 emoji，用汉字标签承载，保持纸感。
+ *  标签走 i18n（hud.streak / hud.xp / hud.energy），非中文环境不再露汉字。
  */
 export function HudAssets({
   streak,
@@ -10,6 +12,7 @@ export function HudAssets({
   energy,
   goalPct,
   goalLabel,
+  lang = "zh",
   className = "",
 }: {
   streak?: number;
@@ -17,23 +20,24 @@ export function HudAssets({
   energy?: number;
   goalPct?: number;
   goalLabel?: string;
+  lang?: Lang;
   className?: string;
 }) {
   return (
     <div className={`hud-assets ${className}`}>
       {streak != null && (
         <span className="ha-item">
-          连习 <b>{streak}</b> 日
+          {t("hud.streak", lang).replace("{a}", String(streak))}
         </span>
       )}
       {xp != null && (
         <span className="ha-item">
-          修行 <b>{xp}</b> XP
+          {t("hud.xp", lang).replace("{a}", String(xp))}
         </span>
       )}
       {energy != null && (
         <span className="ha-item">
-          体力 <b>{energy}</b>
+          {t("hud.energy", lang).replace("{a}", String(energy))}
         </span>
       )}
       {goalPct != null && (

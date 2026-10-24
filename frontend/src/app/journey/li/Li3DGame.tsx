@@ -485,7 +485,7 @@ export default function Li3DGame({
           </Reveal>
         )}
         {nearbyHint && canWalk && (
-          <div className="pointer-events-none absolute left-1/2 top-24 -translate-x-1/2 rounded-full bg-accent/75 px-3 py-1 text-xs text-white">
+          <div className="pointer-events-none absolute left-1/2 top-24 -translate-x-1/2 rounded-full bg-accent/75 px-3 py-1 text-xs text-on-accent">
             {nearbyHint}
           </div>
         )}
@@ -545,7 +545,7 @@ export default function Li3DGame({
               </div>
               <Pressable
                 type="button"
-                className="pointer-events-auto mt-3 w-full rounded-xl bg-accent py-3 text-sm font-medium text-white"
+                className="pointer-events-auto mt-3 w-full rounded-xl bg-accent py-3 text-sm font-medium text-on-accent"
                 onPointerDown={() => setCharging(true)}
                 onPointerUp={releaseBow}
                 onPointerLeave={() => charging && releaseBow()}

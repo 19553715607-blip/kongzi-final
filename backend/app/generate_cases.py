@@ -162,6 +162,7 @@ QUESTIONS = {
 }
 
 # 每问题 × 多角度（生成 ≥4 案例）
+# 角度五语词表:(zh 名, en, fr, es, ar)+ 五语指引 —— 拼装 answer_i18n 用
 ANGLES = [
     ("通识入门", "{q}", "请以面向 Z 世代年轻人的友好语气解读。"),
     ("学者视角", "{q}", "请从学术研究的视角，给出严谨的多文明对照。"),
@@ -169,6 +170,49 @@ ANGLES = [
     ("跨文化沟通", "向不熟悉儒家的西方对话者解释：{q}", "请兼顾文化语境与可理解性。"),
     ("现实抉择", "在我面临具体选择时，{q}", "请给出可操作的实践智慧。"),
 ]
+
+# 各角度的五语名称与五语指引(与 ANGLES 顺序一致)
+ANGLE_I18N = [
+    {
+        "en": ("General intro", "Read this in a friendly tone for Generation Z."),
+        "fr": ("Intro générale", "À lire dans un ton amical pour la génération Z."),
+        "es": ("Introducción general", "Léelo con un tono cercano para la generación Z."),
+        "ar": ("مدخل عام", "اقرأه بنبرة ودّة موجهة لجيل Z."),
+    },
+    {
+        "en": ("Scholar's lens", "A rigorous multi-civilisation comparison from a research perspective."),
+        "fr": ("Regard du chercheur", "Une comparaison multi-civilisations rigoureuse, en perspective de recherche."),
+        "es": ("Mirada académica", "Una comparación multirregional rigurosa desde la investigación."),
+        "ar": ("منظار الباحث", "مقارنة صارمة بين الحضارات من منظور بحثي."),
+    },
+    {
+        "en": ("Classroom", "A discussion outline fit for a 25-minute seminar."),
+        "fr": ("En classe", "Un plan de discussion pour un séminaire de 25 minutes."),
+        "es": ("En el aula", "Un guion de debate para una clase de 25 minutos."),
+        "ar": ("في الصف", "مخطط نقاش لحصة من 25 دقيقة."),
+    },
+    {
+        "en": ("Cross-cultural", "Balance cultural context with accessibility for readers new to Confucianism."),
+        "fr": ("Interculturel", "Équilibrer contexte culturel et accessibilité pour les lecteurs novices."),
+        "es": ("Intercultural", "Equilibrar contexto cultural y accesibilidad para lectores no iniciados."),
+        "ar": ("عبر ثقافي", "وازن السياق الثقافي مع وضوح الفهم للقارئ الجديد."),
+    },
+    {
+        "en": ("Real decision", "Practical wisdom you can act on."),
+        "fr": ("Décision réelle", "Une sagesse pratique et actionnable."),
+        "es": ("Decisión real", "Una sabiduría práctica y aplicable."),
+        "ar": ("قرار واقعي", "حكمة عملية قابلة للتطبيق."),
+    },
+]
+
+# 答案模板的五语段头
+SECTIONS = {
+    "zh": {"topic": "议题", "reason": "儒家价值推理", "basis": "经典依据", "practice": "实践指向"},
+    "en": {"topic": "Topic", "reason": "Confucian value reasoning", "basis": "Classical basis", "practice": "Practical direction"},
+    "fr": {"topic": "Thème", "reason": "Raisonnement confucéen", "basis": "Fondement classique", "practice": "Orientation pratique"},
+    "es": {"topic": "Tema", "reason": "Razonamiento confuciano", "basis": "Fundamento clásico", "practice": "Orientación práctica"},
+    "ar": {"topic": "الموضوع", "reason": "الاستدلال الكونفوشيوسي", "basis": "الأساس النصي", "practice": "التوجيه العملي"},
+}
 
 
 def _passage_text(db: Session, ref_id: str) -> tuple[str, str]:
@@ -184,6 +228,7 @@ def _compose_case(
     views: list[CrossCivView],
     question: str,
     angle: tuple[str, str, str],
+    angle_idx: int = 0,
 ) -> dict:
     angle_name, q_tpl, instruction = angle
     full_q = q_tpl.format(q=question)
@@ -214,15 +259,37 @@ def _compose_case(
             f"【议题】{topic.name_zh}\n本案例待补充权威儒家立场与经典依据。"
         )
 
-    # 跨文明立场摘要：5 文明并陈（headline 级摘要 → 案例页可展开详情）
+    # 跨文明立场摘要：5 文明并陈（附带五语标签与五语 headline,展示端按 lang 取用）
     civ_summary = [
         {
             "civilization": v.civilization,
             "civ_label": v.civ_label_zh,
+            "civ_label_i18n": dict(v.civ_label_i18n or {}),
             "headline": (v.headline or {}).get("zh", ""),
+            "headline_i18n": dict(v.headline or {}),
         }
         for v in views
     ]
+
+    # 长答案五语版:同一模板换五语素材重拼(经典原文保持中文,属可溯源原典)
+    answer_i18n = {}
+    ai = ANGLE_I18N[angle_idx]
+    for lg in ("en", "fr", "es", "ar"):
+        if not (confucian and cits):
+            break
+        sec = SECTIONS[lg]
+        a_name, a_instr = ai[lg]
+        cit_lines = "\n".join(
+            f"  · {c['text']} — {c['ref_label']}" for c in cits
+        )
+        answer_i18n[lg] = (
+            f"[{sec['topic']}] {(topic.name_i18n or {}).get(lg, topic.name_zh)} — "
+            f"{(topic.description or {}).get(lg, '')}\n\n"
+            f"[{sec['reason']}]\n{(confucian.headline or {}).get(lg, '')}.\n"
+            f"{(confucian.detail or {}).get(lg, '')}\n\n"
+            f"[{sec['basis']}]\n{cit_lines}\n\n"
+            f"[{sec['practice']} · {a_name}]\n{a_instr}"
+        )
 
     return {
         "topic_id": topic.id,
@@ -230,6 +297,7 @@ def _compose_case(
         "title": f"{topic.name_zh} · {angle_name} · {question[:18]}",
         "question": full_q,
         "confucian_answer": answer,
+        "answer_i18n": answer_i18n,
         "cross_civ_views": civ_summary,
         "citations": cits,
         "tags": [topic.id, angle_name],
@@ -266,7 +334,7 @@ def generate(db: Session, reset: bool = False) -> dict:
         qs = QUESTIONS.get(t.id, [])
         per_topic = 0
         for q in qs:
-            for angle in ANGLES:
+            for angle_idx, angle in enumerate(ANGLES):
                 case = _compose_case(db, t, views, q, angle)
                 if (case["topic_id"], case["title"]) in existing_keys:
                     continue

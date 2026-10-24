@@ -190,7 +190,7 @@ export default function CoCreatePage() {
           <button
             onClick={() => setFilter(null)}
             className={`pressable rounded-full px-2.5 py-1 text-xs ${
-              filter === null ? "bg-accent text-white" : "border border-line text-muted"
+              filter === null ? "bg-accent text-on-accent" : "border border-line text-muted"
             }`}
           >
             {t("co.all", lang)}

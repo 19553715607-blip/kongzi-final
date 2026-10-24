@@ -1,22 +1,39 @@
 # 孔子 · 儒家语义平台 — 一键起 docker compose
 # 用法：
 #   1. cp backend/.env.example backend/.env  并填入 QWEN_API_KEY 等
-#   2. docker compose up -d
+#   2. docker compose up -d --build
 #   3. 浏览器 → http://localhost:3000
 #
 # 包含：
-#   - neo4j  (图谱)
+#   - neo4j  (图谱，仅本机可访问 7474/7687)
 #   - backend (FastAPI + Chroma + bge-m3)
 #   - frontend (Next.js standalone)
+#
+# API 反代机制：浏览器只访问 3000 一个端口，前端 /api/* 由 Next rewrites
+# 转发到后端。目标地址由 BACKEND_ORIGIN 控制，默认 http://backend:8000
+# （compose 服务名）。注意 rewrites 在【镜像构建期】固化（见 frontend/Dockerfile
+# 的 ARG），改 BACKEND_ORIGIN 后需要重新 build，仅重启容器不生效。
+#
+# 部署后自查：
+#   docker compose ps                  # 三个服务均应为 healthy
+#   curl http://localhost:3000/api/v1/feed   # 穿透前端反代到后端，应返回 JSON
+#
+# 部署到带 IP/域名的服务器时，在 compose 同目录 .env 里按需覆盖：
+#   BACKEND_ORIGIN=http://backend:8000       # 反代目标，容器内部地址，一般不用改
+#   CORS_ORIGINS=http://<服务器地址>:3000     # 仅供浏览器直连 :8000 调试（如 /docs）
+#   NEO4J_PASSWORD=<强密码>                  # 生产建议覆盖默认值
 
 services:
   neo4j:
     image: docker.m.daocloud.io/library/neo4j:5-community
     container_name: kongzi-neo4j
     ports:
-      - "7474:7474"
-      - "7687:7687"
+      # 只绑本机回环：浏览器本机调试 7474 用；backend 走内部网络
+      # bolt://neo4j:7687，不经宿主端口，不受此限制影响
+      - "127.0.0.1:7474:7474"
+      - "127.0.0.1:7687:7687"
     environment:
+      # backend 读同名变量，两处始终一致；生产环境建议在 .env 覆盖
       NEO4J_AUTH: "neo4j/${NEO4J_PASSWORD:-kongzi-graph}"
     volumes:
       - neo4j_data:/data
@@ -41,7 +58,8 @@ services:
       NEO4J_PASSWORD: ${NEO4J_PASSWORD:-kongzi-graph}
       GRAPH_BACKEND: ${GRAPH_BACKEND:-neo4j}
       CHROMA_PATH: /data/chroma
-      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
+      # 同源反代下浏览器不直连 :8000，此项只影响浏览器直连调试（/docs 等）
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000,http://127.0.0.1:3000}
       # HuggingFace 走本地缓存（不连 huggingface.co，否则启动会卡在拉模型）
       # bge-m3 模型已在 backend_data volume 的 /data/hf_home 里
       HF_HUB_OFFLINE: "1"
@@ -53,17 +71,38 @@ services:
     volumes:
       - backend_data:/data
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8000/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 8
+      start_period: 90s
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      args:
+        # 构建期传入：rewrites 目标在 next build 时固化进 routes-manifest.json
+        BACKEND_ORIGIN: ${BACKEND_ORIGIN:-http://backend:8000}
     container_name: kongzi-frontend
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     environment:
-      NEXT_PUBLIC_API_BASE: ${NEXT_PUBLIC_API_BASE:-http://localhost:8000}
+      # 运行期同值兜底（next dev / 直接 next start 场景会读它；
+      # 容器内已构建产物以构建期固化值为准）
+      BACKEND_ORIGIN: ${BACKEND_ORIGIN:-http://backend:8000}
+      # 默认空串 = 浏览器走同源 /api 反代；仅当后端有独立公网域名时才在 .env 显式设置
+      NEXT_PUBLIC_API_BASE: ${NEXT_PUBLIC_API_BASE:-}
     ports:
       - "3000:3000"
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:3000 || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 8
+      start_period: 30s
 
 volumes:
   neo4j_data:

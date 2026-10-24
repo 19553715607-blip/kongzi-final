@@ -73,6 +73,14 @@ def _lightweight_migrations() -> None:
             ("signup_ip", "TEXT"),
             ("signup_country", "TEXT"),
             ("is_banned", "BOOLEAN NOT NULL DEFAULT 0"),
+            ("avatar_url", "TEXT"),
+        ],
+    )
+    # 跨文明案例:长答案多语(生成器 i18n 化后的新列)
+    _add_columns_if_missing(
+        "dialog_cases",
+        [
+            ("answer_i18n", "JSON"),
         ],
     )
     # 内容表：发布开关 + 溯源 meta（既有库补列；新库由 create_all 建）

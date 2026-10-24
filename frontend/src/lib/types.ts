@@ -116,6 +116,7 @@ export interface AuthUser {
   is_guest: boolean;
   is_admin?: boolean;
   display_name: string;
+  avatar_url?: string | null;
   lang: string;
   theme: string;
   ai_persona: string;
@@ -806,6 +807,7 @@ export interface CorpusStats {
 
 // ── 跨文明对话案例库 ────────────────────────────────────────────
 export interface CaseBrief {
+  slug?: string;
   id: number;
   topic_id: string;
   lang: string;

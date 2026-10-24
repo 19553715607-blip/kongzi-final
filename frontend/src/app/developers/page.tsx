@@ -275,7 +275,7 @@ topics = r.json()`} />
           className="h-full text-start"
           href="/reach"
           title={t("nav.reach", lang)}
-          accession="/reach"
+          
           thumb={
             <span className="flex h-full items-center justify-center font-serif text-base tracking-[0.25em] text-accent">
               AR

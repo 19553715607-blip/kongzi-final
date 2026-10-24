@@ -111,6 +111,21 @@ export default function PathsPage() {
             </div>
           </Reveal>
         ))}
+
+        {/* 论文起手包横幅:paths 与 essays 互相导流 */}
+        <Reveal delay={120}>
+          <Link
+            href="/essays"
+            className="pressable flex items-center gap-4 rounded-2xl border border-accent/30 bg-accent-soft/40 p-5 transition hover:border-accent/60"
+          >
+            <span className="seal flex h-11 w-11 shrink-0 items-center justify-center rounded-md font-serif text-lg">文</span>
+            <span className="min-w-0 flex-1">
+              <span className="block font-serif text-base font-medium text-fg">{t("essays.title", lang)}</span>
+              <span className="mt-0.5 block text-xs leading-relaxed text-muted">{t("paths.essays.banner", lang)}</span>
+            </span>
+            <span className="shrink-0 text-accent">→</span>
+          </Link>
+        </Reveal>
       </div>
     </div>
   );
