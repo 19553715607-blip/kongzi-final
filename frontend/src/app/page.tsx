@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import {
   addFavorite,
@@ -53,32 +52,6 @@ const BD_CASES_KEY = "跨文明对话案例（条）";
 function bdLabel(k: string, lang: Parameters<typeof t>[1]): string {
   const key = BD_KEY[k];
   return key ? t(key, lang) : k;
-}
-
-// 路径卡缩略图：有配图用配图，没有则退回品牌色几何小景（容错，避免破图）
-function RailThumb({
-  img,
-}: {
-  img?: string;
-}) {
-  if (img) {
-    return (
-      <span className="relative block h-full w-full overflow-hidden">
-        <Image src={img} alt="" fill sizes="240px" className="object-cover" unoptimized />
-      </span>
-    );
-  }
-  return (
-    <span
-      className="flex h-full w-full items-center justify-center"
-      style={{ background: "linear-gradient(135deg,var(--accent) 0%,var(--accent-deep) 100%)" }}
-    >
-      <svg width="46" height="46" viewBox="0 0 48 48" aria-hidden="true">
-        <circle cx="24" cy="24" r="18" fill="none" stroke="currentColor" strokeOpacity="0.5" strokeWidth="1.4" className="text-white" />
-        <circle cx="24" cy="24" r="6" fill="currentColor" fillOpacity="0.65" className="text-white" />
-      </svg>
-    </span>
-  );
 }
 
 export default function Home() {
@@ -248,12 +221,12 @@ export default function Home() {
     quote?.translations.find((tr) => tr.lang === lang) ??
     quote?.translations.find((tr) => tr.lang === "en");
 
-  // 精选学习路径 rail（配图：竹简 / 山峦 / 编钟 / 两圆）
+  // 精选学习路径 rail（纯文本：标题 + 一句话说明 + 编号，不配图）
   const pathCards = [
-    { titleKey: "paths.analects.title",  acc: "P-01", img: "/home/path-analects.webp" },
-    { titleKey: "paths.lineage.title",   acc: "P-02", img: "/home/path-lineage.webp" },
-    { titleKey: "paths.arts.title",      acc: "P-03", img: "/home/path-arts.webp" },
-    { titleKey: "paths.crossciv.title",  acc: "P-04", img: "/home/path-crossciv.webp" },
+    { titleKey: "paths.analects.title", descKey: "paths.analects.desc", acc: "P-01" },
+    { titleKey: "paths.lineage.title",  descKey: "paths.lineage.desc",  acc: "P-02" },
+    { titleKey: "paths.arts.title",     descKey: "paths.arts.desc",     acc: "P-03" },
+    { titleKey: "paths.crossciv.title", descKey: "paths.crossciv.desc", acc: "P-04" },
   ];
 
   // ── Hero 内的玻璃金句面板（保留全部交互：每日/随机、复制/朗读/收藏、前后句、溯源）──
@@ -470,24 +443,17 @@ export default function Home() {
               <CollectionCard
                 key={p.titleKey}
                 className="w-[220px] self-stretch sm:w-[240px]"
-                thumb={<RailThumb img={p.img} />}
                 title={t(p.titleKey, lang)}
+                note={t(p.descKey, lang)}
                 accession={p.acc}
                 href="/paths"
               />
             ))}
             <CollectionCard
               className="w-[220px] self-stretch sm:w-[240px]"
-              thumb={
-                <span className="flex h-full w-full flex-col items-center justify-center gap-1.5 bg-surface-2/70 text-accent">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <path d="M5 12h14M13 6l6 6-6 6" />
-                  </svg>
-                  <span className="font-serif text-xs">{t("home.paths.more", lang)}</span>
-                </span>
-              }
               title={t("nav.learn", lang)}
-              accession="ALL"
+              note={`${t("home.paths.more", lang)} →`}
+              badgeRaw="ALL"
               href="/paths"
             />
           </HorizontalRail>
