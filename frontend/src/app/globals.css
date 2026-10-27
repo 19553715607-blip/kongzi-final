@@ -353,6 +353,27 @@ button.retry-btn:hover { filter: brightness(1.06); }
 .collection-card .cc-title { font-family: Georgia, "Songti SC", serif; font-size: 13.5px; font-weight: 600; line-height: 1.4; color: var(--fg); display: block; }
 .collection-card .cc-acc { font-family: ui-monospace, Menlo, monospace; font-size: 10.5px; color: var(--faint); margin-top: 4px; display: block; letter-spacing: 0.04em; }
 .collection-card .cc-note { display: block; margin-top: 5px; font-size: 11.5px; line-height: 1.55; color: var(--muted); }
+/* 案例卡（纯文本）：无缩略图位，靠议题竖条 + 编号 + 衬线标题建立层次 */
+.case-card {
+  display: flex; flex-direction: column; gap: 8px;
+  min-height: 132px; padding: 14px 16px;
+  background: var(--surface); border: 1px solid var(--line);
+  border-inline-start: 3px solid var(--accent);
+  border-radius: var(--radius-sm);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+.case-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card-hover);
+  border-color: color-mix(in srgb, var(--accent) 30%, var(--line));
+}
+.case-card__q {
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3;
+  line-clamp: 3; overflow: hidden;
+  font-family: Georgia, "Songti SC", serif;
+  font-size: 14px; font-weight: 600; line-height: 1.55; color: var(--fg);
+}
+
 /* 预览型卡片：标题限 4 行。经文长短差异极大，不限行的话一条长文会把整条横轨撑高 */
 .collection-card.is-clamped .cc-title {
   display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4;

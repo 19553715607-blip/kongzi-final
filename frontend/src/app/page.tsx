@@ -429,28 +429,24 @@ export default function Home() {
     <div>
       <NightHero lang={lang} quotePanel={quotePanel} />
 
-      {/* 跨文明对话前置条带:面向海外读者的差异化内容,紧随英雄区 */}
+      {/* 跨文明对话前置条带:面向海外读者的差异化内容,紧随英雄区。
+          纯文本呈现——案例没有封面图，改用左侧金线 + 衬线标题建立层次。 */}
       <section className="border-y border-line bg-surface/60">
-        <div className="mx-auto flex max-w-6xl flex-col items-center gap-6 px-5 py-10 md:flex-row md:px-10">
-          <Link
-            href="/cases"
-            className="pressable relative block h-36 w-full shrink-0 overflow-hidden rounded-xl border border-line md:h-32 md:w-56"
-            aria-label={t("home.civ.cta", lang)}
+        <div className="mx-auto flex max-w-6xl flex-col gap-5 px-5 py-10 md:flex-row md:items-center md:px-10">
+          <div
+            className="min-w-0 flex-1 border-s-2 ps-4 md:ps-5"
+            style={{ borderInlineStartColor: "color-mix(in srgb, var(--accent) 45%, transparent)" }}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element -- 静态装饰图 */}
-            <img src="/home/path-crossciv.webp" alt="" className="h-full w-full object-cover" />
-          </Link>
-          <div className="min-w-0 flex-1 text-center md:text-start">
             <h2 className="font-serif text-xl font-semibold tracking-wide text-fg md:text-2xl">
               {t("home.civ.title", lang)}
             </h2>
-            <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted">
+            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">
               {t("home.civ.desc", lang)}
             </p>
           </div>
           <Link
             href="/cases"
-            className="nz-btn shrink-0"
+            className="nz-btn shrink-0 self-start md:self-auto"
           >
             {t("home.civ.cta", lang)} →
           </Link>
