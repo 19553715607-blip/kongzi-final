@@ -233,9 +233,6 @@ export default function Home() {
   const quotePanel = (
     <div className="nz-glass p-5 md:p-6">
       <div className="mb-3 flex items-center gap-2.5">
-        <span className="seal flex h-7 w-7 shrink-0 items-center justify-center rounded font-serif text-[11px] leading-none">
-          {t("brand.short", lang)}
-        </span>
         <span className="text-[0.65rem] tracking-[0.4em] text-accent">{t("home.quote", lang)}</span>
         <span className="ms-auto flex items-center gap-0.5 rounded-full border border-line p-0.5">
           <button
