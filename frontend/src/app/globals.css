@@ -481,6 +481,11 @@ button.retry-btn:hover { filter: brightness(1.06); }
   .gp-node { width: 46px; height: 46px; font-size: 15px; }
   .gp-link { margin: 0 4px; }
 }
+/* 320px（iPhone SE 一代）再收一档：六个 46px 节点仍差 33px */
+@media (max-width: 360px) {
+  .gp-node { width: 40px; height: 40px; font-size: 13px; }
+  .gp-link { margin: 0 3px; }
+}
 .gp-link.link-done { background: color-mix(in srgb, var(--cel) 60%, transparent); }
 
 /* HUD 资产（连续天数/经验/体力，可见资产） */

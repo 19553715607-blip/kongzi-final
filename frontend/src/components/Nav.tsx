@@ -90,7 +90,7 @@ export default function Nav({ ghost = false }: { ghost?: boolean }) {
             ))}
           </nav>
 
-          <div className="ms-auto flex items-center gap-2 md:ms-0">
+          <div className="ms-auto flex min-w-0 items-center gap-1.5 sm:gap-2 md:ms-0">
             <LangSwitcher />
             <ThemeToggle />
             <UserMenu />

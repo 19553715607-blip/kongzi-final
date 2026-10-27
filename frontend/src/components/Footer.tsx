@@ -21,7 +21,7 @@ export default function Footer() {
                   <li key={l.href}>
                     <Link
                       href={l.href}
-                      className="whitespace-nowrap text-sm text-muted transition hover:text-accent"
+                      className="text-sm text-muted transition hover:text-accent"
                     >
                       {t(l.labelKey, lang)}
                     </Link>
