@@ -46,7 +46,7 @@ export default function NightHero({
       {/* 双时辰底图：暗=破晓夜雾，明=天亮晨光；由 .dark 切换显示（见 globals.css）。
           v 参数随图迭代递增，击穿浏览器与优化器对同名 URL 的陈旧缓存。 */}
       <Image
-        src="/home/hero-dawn.webp?v=5"
+        src="/home/hero-dawn.webp?v=6"
         alt=""
         fill
         priority
@@ -54,7 +54,7 @@ export default function NightHero({
         className="nz-img nz-img-dark"
       />
       <Image
-        src="/home/hero-morning.webp?v=5"
+        src="/home/hero-morning.webp?v=6"
         alt=""
         fill
         sizes="100vw"
