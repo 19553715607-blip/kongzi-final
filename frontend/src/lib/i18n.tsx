@@ -2,7 +2,7 @@
 // 仅外化核心文案；长释义与正文由后端按 lang 返回。
 "use client";
 
-import { useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 
 export type Lang = "zh" | "en" | "fr" | "es" | "ar";
 
@@ -2256,20 +2256,47 @@ export function setLang(l: Lang) {
   listeners.forEach((fn) => fn(l));
 }
 
-export function useLang(): [Lang, (l: Lang) => void] {
-  // 初始种子用英语（面向海外的兜底语种），注水后 useEffect 立即校正为
-  // 已存偏好或浏览器检测结果，避免服务端/客户端注水不一致
-  const [lang, setS] = useState<Lang>("en");
+const LangCtx = createContext<Lang>("en");
+
+/** 根布局(服务端)按 Accept-Language 推断初始语言后包一层:
+ *  SSR 首帧即以正确语言渲染,消除非英文用户的首帧英文闪屏。
+ *  挂载后已存偏好(localStorage)优先于服务端推断。 */
+export function I18nProvider({ initialLang, children }: { initialLang: Lang; children: ReactNode }) {
+  const [lang, setLangState] = useState<Lang>(initialLang);
   useEffect(() => {
-    const initial = getLang();
-    setS(initial);
-    setHtmlAttrs(initial);
-    const sub = (l: Lang) => setS(l);
+    let stored: Lang | null = null;
+    try {
+      const v = localStorage.getItem(STORAGE_KEY);
+      if (v && LANGS.some((l) => l.code === v)) stored = v as Lang;
+    } catch {
+      /* ignore */
+    }
+    const resolved = stored ?? initialLang;
+    current = resolved;
+    setLangState(resolved);
+    setHtmlAttrs(resolved);
+    const sub = (l: Lang) => setLangState(l);
     listeners.add(sub);
     return () => {
       listeners.delete(sub);
     };
-  }, []);
+  }, [initialLang]);
+  return <LangCtx.Provider value={lang}>{children}</LangCtx.Provider>;
+}
+
+export function useLang(): [Lang, (l: Lang) => void] {
+  const lang = useContext(LangCtx);
+  useEffect(() => {
+    // 保底:未经 Provider 的树(理论不存在)也校正 html 属性
+    if (typeof document !== "undefined" && document.documentElement.lang !== lang) {
+      setHtmlAttrs(lang);
+    }
+    const sub = () => {};
+    listeners.add(sub);
+    return () => {
+      listeners.delete(sub);
+    };
+  }, [lang]);
   return [lang, setLang];
 }
 

@@ -25,7 +25,7 @@ import { fileURLToPath } from "node:url";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const APP = path.join(ROOT, "frontend/src/app");
 const NAV = path.join(ROOT, "frontend/src/lib/nav.ts");
-const I18N = path.join(ROOT, "frontend/src/lib/i18n.ts");
+const I18N = path.join(ROOT, "frontend/src/lib/i18n.tsx");
 
 const MAX_PER_AREA = 6;
 const failures = [];
@@ -130,7 +130,7 @@ console.log(`路由 ${routes.length} 个 · SITE_MAP ${siteMap.length} 条 · �
   const legacy = ["NAV_GROUPS", "EXTRA_LINKS", "FOOTER_GROUPS", "nav.zh.explore", "footer.community", "footer.tools"];
   const hits = [];
   for (const name of legacy) {
-    for (const rel of ["frontend/src/lib/nav.ts", "frontend/src/lib/i18n.ts", "frontend/src/components/Nav.tsx", "frontend/src/components/Footer.tsx", "frontend/src/components/Breadcrumb.tsx"]) {
+    for (const rel of ["frontend/src/lib/nav.ts", "frontend/src/lib/i18n.tsx", "frontend/src/components/Nav.tsx", "frontend/src/components/Footer.tsx", "frontend/src/components/Breadcrumb.tsx"]) {
       const file = path.join(ROOT, rel);
       if (fs.existsSync(file) && fs.readFileSync(file, "utf8").includes(name)) hits.push(`${name} @ ${rel}`);
     }

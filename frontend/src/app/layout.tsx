@@ -1,4 +1,5 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
+import { headers } from "next/headers";
 import "@fontsource/noto-serif-sc/400.css";
 import "@fontsource/noto-serif-sc/600.css";
 import "@fontsource/noto-serif-sc/700.css";
@@ -11,6 +12,7 @@ import PublicChrome from "@/components/PublicChrome";
 import Toaster from "@/components/Toast";
 import Tracker from "@/components/Tracker";
 import { META_DESCRIPTION, META_KEYWORDS, META_TITLE } from "@/lib/metaText";
+import { I18nProvider, type Lang } from "@/lib/i18n";
 
 export const metadata: Metadata = {
   title: META_TITLE.zh,
@@ -34,6 +36,34 @@ export const metadata: Metadata = {
   },
 };
 
+// 移动端视口与浏览器主题色(地址栏跟随夜游底色)
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#0A0F1A",
+};
+
+// 服务端按 Accept-Language 推断初始语言:SSR 首帧即输出正确语言,
+// 消除非英文用户的首帧英文闪屏(客户端 I18nProvider 以此为种子,
+// 挂载后已存偏好 localStorage 优先)。
+const SUPPORTED: Lang[] = ["zh", "en", "fr", "es", "ar"];
+function detectLangFromHeaders(): Lang {
+  const al = headers().get("accept-language") ?? "";
+  const parts = al
+    .split(",")
+    .map((p) => {
+      const [tag, q] = p.trim().split(";q=");
+      return { tag: (tag || "").toLowerCase(), q: q ? parseFloat(q) : 1 };
+    })
+    .sort((a, b) => b.q - a.q);
+  for (const { tag } of parts) {
+    const base = tag.slice(0, 2);
+    const hit = SUPPORTED.find((l) => l === base);
+    if (hit) return hit;
+  }
+  return "en";
+}
+
 // 无闪烁主题：在 React 注水前写入 dark 类。
 // 夜游博物馆为全站默认：无存储偏好时恒定暗色（不再跟随系统偏好）；
 // 用户点过明暗切换则尊重其选择。
@@ -53,16 +83,19 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const initialLang = detectLangFromHeaders();
   return (
-    <html lang="en">
+    <html lang={initialLang} dir={initialLang === "ar" ? "rtl" : "ltr"}>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <script dangerouslySetInnerHTML={{ __html: langScript }} />
       </head>
       <body className="min-h-screen bg-bg font-sans text-fg antialiased">
-        <Tracker />
-        <PublicChrome>{children}</PublicChrome>
-        <Toaster />
+        <I18nProvider initialLang={initialLang}>
+          <Tracker />
+          <PublicChrome>{children}</PublicChrome>
+          <Toaster />
+        </I18nProvider>
       </body>
     </html>
   );

@@ -103,8 +103,10 @@ export default function Li3DGame({
   const bowRaf = useRef<number | null>(null);
 
   const [banquetStart, setBanquetStart] = useState(0);
-  const [eventCursor, setEventCursor] = useState(0);
+  const eventCursorRef = useRef(0);
   const [liveEvents, setLiveEvents] = useState<LiveEv[]>([]);
+  const liveEventsRef = useRef<LiveEv[]>([]);
+  liveEventsRef.current = liveEvents;
   const [eventResults, setEventResults] = useState<LiHostRoundDetail["events"]>([]);
   const [overActs, setOverActs] = useState(0);
   const [atmosphere, setAtmosphere] = useState(62);
@@ -311,6 +313,29 @@ export default function Li3DGame({
     }, 800);
   };
 
+  // 空格按住作揖:keydown 蓄力 / keyup 松手(ref 取最新闭包,避免每帧重订阅)
+  const releaseBowRef = useRef<() => void>(() => {});
+  releaseBowRef.current = releaseBow;
+  useEffect(() => {
+    if (phase !== "bow") return;
+    const down = (e: KeyboardEvent) => {
+      if (e.code !== "Space" || e.repeat) return;
+      e.preventDefault();
+      setCharging(true);
+    };
+    const up = (e: KeyboardEvent) => {
+      if (e.code !== "Space") return;
+      e.preventDefault();
+      releaseBowRef.current();
+    };
+    window.addEventListener("keydown", down);
+    window.addEventListener("keyup", up);
+    return () => {
+      window.removeEventListener("keydown", down);
+      window.removeEventListener("keyup", up);
+    };
+  }, [phase]);
+
   const assignSeat = (seatIdx: number) => {
     if (phase !== "seat") return;
     const g = guests[seatGuestIdx];
@@ -330,7 +355,7 @@ export default function Li3DGame({
       showToast(ss >= 75 ? t("位次尽合于礼") : t("位次略有出入"));
       window.setTimeout(() => {
         setBanquetStart(performance.now());
-        setEventCursor(0);
+        eventCursorRef.current = 0;
         setLiveEvents([]);
         setPhase("banquet");
       }, 900);
@@ -360,33 +385,36 @@ export default function Li3DGame({
     if (phase !== "banquet") return;
     const id = window.setInterval(() => {
       const elapsed = (performance.now() - banquetStart) / 1000;
-      while (eventCursor < scenario.events.length && scenario.events[eventCursor].at <= elapsed) {
-        const cfg = scenario.events[eventCursor];
+      // 到点事件出列(ref 游标,循环体内可控)
+      const spawn: LiHostScenarioCfg["events"] = [];
+      while (eventCursorRef.current < scenario.events.length && scenario.events[eventCursorRef.current].at <= elapsed) {
+        spawn.push(scenario.events[eventCursorRef.current]);
+        eventCursorRef.current += 1;
+      }
+      if (spawn.length > 0) {
+        const nowMs = performance.now();
         setLiveEvents((le) => [
           ...le,
-          { cfg, guestId: cfg.guest, startMs: performance.now(), resolved: false },
+          ...spawn.map((cfg) => ({ cfg, guestId: cfg.guest, startMs: nowMs, resolved: false })),
         ]);
-        setEventCursor((c) => c + 1);
       }
-      setLiveEvents((le) => {
-        let changed = false;
-        const next = le.map((e) => {
-          if (e.resolved) return e;
-          const tp = (performance.now() - e.startMs) / (e.cfg.duration * 1000);
-          if (tp >= 1) {
-            changed = true;
-            setEventResults((r) => [...r, { label: e.cfg.label, verdict: t("怠慢了"), score: 30 }]);
-            setAtmosphere((a) => clamp(a - 8, 20, 100));
-            return { ...e, resolved: true };
-          }
-          return e;
+      // 超时未照应 → 怠慢(副作用放在 updater 之外)
+      const nowMs = performance.now();
+      const expired = liveEventsRef.current.filter(
+        (e) => !e.resolved && (nowMs - e.startMs) / (e.cfg.duration * 1000) >= 1,
+      );
+      if (expired.length > 0) {
+        const expiredSet = new Set(expired);
+        setLiveEvents((le) => le.map((e) => (expiredSet.has(e) ? { ...e, resolved: true } : e)));
+        expired.forEach((e) => {
+          setEventResults((r) => [...r, { label: e.cfg.label, verdict: t("怠慢了"), score: 30 }]);
+          setAtmosphere((a) => clamp(a - 8, 20, 100));
         });
-        return changed ? next : le;
-      });
-      if (elapsed >= scenario.banquetSeconds && phase === "banquet") setPhase("done");
+      }
+      if (elapsed >= scenario.banquetSeconds) setPhase("done");
     }, 120);
     return () => clearInterval(id);
-  }, [phase, banquetStart, eventCursor, scenario]);
+  }, [phase, banquetStart, scenario, t]);
 
   useEffect(() => {
     if (phase !== "done") return;
@@ -419,7 +447,7 @@ export default function Li3DGame({
         className="relative overflow-hidden rounded-2xl border border-line select-none shadow-inner"
         style={{ height: "min(68vh, 520px)", minHeight: 380, touchAction: "none", background: `linear-gradient(180deg, ${PAL.skyTop}, ${PAL.skyBot})` }}
       >
-        <Canvas camera={{ position: [0, 2.5, 5], fov: 48, near: 0.1, far: 60 }} dpr={[1, 1.75]}>
+        <Canvas shadows camera={{ position: [0, 2.5, 5], fov: 48, near: 0.1, far: 60 }} dpr={[1, 1.75]}>
           <Suspense fallback={null}>
             <CourtyardScene atmosphere={atmosphere} />
             {guests.map((g, i) => (
@@ -550,7 +578,7 @@ export default function Li3DGame({
                 onPointerUp={releaseBow}
                 onPointerLeave={() => charging && releaseBow()}
               >
-                {t("按住作揖 · 松手定深浅")}
+                {isTouch ? t("按住按钮作揖 · 松手定深浅") : t("按住空格作揖 · 松手定深浅")}
               </Pressable>
             </div>
           )}

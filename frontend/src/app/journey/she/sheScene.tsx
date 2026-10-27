@@ -13,6 +13,7 @@ import { useFrame, useThree } from "@react-three/fiber";
 import { useMemo, useRef, type MutableRefObject } from "react";
 import * as THREE from "three";
 import { aimAt, type Impact } from "./sheEngine";
+import { InkWorld, InkMat } from "@/components/three/inkwash";
 
 // ── 共享可变游戏状态（SheGame 创建并传入） ──
 export type ScenePhase = "ready" | "draw" | "fly" | "mark" | "summary";
@@ -65,8 +66,6 @@ export function createGameRefs(): GameRefs {
 }
 
 // ── 场景常量 ──
-const SKY = "#f1ead7";
-const FOG = "#ece4cd";
 const R_WORLD = 0.75; // 靶面单位 1 → 0.75m
 const TARGET_Z = -30;
 const TARGET_Y = 1.6;
@@ -176,16 +175,23 @@ export function ArcheryScene({
 
   return (
     <>
-      <color attach="background" args={[SKY]} />
-      <fog attach="fog" args={[FOG, 22, 85]} />
-      <hemisphereLight args={["#f8f4e6", "#aebd90", 0.95]} />
-      <directionalLight position={[6, 10, 4]} intensity={0.65} color="#fff1d4" />
-
-      <Ground />
-      <RangePath />
-      <Mountains />
-      <Pines />
-      <Clouds />
+      <InkWorld
+        fogRange={[22, 85]}
+        groundSize={[220, 140]}
+        groundPosition={[0, 0, -20]}
+        pines={[
+          { x: -5.5, z: -14, s: 1.2 }, { x: 6.5, z: -18, s: 1.5 },
+          { x: -8, z: -24, s: 1.8 }, { x: 9, z: -27, s: 1.3 },
+          { x: -4, z: -33, s: 1.6 }, { x: 5, z: -35, s: 2.0 },
+        ]}
+        clouds={[
+          { x: -16, y: 13, z: -50, s: 3.2 }, { x: 4, y: 16, z: -55, s: 4 },
+          { x: 18, y: 12, z: -48, s: 2.6 },
+        ]}
+        sun={{ focus: [0, 1.5, -16], size: 34, offset: [12, 18, 7] }}
+      >
+        <RangePath />
+      </InkWorld>
       <TargetStand g={g} />
       <WindFlag g={g} />
       <Leaves g={g} />
@@ -198,124 +204,12 @@ export function ArcheryScene({
   );
 }
 
-// ── 环境 ──
-function Ground() {
-  return (
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, -20]}>
-      <planeGeometry args={[220, 140]} />
-      <meshStandardMaterial color="#b3c091" />
-    </mesh>
-  );
-}
-
 function RangePath() {
   return (
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.012, -15]}>
       <planeGeometry args={[2.4, 32]} />
-      <meshStandardMaterial color="#d8ceaf" />
+      <InkMat color="#d8ceaf" />
     </mesh>
-  );
-}
-
-function Mountains() {
-  const ridges = useMemo(() => {
-    const mk = (z: number, hBase: number, f1: number, f2: number, phase: number) => {
-      const pts: number[] = [];
-      const n = 26;
-      for (let i = 0; i <= n; i++) {
-        const x = -70 + (140 * i) / n;
-        const h = hBase + Math.sin(i * f1 + phase) * hBase * 0.45 + Math.sin(i * f2) * hBase * 0.2;
-        pts.push(x, 0, z, x, h, z);
-      }
-      const idx: number[] = [];
-      for (let i = 0; i < n; i++) {
-        const a = i * 2;
-        idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2);
-      }
-      const geo = new THREE.BufferGeometry();
-      geo.setAttribute("position", new THREE.Float32BufferAttribute(pts, 3));
-      geo.setIndex(idx);
-      return geo;
-    };
-    return [
-      { geo: mk(-58, 9, 0.9, 0.31, 1.2), color: "#93a495", opacity: 0.55 },
-      { geo: mk(-46, 6, 1.1, 0.4, 4.1), color: "#849a8c", opacity: 0.7 },
-      { geo: mk(-38, 3.6, 1.4, 0.5, 2.6), color: "#7a9184", opacity: 0.85 },
-    ];
-  }, []);
-  return (
-    <>
-      {ridges.map((r, i) => (
-        <mesh key={i} geometry={r.geo}>
-          <meshBasicMaterial color={r.color} transparent opacity={r.opacity} side={THREE.DoubleSide} />
-        </mesh>
-      ))}
-    </>
-  );
-}
-
-function Pines() {
-  const trees = useMemo(
-    () => [
-      { x: -5.5, z: -14, s: 1.2 }, { x: 6.5, z: -18, s: 1.5 },
-      { x: -8, z: -24, s: 1.8 }, { x: 9, z: -27, s: 1.3 },
-      { x: -4, z: -33, s: 1.6 }, { x: 5, z: -35, s: 2.0 },
-    ],
-    [],
-  );
-  return (
-    <>
-      {trees.map((t, i) => (
-        <group key={i} position={[t.x, 0, t.z]} scale={t.s}>
-          <mesh position={[0, 0.5, 0]}>
-            <cylinderGeometry args={[0.09, 0.13, 1, 7]} />
-            <meshStandardMaterial color="#5a4632" />
-          </mesh>
-          <mesh position={[0, 1.5, 0]}>
-            <coneGeometry args={[0.85, 1.6, 8]} />
-            <meshStandardMaterial color="#40543d" />
-          </mesh>
-          <mesh position={[0, 2.4, 0]}>
-            <coneGeometry args={[0.6, 1.3, 8]} />
-            <meshStandardMaterial color="#4a6044" />
-          </mesh>
-        </group>
-      ))}
-    </>
-  );
-}
-
-function Clouds() {
-  const ref = useRef<THREE.Group>(null);
-  useFrame((state) => {
-    if (ref.current) ref.current.position.x = Math.sin(state.clock.elapsedTime * 0.03) * 6;
-  });
-  const clouds = useMemo(
-    () => [
-      { x: -16, y: 13, z: -50, s: 3.2 }, { x: 4, y: 16, z: -55, s: 4 },
-      { x: 18, y: 12, z: -48, s: 2.6 },
-    ],
-    [],
-  );
-  return (
-    <group ref={ref}>
-      {clouds.map((c, i) => (
-        <group key={i} position={[c.x, c.y, c.z]} scale={c.s}>
-          <mesh>
-            <sphereGeometry args={[1, 12, 10]} />
-            <meshBasicMaterial color="#fbf8ee" transparent opacity={0.85} />
-          </mesh>
-          <mesh position={[0.9, -0.15, 0]} scale={0.7}>
-            <sphereGeometry args={[1, 12, 10]} />
-            <meshBasicMaterial color="#fbf8ee" transparent opacity={0.8} />
-          </mesh>
-          <mesh position={[-0.9, -0.2, 0]} scale={0.65}>
-            <sphereGeometry args={[1, 12, 10]} />
-            <meshBasicMaterial color="#fbf8ee" transparent opacity={0.75} />
-          </mesh>
-        </group>
-      ))}
-    </group>
   );
 }
 
@@ -341,28 +235,28 @@ function TargetStand({ g }: { g: GameRefs }) {
       <group ref={ref}>
         {/* 木架 */}
         {[-1.05, 1.05].map((x) => (
-          <mesh key={x} position={[x, 1.25, 0.06]}>
+          <mesh key={x} position={[x, 1.25, 0.06]} castShadow>
             <boxGeometry args={[0.09, 2.5, 0.09]} />
-            <meshStandardMaterial color="#6b5136" />
+            <InkMat color="#6b5136" />
           </mesh>
         ))}
-        <mesh position={[0, 2.42, 0.06]}>
+        <mesh position={[0, 2.42, 0.06]} castShadow>
           <boxGeometry args={[2.35, 0.09, 0.09]} />
-          <meshStandardMaterial color="#6b5136" />
+          <InkMat color="#6b5136" />
         </mesh>
-        {/* 靶布（侯） */}
-        <mesh position={[0, TARGET_Y, 0]}>
-          <planeGeometry args={[1.9, 1.9]} />
-          <meshStandardMaterial color="#f6f1df" />
+        {/* 靶布（侯,加厚有体积） */}
+        <mesh position={[0, TARGET_Y, -0.035]}>
+          <boxGeometry args={[1.9, 1.9, 0.07]} />
+          <InkMat color="#f6f1df" />
         </mesh>
         {/* 靶布木框 */}
         <mesh position={[0, TARGET_Y + 0.97, 0.01]}>
           <boxGeometry args={[1.98, 0.05, 0.03]} />
-          <meshStandardMaterial color="#8a6a44" />
+          <InkMat color="#8a6a44" />
         </mesh>
         <mesh position={[0, TARGET_Y - 0.97, 0.01]}>
           <boxGeometry args={[1.98, 0.05, 0.03]} />
-          <meshStandardMaterial color="#8a6a44" />
+          <InkMat color="#8a6a44" />
         </mesh>
         {/* 环（外→内） */}
         {RINGS.map((ring, i) => (
@@ -403,7 +297,7 @@ function WindFlag({ g }: { g: GameRefs }) {
     <group position={[-1.75, 0, TARGET_Z + 0.4]}>
       <mesh position={[0, 1.35, 0]}>
         <cylinderGeometry args={[0.022, 0.028, 2.7, 8]} />
-        <meshStandardMaterial color="#6b5136" />
+        <InkMat color="#6b5136" />
       </mesh>
       <mesh ref={flagRef} position={[0.3, 2.52, 0]}>
         <planeGeometry args={[0.56, 0.17, 12, 1]} />
@@ -529,16 +423,16 @@ function Bow({ g }: { g: GameRefs }) {
       {/* 弓臂 */}
       <mesh>
         <tubeGeometry args={[limbCurve.upper, 12, 0.011, 6]} />
-        <meshStandardMaterial color="#5a3b1d" />
+        <InkMat color="#5a3b1d" />
       </mesh>
       <mesh>
         <tubeGeometry args={[limbCurve.lower, 12, 0.011, 6]} />
-        <meshStandardMaterial color="#5a3b1d" />
+        <InkMat color="#5a3b1d" />
       </mesh>
       {/* 握把 */}
       <mesh position={[0.032, 0, -0.03]}>
         <cylinderGeometry args={[0.016, 0.016, 0.11, 8]} />
-        <meshStandardMaterial color="#7a5330" />
+        <InkMat color="#7a5330" />
       </mesh>
       {/* 弦（V 形两段） */}
       <mesh ref={strTopRef}>
@@ -553,11 +447,11 @@ function Bow({ g }: { g: GameRefs }) {
       <group ref={arrowRef} rotation={[Math.PI / 2, 0, 0]}>
         <mesh>
           <cylinderGeometry args={[0.006, 0.006, 0.6, 6]} />
-          <meshStandardMaterial color="#8a6a3f" />
+          <InkMat color="#8a6a3f" />
         </mesh>
         <mesh position={[0, -0.33, 0]}>
           <coneGeometry args={[0.012, 0.045, 6]} />
-          <meshStandardMaterial color="#4a463e" />
+          <InkMat color="#4a463e" />
         </mesh>
         <mesh position={[0, 0.27, 0]}>
           <boxGeometry args={[0.002, 0.07, 0.03]} />
@@ -667,11 +561,11 @@ function FlightArrow({ g }: { g: GameRefs }) {
       <group ref={arrowRef} visible={false}>
         <mesh>
           <cylinderGeometry args={[0.006, 0.006, 0.6, 6]} />
-          <meshStandardMaterial color="#8a6a3f" />
+          <InkMat color="#8a6a3f" />
         </mesh>
         <mesh position={[0, -0.33, 0]}>
           <coneGeometry args={[0.012, 0.045, 6]} />
-          <meshStandardMaterial color="#4a463e" />
+          <InkMat color="#4a463e" />
         </mesh>
         <mesh position={[0, 0.27, 0]}>
           <boxGeometry args={[0.002, 0.07, 0.03]} />
@@ -697,7 +591,7 @@ function StuckArrows({ g }: { g: GameRefs }) {
           >
             <mesh>
               <cylinderGeometry args={[0.006, 0.006, 0.6, 6]} />
-              <meshStandardMaterial color="#8a6a3f" />
+              <InkMat color="#8a6a3f" />
             </mesh>
             <mesh position={[0, 0.27, 0]}>
               <boxGeometry args={[0.002, 0.07, 0.03]} />

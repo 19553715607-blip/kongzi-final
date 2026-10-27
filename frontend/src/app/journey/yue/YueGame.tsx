@@ -351,6 +351,7 @@ export default function YueGame() {
       {(phase === "playing" || phase === "submitting" || phase === "scored") && current && (
         <section className="relative select-none overflow-hidden rounded-2xl border border-line" style={{ height: "min(64vh, 560px)", minHeight: 340 }}>
           <Canvas
+            shadows
             key={`${current.id}-${runId}`}
             dpr={[1, 2]}
             camera={{ position: [0, 2.9, 8.4], fov: 52, near: 0.1, far: 300 }}

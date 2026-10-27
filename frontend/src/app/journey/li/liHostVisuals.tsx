@@ -13,6 +13,7 @@
 import { useFrame } from "@react-three/fiber";
 import { useMemo, useRef, type MutableRefObject } from "react";
 import * as THREE from "three";
+import { InkMat, InkHemi, SunWithShadow, AutoCastShadow } from "@/components/three/inkwash";
 import { RANK_META, type Rank } from "./liHostData";
 import { useLang } from "@/lib/i18n";
 import { gt } from "@/lib/gameDict";
@@ -323,9 +324,9 @@ export function LowPolyPerson({
 
 function FarGround() {
   return (
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.02, -2]}>
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.02, -2]} receiveShadow>
       <planeGeometry args={[110, 90]} />
-      <meshStandardMaterial color={PAL.grass} />
+      <InkMat color={PAL.grass} />
     </mesh>
   );
 }
@@ -345,7 +346,7 @@ function Fields() {
       {strips.map((s, i) => (
         <mesh key={i} rotation={[-Math.PI / 2, 0, 0]} position={[s.x, 0.02, s.z]}>
           <planeGeometry args={[s.w, s.d]} />
-          <meshStandardMaterial color={s.c} />
+          <InkMat color={s.c} />
         </mesh>
       ))}
     </>
@@ -427,15 +428,15 @@ function Pine({ position, scale = 1 }: { position: [number, number, number]; sca
     <group position={position} scale={scale}>
       <mesh position={[0, 0.5, 0]}>
         <cylinderGeometry args={[0.09, 0.13, 1, 7]} />
-        <meshStandardMaterial color="#5a4632" />
+        <InkMat color="#5a4632" />
       </mesh>
       <mesh position={[0, 1.5, 0]}>
         <coneGeometry args={[0.85, 1.6, 8]} />
-        <meshStandardMaterial color="#40543d" />
+        <InkMat color="#40543d" />
       </mesh>
       <mesh position={[0, 2.4, 0]}>
         <coneGeometry args={[0.6, 1.3, 8]} />
-        <meshStandardMaterial color="#4a6044" />
+        <InkMat color="#4a6044" />
       </mesh>
     </group>
   );
@@ -489,16 +490,16 @@ function StoneLantern({ position, warm }: { position: [number, number, number]; 
     <group position={position}>
       <mesh position={[0, 0.09, 0]}>
         <boxGeometry args={[0.52, 0.18, 0.52]} />
-        <meshStandardMaterial color={PAL.stoneDark} />
+        <InkMat color={PAL.stoneDark} />
       </mesh>
       <mesh position={[0, 0.48, 0]}>
         <cylinderGeometry args={[0.08, 0.11, 0.62, 8]} />
-        <meshStandardMaterial color={PAL.stone} />
+        <InkMat color={PAL.stone} />
       </mesh>
       {/* 火袋（四面透窗） */}
       <mesh position={[0, 0.95, 0]}>
         <boxGeometry args={[0.34, 0.3, 0.34]} />
-        <meshStandardMaterial color={PAL.stone} />
+        <InkMat color={PAL.stone} />
       </mesh>
       {([0, Math.PI / 2, Math.PI, -Math.PI / 2] as const).map((ry) => (
         <mesh key={ry} position={[Math.sin(ry) * 0.172, 0.95, Math.cos(ry) * 0.172]} rotation={[0, ry, 0]}>
@@ -512,11 +513,11 @@ function StoneLantern({ position, warm }: { position: [number, number, number]; 
       ))}
       <mesh position={[0, 1.18, 0]}>
         <coneGeometry args={[0.4, 0.24, 4]} />
-        <meshStandardMaterial color={PAL.roofDark} />
+        <InkMat color={PAL.roofDark} />
       </mesh>
       <mesh position={[0, 1.36, 0]}>
         <sphereGeometry args={[0.06, 8, 8]} />
-        <meshStandardMaterial color={PAL.stone} />
+        <InkMat color={PAL.stone} />
       </mesh>
     </group>
   );
@@ -527,7 +528,7 @@ function Walls() {
   const cap = (w: number, d: number) => (
     <mesh position={[0, 1.78, 0]}>
       <boxGeometry args={[w, 0.14, d]} />
-      <meshStandardMaterial color={PAL.roofDark} />
+      <InkMat color={PAL.roofDark} />
     </mesh>
   );
   return (
@@ -537,7 +538,7 @@ function Walls() {
         <group key={x} position={[x, 0, -2.9]}>
           <mesh position={[0, 0.88, 0]}>
             <boxGeometry args={[0.26, 1.76, 12.2]} />
-            <meshStandardMaterial color="#d8cfae" />
+            <InkMat color="#d8cfae" />
           </mesh>
           {cap(0.44, 12.3)}
         </group>
@@ -546,7 +547,7 @@ function Walls() {
       <group position={[0, 0, -9.0]}>
         <mesh position={[0, 0.88, 0]}>
           <boxGeometry args={[13.3, 1.76, 0.26]} />
-          <meshStandardMaterial color="#d8cfae" />
+          <InkMat color="#d8cfae" />
         </mesh>
         {cap(13.4, 0.44)}
       </group>
@@ -555,7 +556,7 @@ function Walls() {
         <group key={x} position={[x, 0, 3.1]}>
           <mesh position={[0, 0.88, 0]}>
             <boxGeometry args={[5.4, 1.76, 0.26]} />
-            <meshStandardMaterial color="#d8cfae" />
+            <InkMat color="#d8cfae" />
           </mesh>
           {cap(5.5, 0.44)}
         </group>
@@ -564,16 +565,16 @@ function Walls() {
       {[-1.35, 1.35].map((x) => (
         <mesh key={x} position={[x, 1.05, 3.1]}>
           <boxGeometry args={[0.3, 2.1, 0.3]} />
-          <meshStandardMaterial color={PAL.lacquer} />
+          <InkMat color={PAL.lacquer} />
         </mesh>
       ))}
       <mesh position={[0, 2.05, 3.1]}>
         <boxGeometry args={[3.4, 0.26, 0.42]} />
-        <meshStandardMaterial color={PAL.lacquer} />
+        <InkMat color={PAL.lacquer} />
       </mesh>
       <mesh position={[0, 2.3, 3.1]}>
         <boxGeometry args={[3.9, 0.14, 0.95]} />
-        <meshStandardMaterial color={PAL.roofDark} />
+        <InkMat color={PAL.roofDark} />
       </mesh>
     </>
   );
@@ -604,12 +605,12 @@ function CourtyardGround() {
       {/* 院内草地（底色 + 色块层次） */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.005, -2.9]}>
         <planeGeometry args={[12.9, 11.7]} />
-        <meshStandardMaterial color="#a9ba7e" />
+        <InkMat color="#a9ba7e" />
       </mesh>
       {patches.map((p, i) => (
         <mesh key={i} rotation={[-Math.PI / 2, 0, 0]} position={[p.x, 0.009, p.z]}>
           <circleGeometry args={[p.r, 24]} />
-          <meshStandardMaterial color={p.c} />
+          <InkMat color={p.c} />
         </mesh>
       ))}
       {/* 石板径 */}
@@ -631,17 +632,17 @@ function Hall({ title, warm }: { title: string; warm: number }) {
       {/* 石地坪（席位所在，与玩法锚点齐平） */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, -4.5]}>
         <circleGeometry args={[4.9, 48]} />
-        <meshStandardMaterial color="#c9bfa4" />
+        <InkMat color="#c9bfa4" />
       </mesh>
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.026, -4.5]}>
         <ringGeometry args={[4.35, 4.9, 48]} />
-        <meshStandardMaterial color={PAL.stoneDark} />
+        <InkMat color={PAL.stoneDark} />
       </mesh>
       {/* 正面两级浅阶 */}
       {[2.62, 2.86].map((w, i) => (
         <mesh key={w} position={[0, 0.02 + i * 0.02, 0.15 + i * 0.22]}>
           <boxGeometry args={[w, 0.05, 0.24]} />
-          <meshStandardMaterial color={PAL.stone} />
+          <InkMat color={PAL.stone} />
         </mesh>
       ))}
 
@@ -655,7 +656,7 @@ function Hall({ title, warm }: { title: string; warm: number }) {
             </mesh>
             <mesh position={[0, 0.11, 0]}>
               <boxGeometry args={[0.46, 0.22, 0.46]} />
-              <meshStandardMaterial color={PAL.stoneDark} />
+              <InkMat color={PAL.stoneDark} />
             </mesh>
           </group>
         )),
@@ -679,6 +680,21 @@ function Hall({ title, warm }: { title: string; warm: number }) {
         <coneGeometry args={[4.95, 1.75, 4]} />
         <meshStandardMaterial color={PAL.roof} roughness={0.85} flatShading />
       </mesh>
+      {/* 重檐下檐(第二层瓦面) */}
+      <mesh position={[0, 3.44, -4.5]} rotation={[0, Math.PI / 4, 0]} scale={[1, 1, 0.68]}>
+        <coneGeometry args={[5.9, 0.95, 4]} />
+        <meshStandardMaterial color={PAL.roof} roughness={0.85} flatShading />
+      </mesh>
+      {/* 下檐椽口(椽头一圈) */}
+      {Array.from({ length: 28 }, (_, i) => {
+        const a = (i / 28) * Math.PI * 2 + Math.PI / 4;
+        return (
+          <mesh key={i} position={[Math.cos(a) * 4.55, 3.18, -4.5 + Math.sin(a) * 3.1]} rotation={[0, -a, 0]}>
+            <boxGeometry args={[0.1, 0.09, 0.4]} />
+            <meshStandardMaterial color={PAL.roofDark} roughness={0.8} />
+          </mesh>
+        );
+      })}
       <mesh position={[0, 4.98, -4.5]}>
         <boxGeometry args={[3.4, 0.2, 0.28]} />
         <meshStandardMaterial color={PAL.roofDark} roughness={0.8} />
@@ -723,7 +739,7 @@ function Hall({ title, warm }: { title: string; warm: number }) {
         <group key={x} position={[x, 0, -2.1]}>
           <mesh position={[0, 1.1, 0]}>
             <cylinderGeometry args={[0.05, 0.07, 2.2, 8]} />
-            <meshStandardMaterial color={PAL.wood} />
+            <InkMat color={PAL.wood} />
           </mesh>
           <mesh position={[0, 2.35, 0]}>
             <boxGeometry args={[0.42, 0.52, 0.42]} />
@@ -735,7 +751,7 @@ function Hall({ title, warm }: { title: string; warm: number }) {
           </mesh>
           <mesh position={[0, 2.68, 0]}>
             <coneGeometry args={[0.36, 0.22, 4]} />
-            <meshStandardMaterial color={PAL.lacquer} />
+            <InkMat color={PAL.lacquer} />
           </mesh>
         </group>
       ))}
@@ -762,7 +778,7 @@ function Hall({ title, warm }: { title: string; warm: number }) {
         {[-3.5, -1.15, 1.15, 3.5].map((x) => (
           <mesh key={x} position={[x, 1.45, 0.02]}>
             <boxGeometry args={[0.14, 2.9, 0.14]} />
-            <meshStandardMaterial color={PAL.wood} />
+            <InkMat color={PAL.wood} />
           </mesh>
         ))}
       </group>
@@ -859,8 +875,9 @@ export function CourtyardScene({ atmosphere, title = "宾至如归" }: { atmosph
     <>
       <color attach="background" args={[PAL.skyTop]} />
       <fog attach="fog" args={[PAL.fog, 30, 110]} />
-      <hemisphereLight args={["#f8f4e6", "#aebd90", 0.85 + warm * 0.2]} />
-      <directionalLight position={[30, 40, 20]} intensity={0.62 + warm * 0.12} color="#fff1d4" />
+      <InkHemi intensity={0.75 + warm * 0.15} />
+      <SunWithShadow focus={[0, 0.8, -1]} size={20} offset={[10, 15, 7]} intensity={1.5 + warm * 0.3} mapSize={1024} />
+      <AutoCastShadow />
 
       <FarGround />
       <Fields />

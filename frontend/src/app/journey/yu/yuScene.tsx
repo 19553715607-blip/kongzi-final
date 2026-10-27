@@ -10,8 +10,8 @@
  * 世界坐标约定：game y(0..600m) → z = -y；x 与车道中心偏移一致（米）。
  */
 
-import { useFrame, useThree } from "@react-three/fiber";
-import { forwardRef, useMemo, useRef, type MutableRefObject } from "react";
+import { useFrame, useLoader, useThree } from "@react-three/fiber";
+import { forwardRef, Suspense, useCallback, useEffect, useMemo, useRef, type MutableRefObject } from "react";
 import * as THREE from "three";
 import type { YuEvent, YuObstacle, YuRoadConfig, YuScenarioBrief, YuTraffic } from "@/lib/types";
 import {
@@ -27,6 +27,26 @@ import {
   type YuRunState,
 } from "./yuEngine";
 import * as sfx from "./yuAudio";
+import { InkWorld, InkMat, toonGradient, type FocusRef } from "@/components/three/inkwash";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+
+/** glb 模型克隆 + 宣纸 Toon 材质(按节点名配色)+ 投影 */
+function useGlbModel(url: string, paint: (name: string) => string) {
+  const gltf = useLoader(GLTFLoader, url);
+  return useMemo(() => {
+    const sc = gltf.scene.clone(true);
+    sc.traverse((o) => {
+      const m = o as THREE.Mesh;
+      if (!m.isMesh) return;
+      m.material = new THREE.MeshToonMaterial({ color: paint(m.name), gradientMap: toonGradient() });
+      m.castShadow = true;
+    });
+    return sc;
+  }, [gltf, paint]);
+}
+
+/** 柔影太阳的跟随焦点(每帧指向马车) */
+const sunFocus: FocusRef = { current: null };
 
 // ── 共享可变状态 ──
 export interface YuRefs {
@@ -48,8 +68,6 @@ export function createYuRefs(): YuRefs {
 }
 
 // ── 场景常量 ──
-const SKY = "#f1ead7";
-const FOG = "#ece4cd";
 const ROAD_W = 18; // 视觉路宽（米）
 const GOLD = "#d9a521";
 const VERMILION = "#b23a2c";
@@ -87,6 +105,7 @@ export function YuScene({ g }: { g: YuRefs }) {
 
     // 追尾相机：沿车头方向跟在正后方（弯道时相机随车转）+ 速度 FOV + 高速微颠
     const cw = carWorld(g);
+    sunFocus.current = { x: cw.x, y: 0, z: cw.z };
     const t = state.clock.elapsedTime;
     const shake = speed > 9 ? (speed - 9) * 0.012 : 0;
     const fx = Math.sin(cw.yaw);
@@ -113,18 +132,43 @@ export function YuScene({ g }: { g: YuRefs }) {
   const cfg = g.scenario?.road_config;
   const length = cfg?.length ?? 600;
 
+  const mountainDefs = useMemo(() => {
+    const zEnd = -length - 120;
+    return [
+      { z: zEnd - 40, hBase: 14, f1: 0.9, f2: 0.31, phase: 1.2, color: "#93a495", opacity: 0.5, span: 360 },
+      { z: zEnd, hBase: 10, f1: 1.1, f2: 0.4, phase: 4.1, color: "#849a8c", opacity: 0.65, span: 360 },
+      { z: -60, hBase: 8, f1: 0.8, f2: 0.35, phase: 2.2, color: "#8b9c8d", opacity: 0.45, span: 360 },
+    ];
+  }, [length]);
+  const pineDefs = useMemo(() => {
+    const arr: { x: number; z: number; s: number }[] = [];
+    for (let i = 0; i < Math.ceil(length / 70); i++) {
+      const side = i % 2 === 0 ? -1 : 1;
+      arr.push({
+        x: side * (20 + ((i * 37) % 25)),
+        z: -i * 70 - 40,
+        s: 1.1 + ((i * 13) % 10) / 10,
+      });
+    }
+    return arr;
+  }, [length]);
+
   return (
     <>
-      <color attach="background" args={[SKY]} />
-      <fog attach="fog" args={[FOG, 60, 320]} />
-      <hemisphereLight args={["#f8f4e6", "#aebd90", 0.95]} />
-      <directionalLight position={[30, 40, 20]} intensity={0.7} color="#fff1d4" />
-
-      <Ground length={length} />
-      <Fields length={length} />
-      <Mountains length={length} />
-      <Pines length={length} />
-      <Clouds />
+      <InkWorld
+        fogRange={[60, 320]}
+        groundSize={[500, length + 240]}
+        groundPosition={[0, 0, -length / 2]}
+        mountains={mountainDefs}
+        pines={pineDefs}
+        clouds={[
+          { x: -30, y: 22, z: -140, s: 5 }, { x: 20, y: 26, z: -260, s: 6.5 },
+          { x: -14, y: 20, z: -420, s: 4 }, { x: 34, y: 24, z: -560, s: 5.5 },
+        ]}
+        sun={{ follow: sunFocus, size: 30, offset: [18, 26, 14] }}
+      >
+        <Fields length={length} />
+      </InkWorld>
       <Road g={g} />
       {cfg?.curves && cfg.curves.length > 0 && <River cfg={cfg} />}
       <BeatGates g={g} />
@@ -133,16 +177,6 @@ export function YuScene({ g }: { g: YuRefs }) {
       <FinishGate g={g} />
       <Chariot g={g} />
     </>
-  );
-}
-
-// ── 环境 ──
-function Ground({ length }: { length: number }) {
-  return (
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, -length / 2]}>
-      <planeGeometry args={[500, length + 240]} />
-      <meshStandardMaterial color="#b3c091" />
-    </mesh>
   );
 }
 
@@ -163,117 +197,10 @@ function Fields({ length }: { length: number }) {
       {strips.map((s, i) => (
         <mesh key={i} rotation={[-Math.PI / 2, 0, 0]} position={[s.x, 0.02, s.z]}>
           <planeGeometry args={[s.w, s.d]} />
-          <meshStandardMaterial color={s.c} />
+          <InkMat color={s.c} />
         </mesh>
       ))}
     </>
-  );
-}
-
-function Mountains({ length }: { length: number }) {
-  const ridges = useMemo(() => {
-    const mk = (z: number, hBase: number, f1: number, f2: number, phase: number) => {
-      const pts: number[] = [];
-      const n = 30;
-      for (let i = 0; i <= n; i++) {
-        const x = -180 + (360 * i) / n;
-        const h = hBase + Math.sin(i * f1 + phase) * hBase * 0.45 + Math.sin(i * f2) * hBase * 0.2;
-        pts.push(x, 0, z, x, h, z);
-      }
-      const idx: number[] = [];
-      for (let i = 0; i < n; i++) {
-        const a = i * 2;
-        idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2);
-      }
-      const geo = new THREE.BufferGeometry();
-      geo.setAttribute("position", new THREE.Float32BufferAttribute(pts, 3));
-      geo.setIndex(idx);
-      return geo;
-    };
-    const zEnd = -length - 120;
-    return [
-      { geo: mk(zEnd - 40, 14, 0.9, 0.31, 1.2), color: "#93a495", opacity: 0.5 },
-      { geo: mk(zEnd, 10, 1.1, 0.4, 4.1), color: "#849a8c", opacity: 0.65 },
-      { geo: mk(-60, 8, 0.8, 0.35, 2.2), color: "#8b9c8d", opacity: 0.45 },
-    ];
-  }, [length]);
-  return (
-    <>
-      {ridges.map((r, i) => (
-        <mesh key={i} geometry={r.geo}>
-          <meshBasicMaterial color={r.color} transparent opacity={r.opacity} side={THREE.DoubleSide} />
-        </mesh>
-      ))}
-    </>
-  );
-}
-
-function Pines({ length }: { length: number }) {
-  const trees = useMemo(() => {
-    const arr: { x: number; z: number; s: number }[] = [];
-    for (let i = 0; i < Math.ceil(length / 70); i++) {
-      const side = i % 2 === 0 ? -1 : 1;
-      arr.push({
-        x: side * (20 + ((i * 37) % 25)),
-        z: -i * 70 - 40,
-        s: 1.1 + ((i * 13) % 10) / 10,
-      });
-    }
-    return arr;
-  }, [length]);
-  return (
-    <>
-      {trees.map((t, i) => (
-        <group key={i} position={[t.x, 0, t.z]} scale={t.s}>
-          <mesh position={[0, 0.5, 0]}>
-            <cylinderGeometry args={[0.09, 0.13, 1, 7]} />
-            <meshStandardMaterial color="#5a4632" />
-          </mesh>
-          <mesh position={[0, 1.5, 0]}>
-            <coneGeometry args={[0.85, 1.6, 8]} />
-            <meshStandardMaterial color="#40543d" />
-          </mesh>
-          <mesh position={[0, 2.4, 0]}>
-            <coneGeometry args={[0.6, 1.3, 8]} />
-            <meshStandardMaterial color="#4a6044" />
-          </mesh>
-        </group>
-      ))}
-    </>
-  );
-}
-
-function Clouds() {
-  const ref = useRef<THREE.Group>(null);
-  useFrame((state) => {
-    if (ref.current) ref.current.position.x = Math.sin(state.clock.elapsedTime * 0.03) * 8;
-  });
-  const clouds = useMemo(
-    () => [
-      { x: -30, y: 22, z: -140, s: 5 }, { x: 20, y: 26, z: -260, s: 6.5 },
-      { x: -14, y: 20, z: -420, s: 4 }, { x: 34, y: 24, z: -560, s: 5.5 },
-    ],
-    [],
-  );
-  return (
-    <group ref={ref}>
-      {clouds.map((c, i) => (
-        <group key={i} position={[c.x, c.y, c.z]} scale={c.s}>
-          <mesh>
-            <sphereGeometry args={[1, 12, 10]} />
-            <meshBasicMaterial color="#fbf8ee" transparent opacity={0.85} />
-          </mesh>
-          <mesh position={[0.9, -0.15, 0]} scale={0.7}>
-            <sphereGeometry args={[1, 12, 10]} />
-            <meshBasicMaterial color="#fbf8ee" transparent opacity={0.8} />
-          </mesh>
-          <mesh position={[-0.9, -0.2, 0]} scale={0.65}>
-            <sphereGeometry args={[1, 12, 10]} />
-            <meshBasicMaterial color="#fbf8ee" transparent opacity={0.75} />
-          </mesh>
-        </group>
-      ))}
-    </group>
   );
 }
 
@@ -339,15 +266,15 @@ function Road({ g }: { g: YuRefs }) {
   return (
     <>
       <mesh geometry={data.geo}>
-        <meshStandardMaterial color="#d8ceaf" />
+        <InkMat color="#d8ceaf" />
       </mesh>
       <mesh geometry={data.rutGeo}>
-        <meshStandardMaterial color="#bfae87" />
+        <InkMat color="#bfae87" />
       </mesh>
       {data.stones.map((s, i) => (
         <mesh key={i} position={[s.x, 0.1, s.z]}>
           <boxGeometry args={[0.45, 0.2, 0.45]} />
-          <meshStandardMaterial color="#b0a184" />
+          <InkMat color="#b0a184" />
         </mesh>
       ))}
     </>
@@ -430,12 +357,12 @@ function BeatGate({ g, idx, y }: { g: YuRefs; idx: number; y: number }) {
       {[-4.5, 4.5].map((x) => (
         <mesh key={x} position={[x, 2.4, 0]}>
           <cylinderGeometry args={[0.14, 0.18, 4.8, 8]} />
-          <meshStandardMaterial color={VERMILION} />
+          <InkMat color={VERMILION} />
         </mesh>
       ))}
       <mesh position={[0, 4.9, 0]}>
         <boxGeometry args={[10.2, 0.3, 0.3]} />
-        <meshStandardMaterial color={VERMILION} />
+        <InkMat color={VERMILION} />
       </mesh>
       <group ref={bellRef} position={[0, 4.2, 0]}>
         <mesh>
@@ -444,7 +371,7 @@ function BeatGate({ g, idx, y }: { g: YuRefs; idx: number; y: number }) {
         </mesh>
         <mesh position={[0, -0.5, 0]}>
           <coneGeometry args={[0.12, 0.24, 8]} />
-          <meshStandardMaterial color="#8a6a3f" />
+          <InkMat color="#8a6a3f" />
         </mesh>
       </group>
     </group>
@@ -481,12 +408,12 @@ function JunbiaoArch({ g, o, idx }: { g: YuRefs; o: YuObstacle; idx: number }) {
       {[-3.2, 3.2].map((x) => (
         <mesh key={x} position={[x, 2.6, 0]}>
           <boxGeometry args={[0.5, 5.2, 0.5]} />
-          <meshStandardMaterial color={VERMILION} />
+          <InkMat color={VERMILION} />
         </mesh>
       ))}
       <mesh position={[0, 5.4, 0]}>
         <boxGeometry args={[8.2, 0.5, 0.6]} />
-        <meshStandardMaterial color={VERMILION} />
+        <InkMat color={VERMILION} />
       </mesh>
       <mesh position={[0, 4.6, 0]}>
         <boxGeometry args={[2.2, 0.9, 0.2]} />
@@ -504,6 +431,7 @@ function JunbiaoArch({ g, o, idx }: { g: YuRefs; o: YuObstacle; idx: number }) {
 /** 行人：宽袍大袖横穿马路；被撞则倾倒 */
 function Pedestrian({ g, o, idx }: { g: YuRefs; o: YuObstacle; idx: number }) {
   const grp = useRef<THREE.Group>(null);
+  useAllCastShadow(grp);
   useFrame((state) => {
     const el = grp.current;
     if (!el) return;
@@ -523,29 +451,27 @@ function Pedestrian({ g, o, idx }: { g: YuRefs; o: YuObstacle; idx: number }) {
   });
   return (
     <group ref={grp} position={[0, 0, -o.y]}>
-      {/* 袍 */}
-      <mesh position={[0, 0.62, 0]}>
-        <coneGeometry args={[0.34, 1.24, 10]} />
-        <meshStandardMaterial color="#5b6e8c" />
-      </mesh>
-      {/* 头 */}
-      <mesh position={[0, 1.44, 0]}>
-        <sphereGeometry args={[0.17, 12, 10]} />
-        <meshStandardMaterial color="#e8c9a0" />
-      </mesh>
-      {/* 冠 */}
-      <mesh position={[0, 1.6, 0]}>
-        <cylinderGeometry args={[0.09, 0.11, 0.12, 8]} />
-        <meshStandardMaterial color="#2b2925" />
-      </mesh>
+      <Suspense fallback={null}>
+        <PedestrianModel />
+      </Suspense>
     </group>
   );
+}
+
+function PedestrianModel() {
+  const paint = useCallback(
+    (name: string) => (/head/i.test(name) ? "#e8c9a0" : /hat/i.test(name) ? "#2b2925" : "#5b6e8c"),
+    [],
+  );
+  const scene = useGlbModel("/models/sixarts/pedestrian.glb", paint);
+  return <primitive object={scene} />;
 }
 
 /** 奔鹿：车近受惊，向左奔逸（逐禽左：勿追） */
 function Deer({ g, o, idx }: { g: YuRefs; o: YuObstacle; idx: number }) {
   const grp = useRef<THREE.Group>(null);
-  const legsRef = useRef<THREE.Group>(null);
+  const legsRef = useRef<THREE.Object3D | null>(null);
+  useAllCastShadow(grp);
   useFrame((state) => {
     const el = grp.current;
     if (!el) return;
@@ -565,38 +491,24 @@ function Deer({ g, o, idx }: { g: YuRefs; o: YuObstacle; idx: number }) {
   });
   return (
     <group ref={grp} position={[-16, 0, -o.y]} rotation={[0, Math.PI / 2, 0]}>
-      {/* 身 */}
-      <mesh position={[0, 0.78, 0]}>
-        <capsuleGeometry args={[0.26, 0.7, 6, 10]} />
-        <meshStandardMaterial color="#9a7148" />
-      </mesh>
-      {/* 颈 + 头 */}
-      <mesh position={[0, 1.16, 0.42]} rotation={[0.5, 0, 0]}>
-        <cylinderGeometry args={[0.1, 0.14, 0.5, 8]} />
-        <meshStandardMaterial color="#9a7148" />
-      </mesh>
-      <mesh position={[0, 1.44, 0.56]}>
-        <boxGeometry args={[0.2, 0.2, 0.3]} />
-        <meshStandardMaterial color="#8a6339" />
-      </mesh>
-      {/* 角 */}
-      {[-0.08, 0.08].map((x) => (
-        <mesh key={x} position={[x, 1.64, 0.5]} rotation={[0.3, 0, x > 0 ? -0.4 : 0.4]}>
-          <coneGeometry args={[0.03, 0.34, 5]} />
-          <meshStandardMaterial color="#6b5136" />
-        </mesh>
-      ))}
-      {/* 腿 */}
-      <group ref={legsRef}>
-        {[[-0.16, 0.3], [0.16, 0.3], [-0.16, -0.3], [0.16, -0.3]].map(([x, z], i) => (
-          <mesh key={i} position={[x, 0.3, z]}>
-            <cylinderGeometry args={[0.045, 0.04, 0.62, 6]} />
-            <meshStandardMaterial color="#8a6339" />
-          </mesh>
-        ))}
-      </group>
+      <Suspense fallback={null}>
+        <DeerModel legsRef={legsRef} />
+      </Suspense>
     </group>
   );
+}
+
+function DeerModel({ legsRef }: { legsRef: MutableRefObject<THREE.Object3D | null> }) {
+  const paint = useCallback(
+    (name: string) =>
+      /antler/i.test(name) ? "#6b5136" : /head|leg|tail|hoof/i.test(name) ? "#8a6339" : "#9a7148",
+    [],
+  );
+  const scene = useGlbModel("/models/sixarts/deer.glb", paint);
+  useMemo(() => {
+    legsRef.current = scene.getObjectByName("legs") ?? null;
+  }, [scene, legsRef]);
+  return <primitive object={scene} />;
 }
 
 /** 终点牌坊 */
@@ -609,16 +521,16 @@ function FinishGate({ g }: { g: YuRefs }) {
       {[-4.5, 4.5].map((x) => (
         <mesh key={x} position={[x, 2.8, 0]}>
           <cylinderGeometry args={[0.16, 0.2, 5.6, 8]} />
-          <meshStandardMaterial color="#6b5136" />
+          <InkMat color="#6b5136" />
         </mesh>
       ))}
       <mesh position={[0, 5.7, 0]}>
         <boxGeometry args={[10.4, 0.4, 0.4]} />
-        <meshStandardMaterial color={GOLD} />
+        <InkMat color={GOLD} />
       </mesh>
       <mesh position={[0, 5.05, 0]}>
         <boxGeometry args={[3, 0.8, 0.15]} />
-        <meshStandardMaterial color="#f6f1df" />
+        <InkMat color="#f6f1df" />
       </mesh>
     </group>
   );
@@ -632,22 +544,22 @@ const Driver = forwardRef<THREE.Group, { coat: string }>(
         {/* 深衣 */}
         <mesh position={[0, 0.16, 0]}>
           <cylinderGeometry args={[0.16, 0.2, 0.42, 10]} />
-          <meshStandardMaterial color={coat} />
+          <InkMat color={coat} />
         </mesh>
         {/* 双臂前拱 */}
         <mesh position={[0, 0.22, -0.14]} rotation={[Math.PI / 2.6, 0, 0]}>
           <cylinderGeometry args={[0.05, 0.05, 0.3, 8]} />
-          <meshStandardMaterial color={coat} />
+          <InkMat color={coat} />
         </mesh>
         {/* 首 */}
         <mesh position={[0, 0.44, 0]}>
           <sphereGeometry args={[0.11, 12, 10]} />
-          <meshStandardMaterial color="#d9b48f" />
+          <InkMat color="#d9b48f" />
         </mesh>
         {/* 冠 */}
         <mesh position={[0, 0.53, 0]}>
           <cylinderGeometry args={[0.07, 0.09, 0.08, 10]} />
-          <meshStandardMaterial color="#2b2620" />
+          <InkMat color="#2b2620" />
         </mesh>
       </group>
     );
@@ -689,6 +601,7 @@ function Traffic({ g }: { g: YuRefs }) {
 
 function AIChariot({ g, tr, idx }: { g: YuRefs; tr: YuTraffic; idx: number }) {
   const root = useRef<THREE.Group>(null);
+  useAllCastShadow(root);
   const horseRef = useRef<THREE.Group>(null);
   const wheelL = useRef<THREE.Group>(null);
   const wheelR = useRef<THREE.Group>(null);
@@ -714,7 +627,7 @@ function AIChariot({ g, tr, idx }: { g: YuRefs; tr: YuTraffic; idx: number }) {
     if (hg) {
       const phase = t * (4 + speed * 1.1);
       hg.position.y = Math.abs(Math.sin(phase)) * 0.05;
-      hg.children.forEach((child) => {
+      hg.traverse((child) => {
         if (child.userData.leg != null) {
           const off = child.userData.leg % 2 === 0 ? 0 : Math.PI;
           child.rotation.x = Math.sin(phase + off) * 0.5;
@@ -734,21 +647,21 @@ function AIChariot({ g, tr, idx }: { g: YuRefs; tr: YuTraffic; idx: number }) {
       {/* 辕 */}
       <mesh position={[0, 0.86, -1.6]} rotation={[Math.PI / 2, 0, 0]}>
         <cylinderGeometry args={[0.05, 0.06, 2.4, 8]} />
-        <meshStandardMaterial color="#5a3b1d" />
+        <InkMat color="#5a3b1d" />
       </mesh>
       {/* 舆（与玩家朱厢相别） */}
       <mesh position={[0, 0.98, 0.2]}>
         <boxGeometry args={[1.6, 0.48, 1.4]} />
-        <meshStandardMaterial color={oncoming ? "#474a55" : "#6b4a2e"} />
+        <InkMat color={oncoming ? "#474a55" : "#6b4a2e"} />
       </mesh>
       {/* 盖 */}
       <mesh position={[0, 1.9, 0.22]}>
         <cylinderGeometry args={[0.035, 0.035, 1.25, 8]} />
-        <meshStandardMaterial color="#5a3b1d" />
+        <InkMat color="#5a3b1d" />
       </mesh>
       <mesh position={[0, 2.58, 0.22]}>
         <coneGeometry args={[1.05, 0.46, 12]} />
-        <meshStandardMaterial color={oncoming ? "#5a6e8c" : "#7c8a5a"} />
+        <InkMat color={oncoming ? "#5a6e8c" : "#7c8a5a"} />
       </mesh>
       <Driver ref={driverRef} coat={oncoming ? "#3c4048" : "#4e3f2c"} />
       <SpokedWheel ref={wheelL} x={-0.9} z={0.22} />
@@ -758,8 +671,20 @@ function AIChariot({ g, tr, idx }: { g: YuRefs; tr: YuTraffic; idx: number }) {
 }
 
 // ── 双马轺车（精细主角） ──
+
+/** 一次性给子树全部网格开投影(马车/行人/鹿等主体) */
+function useAllCastShadow(ref: MutableRefObject<THREE.Group | null>) {
+  useEffect(() => {
+    ref.current?.traverse((o) => {
+      const m = o as THREE.Mesh;
+      if (m.isMesh) m.castShadow = true;
+    });
+  });
+}
+
 function Chariot({ g }: { g: YuRefs }) {
   const root = useRef<THREE.Group>(null);
+  useAllCastShadow(root);
   const wheelL = useRef<THREE.Group>(null);
   const wheelR = useRef<THREE.Group>(null);
   const bodyRef = useRef<THREE.Group>(null);
@@ -799,7 +724,7 @@ function Chariot({ g }: { g: YuRefs }) {
       if (!hg) return;
       const phase = t * (4 + speed * 1.1) + hi * Math.PI;
       hg.position.y = Math.abs(Math.sin(phase)) * 0.05 * Math.min(1, speed / 4);
-      hg.children.forEach((child) => {
+      hg.traverse((child) => {
         if (child.userData.leg != null) {
           const off = child.userData.leg % 2 === 0 ? 0 : Math.PI;
           child.rotation.x = Math.sin(phase + off) * 0.5 * Math.min(1, speed / 4);
@@ -820,11 +745,11 @@ function Chariot({ g }: { g: YuRefs }) {
       {/* 辕 + 轭 */}
       <mesh position={[0, 0.86, -1.7]} rotation={[Math.PI / 2, 0, 0]}>
         <cylinderGeometry args={[0.05, 0.06, 2.8, 8]} />
-        <meshStandardMaterial color="#5a3b1d" />
+        <InkMat color="#5a3b1d" />
       </mesh>
       <mesh position={[0, 1.05, -2.6]} rotation={[0, 0, Math.PI / 2]}>
         <cylinderGeometry args={[0.045, 0.045, 1.7, 8]} />
-        <meshStandardMaterial color="#6b4a26" />
+        <InkMat color="#6b4a26" />
       </mesh>
       {/* 鸾铃（轭两端） */}
       {[-0.85, 0.85].map((x) => (
@@ -838,34 +763,34 @@ function Chariot({ g }: { g: YuRefs }) {
         {/* 厢体 */}
         <mesh position={[0, 0.98, 0.2]}>
           <boxGeometry args={[1.7, 0.5, 1.5]} />
-          <meshStandardMaterial color="#8c2f24" />
+          <InkMat color="#8c2f24" />
         </mesh>
         {/* 栏杆 */}
         {[-0.8, 0.8].map((x) => (
           <mesh key={x} position={[x, 1.45, 0.2]}>
             <boxGeometry args={[0.06, 0.45, 1.5]} />
-            <meshStandardMaterial color="#5a3b1d" />
+            <InkMat color="#5a3b1d" />
           </mesh>
         ))}
         <mesh position={[0, 1.45, 0.92]}>
           <boxGeometry args={[1.7, 0.45, 0.06]} />
-          <meshStandardMaterial color="#5a3b1d" />
+          <InkMat color="#5a3b1d" />
         </mesh>
         {/* 轼（前横木） */}
         <mesh position={[0, 1.32, -0.5]} rotation={[0, 0, Math.PI / 2]}>
           <cylinderGeometry args={[0.035, 0.035, 1.6, 8]} />
-          <meshStandardMaterial color="#6b4a26" />
+          <InkMat color="#6b4a26" />
         </mesh>
         {/* 御者（按礼时拱手一揖） */}
         <Driver ref={driverRef} coat="#6b2420" />
         {/* 华盖杆 + 盖 */}
         <mesh position={[0, 1.9, 0.25]}>
           <cylinderGeometry args={[0.035, 0.035, 1.3, 8]} />
-          <meshStandardMaterial color="#5a3b1d" />
+          <InkMat color="#5a3b1d" />
         </mesh>
         <mesh position={[0, 2.62, 0.25]}>
           <coneGeometry args={[1.15, 0.5, 12]} />
-          <meshStandardMaterial color="#c9a24a" />
+          <InkMat color="#c9a24a" />
         </mesh>
         <mesh position={[0, 2.86, 0.25]}>
           <sphereGeometry args={[0.07, 8, 8]} />
@@ -879,55 +804,36 @@ function Chariot({ g }: { g: YuRefs }) {
   );
 }
 
-/** 马：身/颈/头/耳/鬃/尾/四腿（腿带 userData.leg 供快步动画） */
+/** 马:Blender 低模(腿节点 leg_0..3 带userData.leg,枢轴在髋),快步动画沿用 */
+const darkPart = /mane|tail|hoof|forelock/i;
 const Horse = forwardRef<THREE.Group, { x: number; coat: string; mane: string }>(
   function HorseInner({ x, coat, mane }, ref) {
     return (
       <group ref={ref} position={[x, 0, -2.6]}>
-        {/* 身 */}
-        <mesh position={[0, 1.02, 0]} rotation={[Math.PI / 2, 0, 0]}>
-          <capsuleGeometry args={[0.3, 0.85, 6, 12]} />
-          <meshStandardMaterial color={coat} />
-        </mesh>
-        {/* 颈 */}
-        <mesh position={[0, 1.38, -0.5]} rotation={[0.7, 0, 0]}>
-          <cylinderGeometry args={[0.13, 0.2, 0.65, 10]} />
-          <meshStandardMaterial color={coat} />
-        </mesh>
-        {/* 头 */}
-        <mesh position={[0, 1.66, -0.78]} rotation={[0.35, 0, 0]}>
-          <boxGeometry args={[0.24, 0.26, 0.52]} />
-          <meshStandardMaterial color={coat} />
-        </mesh>
-        {/* 耳 */}
-        {[-0.08, 0.08].map((ex) => (
-          <mesh key={ex} position={[ex, 1.84, -0.66]}>
-            <coneGeometry args={[0.045, 0.14, 6]} />
-            <meshStandardMaterial color={coat} />
-          </mesh>
-        ))}
-        {/* 鬃 */}
-        <mesh position={[0, 1.52, -0.38]} rotation={[0.7, 0, 0]}>
-          <boxGeometry args={[0.06, 0.5, 0.16]} />
-          <meshStandardMaterial color={mane} />
-        </mesh>
-        {/* 尾 */}
-        <mesh position={[0, 1.05, 0.62]} rotation={[-0.9, 0, 0]}>
-          <coneGeometry args={[0.09, 0.6, 8]} />
-          <meshStandardMaterial color={mane} />
-        </mesh>
-        {/* 腿（快步动画节点） */}
-        {[[-0.16, -0.34], [0.16, -0.34], [-0.16, 0.36], [0.16, 0.36]].map(([lx, lz], i) => (
-          <mesh key={i} position={[lx, 0.42, lz]} userData={{ leg: i }}>
-            <cylinderGeometry args={[0.055, 0.045, 0.85, 8]} />
-            <meshStandardMaterial color={coat} />
-          </mesh>
-        ))}
+        <Suspense fallback={null}>
+          <HorseModel coat={coat} mane={mane} />
+        </Suspense>
       </group>
     );
   },
 );
 Horse.displayName = "Horse";
+
+function HorseModel({ coat, mane }: { coat: string; mane: string }) {
+  const paint = useCallback(
+    (name: string) => (darkPart.test(name) ? mane : coat),
+    [coat, mane],
+  );
+  const scene = useGlbModel("/models/sixarts/horse.glb", paint);
+  const tagged = useMemo(() => {
+    scene.traverse((o) => {
+      const m = /^leg_([0-3])$/.exec(o.name);
+      if (m) o.userData.leg = Number(m[1]);
+    });
+    return scene;
+  }, [scene]);
+  return <primitive object={tagged} scale={0.9} />;
+}
 
 /** 十二辐大车轮 */
 const SpokedWheel = forwardRef<THREE.Group, { x: number; z: number }>(
@@ -938,19 +844,19 @@ const SpokedWheel = forwardRef<THREE.Group, { x: number; z: number }>(
         {/* 轮圈（绕 x 轴旋转 → 圈在 yz 平面） */}
         <mesh rotation={[0, Math.PI / 2, 0]}>
           <torusGeometry args={[0.62, 0.055, 10, 28]} />
-          <meshStandardMaterial color="#4a3520" />
+          <InkMat color="#4a3520" />
         </mesh>
         {/* 辐条 */}
         {spokes.map((a, i) => (
           <mesh key={i} rotation={[a, 0, 0]}>
             <cylinderGeometry args={[0.028, 0.028, 1.2, 6]} />
-            <meshStandardMaterial color="#6b4a26" />
+            <InkMat color="#6b4a26" />
           </mesh>
         ))}
         {/* 毂 */}
         <mesh rotation={[0, 0, Math.PI / 2]}>
           <cylinderGeometry args={[0.11, 0.11, 0.18, 10]} />
-          <meshStandardMaterial color="#3c2a16" />
+          <InkMat color="#3c2a16" />
         </mesh>
       </group>
     );
