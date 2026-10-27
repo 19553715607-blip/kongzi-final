@@ -474,6 +474,13 @@ button.retry-btn:hover { filter: brightness(1.06); }
 .gp-node.node-lock { background: var(--surface-2); color: var(--faint); box-shadow: 0 4px 0 var(--line); cursor: pointer; }
 @keyframes node-breathe { 0%,100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 45%, transparent); } 50% { box-shadow: 0 0 0 8px color-mix(in srgb, var(--accent) 0%, transparent); } }
 .gp-link { flex: 1; height: 3px; background: var(--line); margin: 0 8px; border-radius: 2px; }
+/* 窄屏：六个 56px 节点 + 连接线在 390px 下会顶出视口（实测 67px），
+   等比缩小节点与连接线间距，保持一行完整可见，不引入横向滚动 */
+@media (max-width: 480px) {
+  .game-path { padding: 14px 0; }
+  .gp-node { width: 46px; height: 46px; font-size: 15px; }
+  .gp-link { margin: 0 4px; }
+}
 .gp-link.link-done { background: color-mix(in srgb, var(--cel) 60%, transparent); }
 
 /* HUD 资产（连续天数/经验/体力，可见资产） */

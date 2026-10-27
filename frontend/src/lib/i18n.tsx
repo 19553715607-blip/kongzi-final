@@ -1590,6 +1590,10 @@ const DICT: Dict = {
     ar: "سؤال واحد وحضارات متعددة: كيف يحاور الفكر الكونفوشيوسي الثقافات.",
   },
   // ── The China Room 重构：主导航 / 首页 / 路径 / 小测 / 术语 / 教学 ──
+  "nav.lang": {
+    zh: "切换语言", en: "Switch language", fr: "Changer de langue",
+    es: "Cambiar idioma", ar: "تغيير اللغة",
+  },
   "nav.explore":  { zh: "探索", en: "Explore", fr: "Explorer", es: "Explorar", ar: "استكشاف" },
   "nav.learn":    { zh: "学习", en: "Learn", fr: "Apprendre", es: "Aprender", ar: "تعلّم" },
   "nav.teach":    { zh: "教学", en: "Teach", fr: "Enseigner", es: "Enseñar", ar: "التدريس" },

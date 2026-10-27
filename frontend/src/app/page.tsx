@@ -277,7 +277,8 @@ export default function Home() {
               )}
             </div>
           )}
-          <div className="mt-3 flex items-center gap-1.5">
+          {/* 动作行：允许换行——法/西/阿语的按钮文案明显更长，窄屏一行放不下 */}
+          <div className="mt-3 flex flex-wrap items-center gap-1.5 gap-y-2">
             <Pressable
               onClick={doCopy}
               title={t("home.quote.copy", lang)}
