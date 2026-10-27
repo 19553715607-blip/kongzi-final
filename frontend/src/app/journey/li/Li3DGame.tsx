@@ -2,7 +2,7 @@
 
 /**
  * 礼 ·「执礼 · 宾至如归」
- * 参考 Summer Afternoon：第三人称漫步 + 跟随镜头 + 低多边形场景，走近互动完成三幕礼仪。
+ * 正面固定镜头下的庭院漫步与三幕礼仪互动。
  */
 
 import { Canvas } from "@react-three/fiber";
@@ -32,7 +32,7 @@ import { Reveal, CountUp, Pressable } from "@/lib/motion";
 import { TactileButton } from "@/components/museum";
 import {
   dist2d,
-  FollowCamera,
+  FixedRiteCamera,
   PLAYER_START,
   PlayerAvatar,
   useMovementKeys,
@@ -405,21 +405,33 @@ export default function Li3DGame({
 
   const canWalk = phase !== "intro" && phase !== "done" && phase !== "bow";
   const bowTilt = phase === "bow" ? bowDepth : 0;
+  const stageIndex = phase === "seat" ? 1 : phase === "banquet" ? 2 : phase === "done" ? 3 : 0;
+  const stageLabels = [t("一幕 · 走近迎宾"), t("二幕 · 走近安席"), t("三幕 · 席间照应")];
 
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <TactileButton type="button" variant="ghost" onClick={onExit} className="sm">{t("← 退出修行")}</TactileButton>
-        <span className="rounded-full bg-accent-soft px-3 py-1 text-xs text-accent">
-          {t("漫步宾主院")} · {t(scenario.title)}
+        <span className="rounded-full border border-[#b79a5b]/25 bg-[#f4eddd] px-3 py-1 text-xs text-[#735c2f]">
+          {t("礼部修行场")} · {t(scenario.title)}
         </span>
       </div>
 
       <section
-        className="relative overflow-hidden rounded-2xl border border-line select-none shadow-inner"
-        style={{ height: "min(68vh, 520px)", minHeight: 380, touchAction: "none", background: `linear-gradient(180deg, ${PAL.skyTop}, ${PAL.skyBot})` }}
+        className="relative isolate overflow-hidden rounded-[1.35rem] border border-[#9a7940]/40 bg-[#e9dfc7] select-none shadow-[0_24px_70px_-32px_rgba(39,30,18,0.7)] ring-1 ring-white/60"
+        style={{ height: "min(76vh, 650px)", minHeight: 440, touchAction: "none", background: `linear-gradient(180deg, ${PAL.skyTop}, ${PAL.skyBot})` }}
       >
-        <Canvas camera={{ position: [0, 2.5, 5], fov: 48, near: 0.1, far: 60 }} dpr={[1, 1.75]}>
+        <Canvas
+          shadows
+          camera={{ position: [0, 4.8, 10.5], fov: 42, near: 0.1, far: 60 }}
+          dpr={[1, 1.75]}
+          onCreated={({ gl }) => {
+            gl.toneMapping = THREE.ACESFilmicToneMapping;
+            gl.toneMappingExposure = 0.9;
+            gl.shadowMap.enabled = true;
+            gl.shadowMap.type = THREE.PCFSoftShadowMap;
+          }}
+        >
           <Suspense fallback={null}>
             <CourtyardScene atmosphere={atmosphere} />
             {guests.map((g, i) => (
@@ -445,47 +457,63 @@ export default function Li3DGame({
               bowTilt={bowTilt}
               onMove={onPlayerMove}
             />
-            <FollowCamera target={playerPos} active={phase !== "intro"} bowTilt={bowTilt} />
+            <FixedRiteCamera />
           </Suspense>
         </Canvas>
 
+        {/* 【渲染优化】仅调整 HUD 的磨砂半透外观，文字与交互状态保持原样。 */}
         {/* 操控提示 */}
         {canWalk && (
-          <div className="pointer-events-none absolute left-3 top-14 rounded-lg bg-[#2c241c]/50 px-2.5 py-1 text-[10px] text-[#f5efe6]/85 backdrop-blur-sm">
+          <div className="li-glass-panel pointer-events-none absolute left-4 top-[5.4rem] rounded-full border px-3 py-1.5 text-[10px] tracking-wide text-[#f8f1e4]/90">
             {isTouch ? t("左侧摇杆移动") : t("WASD / 方向键移动")} · {t("走近按空格互动")}
           </div>
         )}
 
         {/* HUD */}
-        <div className="pointer-events-none absolute inset-x-0 top-0 bg-gradient-to-b from-[#2c241c]/40 to-transparent p-3">
-          <div className="flex items-start justify-between gap-2">
-            <div>
-              <div className="font-serif text-sm text-[#f5efe6]">{t(scenario.place)}</div>
-              <div className="text-[11px] text-[#f5efe6]/75">
-                {phase === "intro" && t("入院")}
-                {phase === "greet" && t("一幕 · 走近迎宾")}
-                {phase === "bow" && t("作揖")}
-                {phase === "seat" && t("二幕 · 走近安席")}
-                {phase === "banquet" && t("三幕 · 席间照应")}
-                {phase === "done" && t("礼成")}
+        <div className="pointer-events-none absolute inset-x-0 top-0 p-4 sm:p-5">
+          <div className="flex items-start justify-between gap-3">
+            <div className="li-glass-panel flex items-center gap-3 rounded-xl border px-3.5 py-2.5 text-[#f8f1e4]">
+              <div className="grid h-9 w-9 place-items-center rounded-full border border-[#dfbf70]/55 font-serif text-lg text-[#e8c878] shadow-[inset_0_0_0_3px_rgba(223,191,112,0.09)]">礼</div>
+              <div>
+                <div className="font-serif text-sm tracking-[0.12em]">{t(scenario.place)}</div>
+                <div className="mt-0.5 text-[10px] tracking-[0.16em] text-[#e9cf91]/75">
+                  {phase === "intro" && t("入院")}
+                  {phase === "greet" && stageLabels[0]}
+                  {phase === "bow" && t("作揖")}
+                  {phase === "seat" && stageLabels[1]}
+                  {phase === "banquet" && stageLabels[2]}
+                  {phase === "done" && t("礼成")}
+                </div>
               </div>
             </div>
-            <div className="rounded-lg bg-[#2c241c]/50 px-2.5 py-1 text-end backdrop-blur-sm">
-              <div className="text-[10px] text-[#f5efe6]/65">{t("全场气氛")}</div>
-              <div className="font-serif text-lg text-[#f0c878]"><CountUp value={atmosphere} /></div>
+            <div className="li-glass-panel min-w-[118px] rounded-xl border px-3.5 py-2.5 text-end text-[#f8f1e4]">
+              <div className="flex items-center justify-between gap-3 text-[10px] tracking-[0.12em] text-[#e9cf91]/75">
+                <span>{t("全场气氛")}</span>
+                <span className="font-serif text-base leading-none text-[#f0d58e]"><CountUp value={atmosphere} /></span>
+              </div>
+              <div className="mt-2 h-1 overflow-hidden rounded-full bg-white/15">
+                <div className="h-full rounded-full bg-gradient-to-r from-[#b58a43] via-[#e8cf8e] to-[#f5e5b7] transition-[width] duration-700" style={{ width: `${atmosphere}%` }} />
+              </div>
             </div>
+          </div>
+          <div className="mt-3 flex max-w-[230px] gap-1.5" aria-label={t("礼仪进程")}>
+            {stageLabels.map((label, index) => (
+              <div key={label} className="h-1 flex-1 overflow-hidden rounded-full bg-[#211d17]/45" title={label}>
+                <div className={`h-full rounded-full transition-all duration-500 ${index < stageIndex ? "w-full bg-[#e6c675]" : index === stageIndex && phase !== "intro" ? "w-2/3 bg-[#d2ad5b]" : "w-0"}`} />
+              </div>
+            ))}
           </div>
         </div>
 
         {toast && (
           <Reveal className="pointer-events-none absolute left-1/2 top-16 -translate-x-1/2">
-            <div className="rounded-full border border-accent/30 bg-[#2c241c]/80 px-4 py-1.5 text-sm text-[#f5efe6] backdrop-blur-sm animate-toast">
+            <div className="li-glass-panel rounded-full border px-4 py-1.5 text-sm text-[#fff7e5] animate-toast">
               {toast}
             </div>
           </Reveal>
         )}
         {nearbyHint && canWalk && (
-          <div className="pointer-events-none absolute left-1/2 top-24 -translate-x-1/2 rounded-full bg-accent/75 px-3 py-1 text-xs text-on-accent">
+          <div className="li-glass-panel pointer-events-none absolute left-1/2 top-24 -translate-x-1/2 rounded-full border px-3.5 py-1.5 text-xs text-white">
             {nearbyHint}
           </div>
         )}
@@ -496,56 +524,72 @@ export default function Li3DGame({
         )}
 
         {/* Phase overlays */}
-        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#2c241c]/85 via-[#2c241c]/45 to-transparent p-4 pt-12">
+        <div className="absolute inset-x-0 bottom-0 p-3 sm:p-5">
           {phase === "intro" && (
-            <div className="mx-auto max-w-md text-center">
+            <div className="li-glass-panel mx-auto max-w-2xl rounded-2xl border px-4 py-4 text-center text-[#f8f1e4] sm:px-7 sm:py-5">
               <Reveal>
-                <p className="text-sm leading-relaxed text-[#f5efe6]/90">{t(scenario.intro)}</p>
+                <div className="flex items-center justify-center gap-3 text-[9px] tracking-[0.24em] text-[#e5c77e]/80">
+                  <span className="h-px w-8 bg-[#d4b46c]/45" />
+                  <span>{t("礼部修行场")} · {t(scenario.place)}</span>
+                  <span className="h-px w-8 bg-[#d4b46c]/45" />
+                </div>
+                <h2 className="mt-2 font-serif text-2xl tracking-[0.12em] text-[#fff8e8] drop-shadow sm:text-3xl">{t(scenario.title)}</h2>
+                <p className="mx-auto mt-2 max-w-xl text-xs leading-6 text-[#f4eddf]/85 sm:text-sm">{t(scenario.intro)}</p>
               </Reveal>
               <Reveal delay={120}>
-                <p className="mt-2 text-xs text-[#f0c878]/90">{t("要诀：")}{t(scenario.tip)}</p>
+                <div className="mx-auto mt-3 flex max-w-xl items-start gap-2 rounded-lg border border-[#d8bb72]/20 bg-black/15 px-3 py-2 text-start">
+                  <span className="mt-px shrink-0 font-serif text-xs text-[#e8c878]">{t("要诀：")}</span>
+                  <p className="text-[11px] leading-5 text-[#e8d7ad]/90 sm:text-xs">{t(scenario.tip)}</p>
+                </div>
               </Reveal>
               <Reveal delay={220}>
-                <p className="mt-2 text-[10px] text-[#f5efe6]/60">{t("入院后可自由漫步，走近宾客互动")}</p>
-              </Reveal>
-              <Reveal delay={320}>
-                <TactileButton
-                  type="button"
-                  variant="accent"
-                  onClick={() => setPhase("greet")}
-                  className="pointer-events-auto mt-4 w-full"
-                >
-                  {t("入 院")}
-                </TactileButton>
+                <div className="mt-3 flex flex-col items-center justify-between gap-2 sm:flex-row">
+                  <p className="text-[11px] text-[#f5efe6]/55">{t("入院后可自由漫步，走近宾客互动")}</p>
+                  <TactileButton
+                    type="button"
+                    variant="accent"
+                    onClick={() => setPhase("greet")}
+                    className="li-enter-btn pointer-events-auto w-full min-w-48 sm:w-auto"
+                  >
+                    {t("入 院")} <span className="ms-2 opacity-70">↗</span>
+                  </TactileButton>
+                </div>
               </Reveal>
             </div>
           )}
 
           {phase === "greet" && (
-            <p className="text-center text-xs text-[#f5efe6]/85">
-              {t("先尊后卑 · 走近当先迎的宾客按空格（或点「迎宾」）· 还剩")} {remaining.length} {t("位")}
-            </p>
+            <div className="li-glass-panel mx-auto flex max-w-2xl items-center justify-between gap-3 rounded-xl border px-4 py-3 text-[#f8f1e4]">
+              <div>
+                <div className="font-serif text-sm text-[#f0d58e]">{stageLabels[0]}</div>
+                <p className="mt-1 text-[11px] leading-5 text-[#f5efe6]/80">{t("先尊后卑 · 走近当先迎的宾客按空格（或点「迎宾」）· 还剩")} {remaining.length} {t("位")}</p>
+              </div>
+              <span className="shrink-0 rounded-full border border-[#d8bb72]/30 px-2.5 py-1 font-serif text-xs text-[#e8c878]">01 / 03</span>
+            </div>
           )}
 
           {phase === "bow" && focusGuest && (
-            <div className="mx-auto max-w-sm">
-              <p className="text-center text-xs text-[#f5efe6]/85">
-                {t("向")} {t(RANK_META[focusGuest.rank].label)} {t(focusGuest.name)} {t("行揖礼")}
-              </p>
-              <p className="mt-1 text-center text-[10px] text-[#f0c878]/85">{t(focusGuest.note)}</p>
-              <div className="relative mx-auto mt-3 h-3 w-full overflow-hidden rounded-full bg-[#f5efe6]/15">
+            <div className="li-glass-panel mx-auto max-w-lg rounded-xl border px-4 py-3 text-[#f8f1e4] sm:px-5">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs text-[#f5efe6]/85">{t("向")} {t(RANK_META[focusGuest.rank].label)} {t(focusGuest.name)} {t("行揖礼")}</p>
+                  <p className="mt-1 text-[10px] text-[#f0c878]/85">{t(focusGuest.note)}</p>
+                </div>
+                <span className="rounded-full border border-[#d8bb72]/25 px-2.5 py-1 text-[10px] text-[#e8c878]">{t("作揖")}</span>
+              </div>
+              <div className="relative mx-auto mt-3 h-3 w-full overflow-hidden rounded-full border border-white/10 bg-white/10">
                 <div
-                  className="absolute inset-y-0 rounded-full bg-accent/70"
+                  className="absolute inset-y-0 rounded-full bg-gradient-to-r from-[#92713b] via-[#e5c875] to-[#fff0b7] shadow-[0_0_12px_rgba(229,200,117,0.5)]"
                   style={{
                     left: `${Math.max(0, (RANK_META[focusGuest.rank].depth - (focusGuest.zoneW ?? scenario.zoneW)) * 100)}%`,
                     width: `${(focusGuest.zoneW ?? scenario.zoneW) * 200}%`,
                   }}
                 />
-                <div className="absolute top-0 h-full w-1 bg-[#f5efe6]" style={{ left: `${bowDepth * 100}%` }} />
+                <div className="absolute -top-1 h-5 w-[3px] rounded-full bg-white shadow-[0_0_8px_rgba(255,255,255,0.9)]" style={{ left: `${bowDepth * 100}%` }} />
               </div>
               <Pressable
                 type="button"
-                className="pointer-events-auto mt-3 w-full rounded-xl bg-accent py-3 text-sm font-medium text-on-accent"
+                className="pointer-events-auto mt-3 w-full rounded-xl border border-[#f2dc9c]/30 bg-gradient-to-b from-[#a8823d] to-[#80612c] py-3 text-sm font-medium tracking-wide text-white shadow-lg shadow-black/20 transition hover:brightness-110"
                 onPointerDown={() => setCharging(true)}
                 onPointerUp={releaseBow}
                 onPointerLeave={() => charging && releaseBow()}
@@ -556,19 +600,27 @@ export default function Li3DGame({
           )}
 
           {phase === "seat" && seatTarget && (
-            <p className="text-center text-xs text-[#f5efe6]/85">
-              {t("为")} <span className="text-[#f0c878]">{t(seatTarget.name)}</span> {t("安排席位 — 走到发光席圈上按空格")}
-            </p>
+            <div className="li-glass-panel mx-auto flex max-w-2xl items-center justify-between gap-3 rounded-xl border px-4 py-3 text-[#f8f1e4]">
+              <div>
+                <div className="font-serif text-sm text-[#f0d58e]">{stageLabels[1]}</div>
+                <p className="mt-1 text-[11px] leading-5 text-[#f5efe6]/80">{t("为")} <span className="text-[#f0c878]">{t(seatTarget.name)}</span> {t("安排席位 — 走到发光席圈上按空格")}</p>
+              </div>
+              <span className="shrink-0 rounded-full border border-[#d8bb72]/30 px-2.5 py-1 font-serif text-xs text-[#e8c878]">02 / 03</span>
+            </div>
           )}
 
           {phase === "banquet" && (
-            <p className="text-center text-xs text-[#f5efe6]/85">
-              {t("走近有需求的宾客按空格照应；无事频扰反失「节」")}
-            </p>
+            <div className="li-glass-panel mx-auto flex max-w-2xl items-center justify-between gap-3 rounded-xl border px-4 py-3 text-[#f8f1e4]">
+              <div>
+                <div className="font-serif text-sm text-[#f0d58e]">{stageLabels[2]}</div>
+                <p className="mt-1 text-[11px] leading-5 text-[#f5efe6]/80">{t("走近有需求的宾客按空格照应；无事频扰反失「节」")}</p>
+              </div>
+              <span className="shrink-0 rounded-full border border-[#d8bb72]/30 px-2.5 py-1 font-serif text-xs text-[#e8c878]">03 / 03</span>
+            </div>
           )}
 
           {phase === "done" && (
-            <p className="text-center font-serif text-lg text-[#f0c878]">{t("宾主尽欢 · 礼成")}</p>
+            <div className="li-glass-panel mx-auto max-w-2xl rounded-xl border px-5 py-4 text-center font-serif text-lg tracking-[0.14em] text-[#f0d58e]">{t("宾主尽欢 · 礼成")}</div>
           )}
 
           {/* 触屏互动钮 */}
@@ -598,7 +650,7 @@ function TouchJoystick({ onChange }: { onChange: (x: number, z: number) => void 
 
   return (
     <div
-      className="pointer-events-auto absolute bottom-20 left-4 h-24 w-24 rounded-full border border-white/25 bg-black/20 backdrop-blur-sm"
+      className="pointer-events-auto absolute bottom-32 left-4 h-24 w-24 rounded-full border border-[#f1dfb1]/40 bg-[#211d17]/35 shadow-lg backdrop-blur-md"
       onPointerDown={(e) => {
         origin.current = { x: e.clientX, y: e.clientY };
         (e.target as HTMLElement).setPointerCapture(e.pointerId);

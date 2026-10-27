@@ -1,16 +1,15 @@
 /**
  * 礼 · 宾主雅集场景与深衣袍服人偶
  *
- * 家族统一视觉（与 御/数/乐/书 同一宣纸天光）：
- *   宣纸天光 + 淡墨远山 + 田野松柏 + 缓慢流云；
- *   雅集院落：石板径、层次草地、竹丛、石灯笼、院墙门楼；
- *   主厅为带坡顶檐角的敞轩（朱柱、瓦顶、匾额、后屏）。
+ * 写实古风庭院：清晨薄雾、远山松林、青石庭院、朱柱青瓦重檐主殿。
  * 人偶：深衣交领宽袖、腰绦、冠/帻按尊卑（贵宾高冠、长者帻、平辈小冠、幼辈总角）。
  *
- * 交互锚点（guestWorldPos/seatWorldPos/WORLD）与低模版完全一致，玩法逻辑不动。
+ * 交互锚点（guestWorldPos/seatWorldPos/WORLD）保持稳定，玩法逻辑不动。
  */
 
 import { useFrame } from "@react-three/fiber";
+import { useCourtyardSurface, useCourtyardTexture } from "./liHostTextures";
+import { CourtyardColorGrade, InkMountainMaterial } from "./liHostRendering";
 import { useMemo, useRef, type MutableRefObject } from "react";
 import * as THREE from "three";
 import { RANK_META, type Rank } from "./liHostData";
@@ -18,26 +17,26 @@ import { useLang } from "@/lib/i18n";
 import { gt } from "@/lib/gameDict";
 
 export const PAL = {
-  skyTop: "#f1ead7", // 页头渐变沿用（Li3DGame）
-  skyBot: "#ece4cd",
-  fog: "#ece4cd",
-  grass: "#b3c091",
-  grassLight: "#c0cd9a",
-  stone: "#cfc6ae",
-  stoneDark: "#b8ad92",
-  wood: "#5a3b1d",
-  pillar: "#9c3a24", // 朱柱
-  lacquer: "#6b2420", // 髹漆梁
-  roof: "#55635c", // 瓦
-  roofDark: "#46534c",
-  paper: "#f2ebe0",
-  mat: "#c9b896",
-  matEdge: "#9a7f5c",
+  skyTop: "#9eafb6",
+  skyBot: "#d5d0c3",
+  fog: "#b9c5c6",
+  grass: "#87917f",
+  grassLight: "#99a28b",
+  stone: "#c9c7bf",
+  stoneDark: "#a09b8e",
+  wood: "#6d5a4b",
+  pillar: "#80604c",
+  lacquer: "#5c493d",
+  roof: "#344b45",
+  roofDark: "#3d4c44",
+  paper: "#dcd6c8",
+  mat: "#c3ad82",
+  matEdge: "#8f7550",
   skin: "#d9b48f",
-  hostRobe: "#3d4f6a", // 主人袍色（liHostPlayer 沿用）
-  bronze: "#8a7448",
-  gold: "#d9a521",
-  glow: "#f0c878",
+  hostRobe: "#263847", // 主人袍色（liHostPlayer 沿用）
+  bronze: "#8e7040",
+  gold: "#d6b36a",
+  glow: "#f1cf82",
   trim: "#993C1D",
 } as const;
 
@@ -83,6 +82,10 @@ function makePlaqueTexture(title: string): THREE.CanvasTexture {
   ctx.textBaseline = "middle";
   ctx.font = `700 92px "Songti SC", "STKaiti", "KaiTi", serif`;
   ctx.fillStyle = "#e8c96a";
+  ctx.shadowColor = "rgba(20, 16, 10, 0.42)";
+  ctx.shadowBlur = 4;
+  ctx.shadowOffsetX = 0;
+  ctx.shadowOffsetY = 2;
   ctx.fillText(title, 256, 84);
   const tex = new THREE.CanvasTexture(cv);
   tex.colorSpace = THREE.SRGBColorSpace;
@@ -115,11 +118,11 @@ function makeNameTexture(name: string, label: string, color: string): THREE.Canv
   return tex;
 }
 
-// ── 深衣袍服人偶（交领宽袖、腰绦、冠帻尊卑） ──
+// ── 礼服人物（交领、宽袖、腰绦与冠帻层次） ──
 
 type HatKind = "host" | Rank | "none";
 
-export function LowPolyPerson({
+export function RiteFigure({
   robeColor,
   hat = "none",
   bowTilt = 0,
@@ -151,6 +154,14 @@ export function LowPolyPerson({
     const c = new THREE.Color(robeColor);
     return `#${c.multiplyScalar(1.35).getHexString()}`;
   }, [robeColor]);
+  const clothSurface = useCourtyardSurface("cloth");
+  const robeGeometry = useMemo(() => {
+    const hem = seated ? 0.42 : 0.66;
+    const points = seated
+      ? [[0.27, 0], [0.39, 0.05], [0.42, 0.12], [0.34, 0.22], [0.26, 0.32], [0.23, hem]]
+      : [[0.25, 0], [0.39, 0.04], [0.42, 0.11], [0.37, 0.22], [0.31, 0.4], [0.26, 0.56], [0.22, hem]];
+    return new THREE.LatheGeometry(points.map(([r, y]) => new THREE.Vector2(r, y)), 32);
+  }, [seated]);
 
   useFrame((state) => {
     const t = state.clock.elapsedTime;
@@ -171,21 +182,19 @@ export function LowPolyPerson({
     }
   });
 
-  const hemH = seated ? 0.42 : 0.66;
-  const hemY = hemH / 2;
   const pivotY = seated ? 0.4 : 0.62;
 
   return (
     <group ref={root} rotation={[0, faceZ, 0]}>
-      {/* 深衣下摆（上窄下宽曳地） */}
-      <mesh position={[0, hemY, 0]}>
-        <cylinderGeometry args={[seated ? 0.27 : 0.24, seated ? 0.44 : 0.4, hemH, 12]} />
-        <meshStandardMaterial color={robeColor} roughness={0.85} />
+      {/* 外袍：连续的缓弧衣摆，避免圆柱拼接感 */}
+      <mesh geometry={robeGeometry} castShadow>
+        {/* 【渲染优化】低强度丝光表现织物纤维，不改变衣物模型。 */}
+        <meshPhysicalMaterial {...clothSurface} color={robeColor} roughness={0.94} sheen={0.14} sheenRoughness={0.92} side={THREE.DoubleSide} />
       </mesh>
       {/* 摆缘 */}
       <mesh position={[0, 0.045, 0]}>
-        <cylinderGeometry args={[seated ? 0.445 : 0.405, seated ? 0.45 : 0.41, 0.07, 12]} />
-        <meshStandardMaterial color={trimColor} roughness={0.85} />
+        <cylinderGeometry args={[seated ? 0.42 : 0.42, seated ? 0.43 : 0.43, 0.045, 32]} />
+        <meshStandardMaterial color={trimColor} roughness={0.78} />
       </mesh>
       {/* 腰绦 */}
       <mesh position={[0, pivotY + 0.01, 0]} rotation={[Math.PI / 2, 0, 0]}>
@@ -195,9 +204,9 @@ export function LowPolyPerson({
 
       <group ref={upper} position={[0, pivotY, 0]}>
         {/* 上身（深衣上衣） */}
-        <mesh position={[0, seated ? 0.21 : 0.25, 0]}>
-          <cylinderGeometry args={[0.19, seated ? 0.27 : 0.25, seated ? 0.42 : 0.5, 12]} />
-          <meshStandardMaterial color={robeColor} roughness={0.85} />
+        <mesh position={[0, seated ? 0.21 : 0.25, 0]} castShadow>
+          <cylinderGeometry args={[0.19, seated ? 0.27 : 0.25, seated ? 0.42 : 0.5, 24, 4]} />
+          <meshPhysicalMaterial {...clothSurface} color={robeColor} roughness={0.94} sheen={0.14} sheenRoughness={0.92} />
         </mesh>
         {/* 交领（左右衽交叠） */}
         <mesh position={[-0.045, seated ? 0.26 : 0.3, 0.16]} rotation={[0.12, 0, 0.42]}>
@@ -211,42 +220,67 @@ export function LowPolyPerson({
         {/* 宽袖（垂胡袖：肩窄口宽） */}
         <group ref={sleeveL} position={[-0.26, seated ? 0.32 : 0.38, 0.02]}>
           <group rotation={[0, 0, 0.3]}>
-            <mesh position={[-0.03, -0.2, 0]}>
-              <boxGeometry args={[0.15, 0.42, 0.16]} />
-              <meshStandardMaterial color={robeColor} roughness={0.85} />
+            <mesh position={[-0.03, -0.2, 0]} rotation={[0, 0, 0.08]} castShadow>
+              <cylinderGeometry args={[0.14, 0.2, 0.42, 24, 4]} />
+              <meshPhysicalMaterial {...clothSurface} color={robeColor} roughness={0.94} sheen={0.14} sheenRoughness={0.92} />
             </mesh>
             <mesh position={[-0.055, -0.42, 0]}>
-              <boxGeometry args={[0.2, 0.09, 0.2]} />
-              <meshStandardMaterial color={trimColor} roughness={0.85} />
-            </mesh>
-            {/* 手（拱于袖内，露出少许） */}
-            <mesh position={[-0.05, -0.46, 0.03]}>
-              <sphereGeometry args={[0.05, 8, 8]} />
-              <meshStandardMaterial color={PAL.skin} roughness={0.7} />
+              <cylinderGeometry args={[0.2, 0.2, 0.055, 24]} />
+              <meshStandardMaterial color={trimColor} roughness={0.76} />
             </mesh>
           </group>
         </group>
         <group ref={sleeveR} position={[0.26, seated ? 0.32 : 0.38, 0.02]}>
           <group rotation={[0, 0, -0.3]}>
-            <mesh position={[0.03, -0.2, 0]}>
-              <boxGeometry args={[0.15, 0.42, 0.16]} />
-              <meshStandardMaterial color={robeColor} roughness={0.85} />
+            <mesh position={[0.03, -0.2, 0]} rotation={[0, 0, -0.08]} castShadow>
+              <cylinderGeometry args={[0.14, 0.2, 0.42, 24, 4]} />
+              <meshPhysicalMaterial {...clothSurface} color={robeColor} roughness={0.94} sheen={0.14} sheenRoughness={0.92} />
             </mesh>
             <mesh position={[0.055, -0.42, 0]}>
-              <boxGeometry args={[0.2, 0.09, 0.2]} />
-              <meshStandardMaterial color={trimColor} roughness={0.85} />
-            </mesh>
-            <mesh position={[0.05, -0.46, 0.03]}>
-              <sphereGeometry args={[0.05, 8, 8]} />
-              <meshStandardMaterial color={PAL.skin} roughness={0.7} />
+              <cylinderGeometry args={[0.2, 0.2, 0.055, 24]} />
+              <meshStandardMaterial color={trimColor} roughness={0.76} />
             </mesh>
           </group>
         </group>
+        {/* 双手相拱于身前 */}
+        <group position={[0, seated ? 0.15 : 0.17, 0.205]}>
+          <mesh position={[-0.048, 0, 0]} scale={[1, 0.82, 0.72]}>
+            <sphereGeometry args={[0.074, 20, 16]} />
+            <meshStandardMaterial color={PAL.skin} roughness={0.6} />
+          </mesh>
+          <mesh position={[0.048, 0, 0]} scale={[1, 0.82, 0.72]}>
+            <sphereGeometry args={[0.074, 20, 16]} />
+            <meshStandardMaterial color={PAL.skin} roughness={0.6} />
+          </mesh>
+          <mesh position={[0, 0.045, -0.012]} rotation={[0, 0, Math.PI / 4]}>
+            <boxGeometry args={[0.035, 0.14, 0.035]} />
+            <meshStandardMaterial color={PAL.skin} roughness={0.6} />
+          </mesh>
+        </group>
         {/* 首 */}
-        <mesh position={[0, seated ? 0.52 : 0.6, 0]}>
-          <sphereGeometry args={[0.145, 14, 12]} />
+        <mesh position={[0, seated ? 0.52 : 0.6, 0]} castShadow>
+          <sphereGeometry args={[0.145, 24, 20]} />
           <meshStandardMaterial color={PAL.skin} roughness={0.65} />
         </mesh>
+        {/* 正面五官与主人须髯 */}
+        <mesh position={[-0.052, seated ? 0.535 : 0.615, 0.119]}>
+          <sphereGeometry args={[0.012, 12, 10]} />
+          <meshStandardMaterial color="#211d18" roughness={0.55} />
+        </mesh>
+        <mesh position={[0.052, seated ? 0.535 : 0.615, 0.119]}>
+          <sphereGeometry args={[0.012, 12, 10]} />
+          <meshStandardMaterial color="#211d18" roughness={0.55} />
+        </mesh>
+        <mesh position={[0, seated ? 0.485 : 0.565, 0.138]} rotation={[Math.PI / 2, 0, 0]}>
+          <coneGeometry args={[0.018, 0.055, 12]} />
+          <meshStandardMaterial color="#9b7058" roughness={0.58} />
+        </mesh>
+        {(hat === "host" || hat === "elder") && (
+          <mesh position={[0, seated ? 0.385 : 0.465, 0.118]} rotation={[0, 0, Math.PI]}>
+            <coneGeometry args={[0.065, seated ? 0.17 : 0.2, 16]} />
+            <meshStandardMaterial color={hat === "elder" ? "#756c5a" : "#292720"} roughness={0.82} />
+          </mesh>
+        )}
         {/* 发髻（冠下） */}
         <mesh position={[0, seated ? 0.63 : 0.71, -0.02]}>
           <sphereGeometry args={[0.1, 10, 8]} />
@@ -255,14 +289,18 @@ export function LowPolyPerson({
         {/* 冠帻（尊卑） */}
         {hat === "host" && (
           <group position={[0, seated ? 0.72 : 0.8, 0]}>
-            {/* 主人玄冠：平板 + 金簪 */}
-            <mesh>
-              <boxGeometry args={[0.36, 0.05, 0.28]} />
+            {/* 主人玄冠：软巾底座、冠梁与金簪 */}
+            <mesh position={[0, -0.025, 0]}>
+              <cylinderGeometry args={[0.12, 0.16, 0.08, 24]} />
+              <meshStandardMaterial color="#28251f" roughness={0.72} />
+            </mesh>
+            <mesh position={[0, 0.04, 0]}>
+              <boxGeometry args={[0.36, 0.06, 0.24]} />
               <meshStandardMaterial color="#2b2620" roughness={0.6} />
             </mesh>
             <mesh position={[0, 0.01, 0]} rotation={[0, 0, Math.PI / 2]}>
               <cylinderGeometry args={[0.013, 0.013, 0.46, 6]} />
-              <meshStandardMaterial color={PAL.gold} metalness={0.5} roughness={0.35} />
+              <meshStandardMaterial color={PAL.gold} metalness={0.12} roughness={0.72} />
             </mesh>
           </group>
         )}
@@ -275,11 +313,11 @@ export function LowPolyPerson({
             </mesh>
             <mesh position={[0, 0.095, 0]}>
               <boxGeometry args={[0.3, 0.035, 0.24]} />
-              <meshStandardMaterial color={PAL.gold} metalness={0.55} roughness={0.35} />
+              <meshStandardMaterial color={PAL.gold} metalness={0.14} roughness={0.72} />
             </mesh>
             <mesh position={[0, 0.01, 0]} rotation={[0, 0, Math.PI / 2]}>
               <cylinderGeometry args={[0.013, 0.013, 0.42, 6]} />
-              <meshStandardMaterial color={PAL.gold} metalness={0.5} roughness={0.35} />
+              <meshStandardMaterial color={PAL.gold} metalness={0.12} roughness={0.72} />
             </mesh>
           </group>
         )}
@@ -333,7 +371,7 @@ function FarGround() {
 function Fields() {
   const strips = useMemo(() => {
     const arr: { x: number; z: number; w: number; d: number; c: string }[] = [];
-    const colors = ["#a8b87e", "#9cae74", "#b3bd88", "#a2b178"];
+    const colors = ["#a6ad9a", "#9ca594", "#b0b4a0", "#a0a895"];
     for (let i = 0; i < 8; i++) {
       arr.push({ x: -26 - (i % 2) * 12, z: 12 - i * 8, w: 20, d: 7, c: colors[i % 4] });
       arr.push({ x: 26 + ((i + 1) % 2) * 12, z: 10 - i * 8, w: 20, d: 7, c: colors[(i + 2) % 4] });
@@ -356,11 +394,13 @@ function Mountains() {
   const ridges = useMemo(() => {
     const mk = (z: number, hBase: number, f1: number, f2: number, phase: number) => {
       const pts: number[] = [];
+      const uvs: number[] = [];
       const n = 30;
       for (let i = 0; i <= n; i++) {
         const x = -110 + (220 * i) / n;
         const h = hBase + Math.sin(i * f1 + phase) * hBase * 0.45 + Math.sin(i * f2) * hBase * 0.2;
         pts.push(x, 0, z, x, h, z);
+        uvs.push(i / n, 0, i / n, 1);
       }
       const idx: number[] = [];
       for (let i = 0; i < n; i++) {
@@ -369,30 +409,46 @@ function Mountains() {
       }
       const geo = new THREE.BufferGeometry();
       geo.setAttribute("position", new THREE.Float32BufferAttribute(pts, 3));
+      geo.setAttribute("uv", new THREE.Float32BufferAttribute(uvs, 2));
       geo.setIndex(idx);
       return geo;
     };
     return [
-      { geo: mk(-58, 12, 0.9, 0.31, 1.2), color: "#93a495", opacity: 0.5 },
-      { geo: mk(-46, 8.5, 1.1, 0.4, 4.1), color: "#849a8c", opacity: 0.6 },
-      { geo: mk(-34, 5.5, 0.8, 0.35, 2.2), color: "#8b9c8d", opacity: 0.45 },
+      { geo: mk(-58, 12, 0.9, 0.31, 1.2), color: "#e4ebe7", opacity: 0.3 },
+      { geo: mk(-46, 8.5, 1.1, 0.4, 4.1), color: "#e6e7de", opacity: 0.43 },
+      { geo: mk(-34, 5.5, 0.8, 0.35, 2.2), color: "#d4e0dd", opacity: 0.56 },
     ];
   }, []);
+
   return (
     <>
       {ridges.map((r, i) => (
         <mesh key={i} geometry={r.geo}>
-          <meshBasicMaterial color={r.color} transparent opacity={r.opacity} side={THREE.DoubleSide} />
+          <InkMountainMaterial color={r.color} opacity={r.opacity} />
         </mesh>
       ))}
     </>
   );
 }
 
+function MorningLightRays() {
+  const texture = useCourtyardTexture("ray");
+  return (
+    <>
+      <sprite position={[-2.2, 3.8, -2.5]} rotation={[0, 0, -0.22]} scale={[1.7, 7.2, 1]} renderOrder={1}>
+        <spriteMaterial map={texture} transparent opacity={0.34} depthWrite={false} blending={THREE.AdditiveBlending} />
+      </sprite>
+      <sprite position={[1.2, 3.5, -4.1]} rotation={[0, 0, 0.18]} scale={[1.1, 6.2, 1]} renderOrder={1}>
+        <spriteMaterial map={texture} transparent opacity={0.22} depthWrite={false} blending={THREE.AdditiveBlending} />
+      </sprite>
+    </>
+  );
+}
+
 function Clouds() {
-  const ref = useRef<THREE.Group>(null);
+  const mist = useCourtyardTexture("mist");
   useFrame((state) => {
-    if (ref.current) ref.current.position.x = Math.sin(state.clock.elapsedTime * 0.03) * 5;
+    mist.offset.x = state.clock.elapsedTime * 0.0015;
   });
   const clouds = useMemo(
     () => [
@@ -401,20 +457,20 @@ function Clouds() {
     [],
   );
   return (
-    <group ref={ref}>
+    <group>
       {clouds.map((c, i) => (
         <group key={i} position={[c.x, c.y, c.z]} scale={c.s}>
           <mesh>
             <sphereGeometry args={[1, 12, 10]} />
-            <meshBasicMaterial color="#fbf8ee" transparent opacity={0.85} />
+            <meshBasicMaterial alphaMap={mist} color="#edf0e9" depthWrite={false} transparent opacity={0.12} />
           </mesh>
           <mesh position={[0.9, -0.15, 0]} scale={0.7}>
             <sphereGeometry args={[1, 12, 10]} />
-            <meshBasicMaterial color="#fbf8ee" transparent opacity={0.8} />
+            <meshBasicMaterial alphaMap={mist} color="#edf0e9" depthWrite={false} transparent opacity={0.1} />
           </mesh>
           <mesh position={[-0.9, -0.2, 0]} scale={0.65}>
             <sphereGeometry args={[1, 12, 10]} />
-            <meshBasicMaterial color="#fbf8ee" transparent opacity={0.75} />
+            <meshBasicMaterial alphaMap={mist} color="#edf0e9" depthWrite={false} transparent opacity={0.08} />
           </mesh>
         </group>
       ))}
@@ -423,26 +479,40 @@ function Clouds() {
 }
 
 function Pine({ position, scale = 1 }: { position: [number, number, number]; scale?: number }) {
+  // 【渲染优化】轻摆现有松冠，树干与场景结构保持不动。
+  const foliage = useRef<THREE.Group>(null);
+  useFrame(({ clock }) => {
+    if (foliage.current) foliage.current.rotation.z = Math.sin(clock.elapsedTime * 0.32 + position[0]) * 0.009;
+  });
   return (
     <group position={position} scale={scale}>
-      <mesh position={[0, 0.5, 0]}>
-        <cylinderGeometry args={[0.09, 0.13, 1, 7]} />
-        <meshStandardMaterial color="#5a4632" />
+      <mesh position={[0, 0.5, 0]} castShadow>
+        <cylinderGeometry args={[0.09, 0.15, 1, 20, 3]} />
+        <meshStandardMaterial color="#493a2b" roughness={0.9} />
       </mesh>
-      <mesh position={[0, 1.5, 0]}>
-        <coneGeometry args={[0.85, 1.6, 8]} />
-        <meshStandardMaterial color="#40543d" />
-      </mesh>
-      <mesh position={[0, 2.4, 0]}>
-        <coneGeometry args={[0.6, 1.3, 8]} />
-        <meshStandardMaterial color="#4a6044" />
-      </mesh>
+      <group ref={foliage}>
+        {[
+          { p: [0, 1.3, 0] as const, s: [0.95, 0.55, 0.8] as const, c: "#34483a" },
+          { p: [-0.15, 1.9, 0.04] as const, s: [0.78, 0.52, 0.68] as const, c: "#3d5744" },
+          { p: [0.12, 2.45, -0.04] as const, s: [0.62, 0.5, 0.56] as const, c: "#49644d" },
+        ].map((layer, i) => (
+          <mesh key={i} position={layer.p} scale={layer.s} castShadow>
+            <sphereGeometry args={[1, 24, 18]} />
+            <meshStandardMaterial color={layer.c} roughness={0.92} />
+          </mesh>
+        ))}
+      </group>
     </group>
   );
 }
 
 // ── 竹丛 ──
 function BambooGrove({ position, scale = 1 }: { position: [number, number, number]; scale?: number }) {
+  // 【渲染优化】以极小幅度带动现有竹叶和竹竿，模拟环境微风。
+  const grove = useRef<THREE.Group>(null);
+  useFrame(({ clock }) => {
+    if (grove.current) grove.current.rotation.z = Math.sin(clock.elapsedTime * 0.27 + position[2]) * 0.004;
+  });
   const stalks = useMemo(
     () =>
       Array.from({ length: 7 }, (_, i) => ({
@@ -454,28 +524,28 @@ function BambooGrove({ position, scale = 1 }: { position: [number, number, numbe
     [],
   );
   return (
-    <group position={position} scale={scale}>
+    <group ref={grove} position={position} scale={scale}>
       {stalks.map((s, i) => (
         <group key={i} position={[s.x, 0, s.z]} rotation={[s.tilt, 0, s.tilt * 0.7]}>
           <mesh position={[0, s.h / 2, 0]}>
-            <cylinderGeometry args={[0.028, 0.04, s.h, 6]} />
-            <meshStandardMaterial color="#6a8a52" roughness={0.8} />
+            <cylinderGeometry args={[0.028, 0.04, s.h, 14, 3]} />
+            <meshStandardMaterial color="#68765e" roughness={0.9} />
           </mesh>
           {/* 节环 */}
           {[0.35, 0.65, 0.9].map((f) => (
             <mesh key={f} position={[0, s.h * f, 0]}>
-              <cylinderGeometry args={[0.042, 0.042, 0.03, 6]} />
-              <meshStandardMaterial color="#55703f" roughness={0.8} />
+              <cylinderGeometry args={[0.042, 0.042, 0.03, 14]} />
+              <meshStandardMaterial color="#5e6b54" roughness={0.9} />
             </mesh>
           ))}
           {/* 叶冠 */}
           <mesh position={[0, s.h + 0.12, 0]} scale={[1, 0.55, 1]}>
-            <sphereGeometry args={[0.42, 8, 6]} />
-            <meshStandardMaterial color="#4f7040" roughness={0.85} />
+            <sphereGeometry args={[0.42, 18, 14]} />
+            <meshStandardMaterial color="#58674f" roughness={0.92} />
           </mesh>
           <mesh position={[0.2, s.h - 0.35, 0.08]} scale={[1, 0.4, 1]}>
-            <sphereGeometry args={[0.3, 8, 6]} />
-            <meshStandardMaterial color="#5a7a46" roughness={0.85} />
+            <sphereGeometry args={[0.3, 18, 14]} />
+            <meshStandardMaterial color="#627057" roughness={0.92} />
           </mesh>
         </group>
       ))}
@@ -485,14 +555,26 @@ function BambooGrove({ position, scale = 1 }: { position: [number, number, numbe
 
 // ── 石灯笼 ──
 function StoneLantern({ position, warm }: { position: [number, number, number]; warm: number }) {
+  const light = useRef<THREE.PointLight>(null);
+  const glowTexture = useCourtyardTexture("glow");
+  const phase = useMemo(() => Math.random() * Math.PI * 2, []);
+  useFrame(({ clock }) => {
+    if (!light.current) return;
+    const t = clock.elapsedTime;
+    const flicker = 0.96 + Math.sin(t * 2.1 + phase) * 0.035 + Math.sin(t * 5.2 + phase * 1.7) * 0.018;
+    light.current.intensity = (0.95 + warm * 0.35) * flicker;
+  });
   return (
     <group position={position}>
-      <mesh position={[0, 0.09, 0]}>
+      <sprite position={[0, 0.98, 0]} scale={[1.45, 1.45, 1]}>
+        <spriteMaterial map={glowTexture} transparent opacity={0.5} depthWrite={false} blending={THREE.AdditiveBlending} />
+      </sprite>
+      <mesh position={[0, 0.09, 0]} castShadow>
         <boxGeometry args={[0.52, 0.18, 0.52]} />
         <meshStandardMaterial color={PAL.stoneDark} />
       </mesh>
-      <mesh position={[0, 0.48, 0]}>
-        <cylinderGeometry args={[0.08, 0.11, 0.62, 8]} />
+      <mesh position={[0, 0.48, 0]} castShadow>
+        <cylinderGeometry args={[0.08, 0.11, 0.62, 20, 3]} />
         <meshStandardMaterial color={PAL.stone} />
       </mesh>
       {/* 火袋（四面透窗） */}
@@ -504,26 +586,62 @@ function StoneLantern({ position, warm }: { position: [number, number, number]; 
         <mesh key={ry} position={[Math.sin(ry) * 0.172, 0.95, Math.cos(ry) * 0.172]} rotation={[0, ry, 0]}>
           <boxGeometry args={[0.16, 0.16, 0.012]} />
           <meshStandardMaterial
-            color="#f5e9c8"
-            emissive="#e8a34c"
-            emissiveIntensity={0.35 + warm * 0.5}
+            color="#ead7ab"
+            emissive="#e4be7e"
+            emissiveIntensity={0.5 + warm * 0.22}
           />
         </mesh>
       ))}
-      <mesh position={[0, 1.18, 0]}>
-        <coneGeometry args={[0.4, 0.24, 4]} />
+      <mesh position={[0, 1.18, 0]} castShadow>
+        <coneGeometry args={[0.4, 0.24, 16]} />
         <meshStandardMaterial color={PAL.roofDark} />
       </mesh>
       <mesh position={[0, 1.36, 0]}>
-        <sphereGeometry args={[0.06, 8, 8]} />
+        <sphereGeometry args={[0.06, 16, 12]} />
         <meshStandardMaterial color={PAL.stone} />
       </mesh>
+      <pointLight ref={light} position={[0, 0.98, 0]} color="#ebce92" intensity={0.95 + warm * 0.35} distance={4.6} decay={2} />
     </group>
+  );
+}
+
+function LanternDust({ position }: { position: [number, number, number] }) {
+  const geometry = useMemo(() => {
+    const points = new Float32Array(12 * 3);
+    for (let i = 0; i < 12; i++) {
+      const angle = i * 2.399;
+      const radius = 0.18 + (i % 4) * 0.12;
+      points[i * 3] = Math.cos(angle) * radius;
+      points[i * 3 + 1] = 0.2 + (i % 6) * 0.24;
+      points[i * 3 + 2] = Math.sin(angle) * radius * 0.65;
+    }
+    const result = new THREE.BufferGeometry();
+    result.setAttribute("position", new THREE.BufferAttribute(points, 3));
+    return result;
+  }, []);
+  useFrame(({ clock }) => {
+    const attribute = geometry.getAttribute("position") as THREE.BufferAttribute;
+    const positions = attribute.array as Float32Array;
+    const t = clock.elapsedTime;
+    for (let i = 0; i < 12; i++) {
+      const angle = i * 2.399 + t * 0.16;
+      const radius = 0.18 + (i % 4) * 0.12;
+      positions[i * 3] = Math.cos(angle) * radius;
+      positions[i * 3 + 1] = 0.2 + (i % 6) * 0.24 + Math.sin(t * 0.7 + i) * 0.045;
+      positions[i * 3 + 2] = Math.sin(angle) * radius * 0.65;
+    }
+    attribute.needsUpdate = true;
+  });
+  return (
+    <points geometry={geometry} position={position}>
+      <pointsMaterial color="#ffe3ae" size={0.035} transparent opacity={0.24} depthWrite={false} sizeAttenuation />
+    </points>
   );
 }
 
 // ── 院墙与门楼 ──
 function Walls() {
+  const woodSurface = useCourtyardSurface("wood");
   const cap = (w: number, d: number) => (
     <mesh position={[0, 1.78, 0]}>
       <boxGeometry args={[w, 0.14, d]} />
@@ -537,7 +655,7 @@ function Walls() {
         <group key={x} position={[x, 0, -2.9]}>
           <mesh position={[0, 0.88, 0]}>
             <boxGeometry args={[0.26, 1.76, 12.2]} />
-            <meshStandardMaterial color="#d8cfae" />
+            <meshStandardMaterial color="#d1cec2" />
           </mesh>
           {cap(0.44, 12.3)}
         </group>
@@ -546,7 +664,7 @@ function Walls() {
       <group position={[0, 0, -9.0]}>
         <mesh position={[0, 0.88, 0]}>
           <boxGeometry args={[13.3, 1.76, 0.26]} />
-          <meshStandardMaterial color="#d8cfae" />
+          <meshStandardMaterial color="#d1cec2" />
         </mesh>
         {cap(13.4, 0.44)}
       </group>
@@ -555,7 +673,7 @@ function Walls() {
         <group key={x} position={[x, 0, 3.1]}>
           <mesh position={[0, 0.88, 0]}>
             <boxGeometry args={[5.4, 1.76, 0.26]} />
-            <meshStandardMaterial color="#d8cfae" />
+            <meshStandardMaterial color="#d1cec2" />
           </mesh>
           {cap(5.5, 0.44)}
         </group>
@@ -564,12 +682,12 @@ function Walls() {
       {[-1.35, 1.35].map((x) => (
         <mesh key={x} position={[x, 1.05, 3.1]}>
           <boxGeometry args={[0.3, 2.1, 0.3]} />
-          <meshStandardMaterial color={PAL.lacquer} />
+          <meshStandardMaterial {...woodSurface} color={PAL.lacquer} roughness={0.84} metalness={0.02} />
         </mesh>
       ))}
       <mesh position={[0, 2.05, 3.1]}>
         <boxGeometry args={[3.4, 0.26, 0.42]} />
-        <meshStandardMaterial color={PAL.lacquer} />
+        <meshStandardMaterial {...woodSurface} color={PAL.lacquer} roughness={0.84} metalness={0.02} />
       </mesh>
       <mesh position={[0, 2.3, 3.1]}>
         <boxGeometry args={[3.9, 0.14, 0.95]} />
@@ -580,13 +698,55 @@ function Walls() {
 }
 
 // ── 雅集院落（石板径 + 层次草地） ──
+function makeHippedRoofGeometry(width: number, depth: number, ridgeLength: number, rise: number, eaveLift: number) {
+  const geometry = new THREE.BufferGeometry();
+  const positions: number[] = [];
+  const uvs: number[] = [];
+  const indices: number[] = [];
+  const divisionsU = 24;
+  const divisionsV = 12;
+  const faces = [
+    (u: number, v: number) => [u * (ridgeLength / 2 + (width / 2 - ridgeLength / 2) * v), rise * (1 - v) + eaveLift * v * Math.pow(Math.abs(u), 6), v * depth / 2],
+    (u: number, v: number) => [u * (ridgeLength / 2 + (width / 2 - ridgeLength / 2) * v), rise * (1 - v) + eaveLift * v * Math.pow(Math.abs(u), 6), -v * depth / 2],
+    (u: number, v: number) => [-(ridgeLength / 2 + (width / 2 - ridgeLength / 2) * v), rise * (1 - v) + eaveLift * v * Math.pow(Math.abs(u), 6), u * v * depth / 2],
+    (u: number, v: number) => [ridgeLength / 2 + (width / 2 - ridgeLength / 2) * v, rise * (1 - v) + eaveLift * v * Math.pow(Math.abs(u), 6), u * v * depth / 2],
+  ];
+
+  for (const point of faces) {
+    const offset = positions.length / 3;
+    for (let row = 0; row <= divisionsV; row++) {
+      const v = row / divisionsV;
+      for (let col = 0; col <= divisionsU; col++) {
+        const u = col / divisionsU * 2 - 1;
+        const [x, y, z] = point(u, v);
+        positions.push(x, y, z);
+        uvs.push(col / divisionsU, row / divisionsV);
+      }
+    }
+    for (let row = 0; row < divisionsV; row++) {
+      for (let col = 0; col < divisionsU; col++) {
+        const a = offset + row * (divisionsU + 1) + col;
+        const b = a + divisionsU + 1;
+        indices.push(a, b, a + 1, b, b + 1, a + 1);
+      }
+    }
+  }
+  geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+  geometry.setAttribute("uv", new THREE.Float32BufferAttribute(uvs, 2));
+  geometry.setIndex(indices);
+  geometry.computeVertexNormals();
+  return geometry;
+}
+
 function CourtyardGround() {
+  const stoneSurface = useCourtyardSurface("stone");
+  const woodSurface = useCourtyardSurface("wood");
   const patches = useMemo(
     () => [
-      { x: -3.4, z: -0.6, r: 1.9, c: "#b3c48a" }, { x: 3.6, z: -1.4, r: 1.6, c: "#9fb277" },
-      { x: -2.6, z: -6.9, r: 1.5, c: "#adbd83" }, { x: 4.4, z: -6.4, r: 1.8, c: "#a4b57c" },
-      { x: -4.6, z: 1.6, r: 1.4, c: "#9fb277" }, { x: 4.7, z: 1.4, r: 1.5, c: "#b3c48a" },
-      { x: 0.2, z: -7.6, r: 1.6, c: "#a2b178" },
+      { x: -3.4, z: -0.6, r: 1.9, c: "#a3aa95" }, { x: 3.6, z: -1.4, r: 1.6, c: "#969f8c" },
+      { x: -2.6, z: -6.9, r: 1.5, c: "#a4ab97" }, { x: 4.4, z: -6.4, r: 1.8, c: "#9ca38e" },
+      { x: -4.6, z: 1.6, r: 1.4, c: "#969f8c" }, { x: 4.7, z: 1.4, r: 1.5, c: "#a3aa95" },
+      { x: 0.2, z: -7.6, r: 1.6, c: "#99a28e" },
     ],
     [],
   );
@@ -602,9 +762,9 @@ function CourtyardGround() {
   return (
     <>
       {/* 院内草地（底色 + 色块层次） */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.005, -2.9]}>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.005, -2.9]} receiveShadow>
         <planeGeometry args={[12.9, 11.7]} />
-        <meshStandardMaterial color="#a9ba7e" />
+        <meshStandardMaterial color="#8e9a83" roughness={1} />
       </mesh>
       {patches.map((p, i) => (
         <mesh key={i} rotation={[-Math.PI / 2, 0, 0]} position={[p.x, 0.009, p.z]}>
@@ -612,26 +772,63 @@ function CourtyardGround() {
           <meshStandardMaterial color={p.c} />
         </mesh>
       ))}
-      {/* 石板径 */}
+      {/* 【渲染优化】中轴青石砖庭保留细缝纹理与微弱反射，不改地面网格。 */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.018, -2.8]} receiveShadow>
+        <planeGeometry args={[9.6, 13.8]} />
+        <meshStandardMaterial {...stoneSurface} color="#e2ddd2" roughness={0.88} metalness={0.025} />
+      </mesh>
+      {/* 前庭两侧低栏，给出通往主殿的纵深轴线 */}
+      {([-4.82, 4.82] as const).map((x) => (
+        <group key={`rail-${x}`} position={[x, 0, -2.1]}>
+          <mesh position={[0, 0.62, 0]} castShadow>
+            <boxGeometry args={[0.16, 0.14, 9.8]} />
+            {/* 【渲染优化】木栏保留木纹粗糙质感并加入极弱反射层次。 */}
+            <meshStandardMaterial {...woodSurface} color={PAL.wood} roughness={0.86} metalness={0.02} />
+          </mesh>
+          <mesh position={[0, 0.7, 0]}>
+            <boxGeometry args={[0.2, 0.035, 9.82]} />
+            <meshStandardMaterial color={PAL.gold} metalness={0.12} roughness={0.72} />
+          </mesh>
+          {Array.from({ length: 6 }, (_, i) => (
+            <group key={i} position={[0, 0, 2.35 - i * 1.75]}>
+              <mesh position={[0, 0.34, 0]}>
+                <cylinderGeometry args={[0.065, 0.08, 0.68, 20]} />
+                <meshStandardMaterial color={PAL.stoneDark} roughness={0.78} />
+              </mesh>
+              <mesh position={[0, 0.72, 0]}>
+                <sphereGeometry args={[0.1, 16, 12]} />
+                <meshStandardMaterial color={PAL.stone} roughness={0.72} />
+              </mesh>
+            </group>
+          ))}
+        </group>
+      ))}
+      {/* 引向殿前的独立石板 */}
       {slabs.map((s, i) => (
         <mesh key={i} position={[s.x, 0.028, s.z]}>
-          <boxGeometry args={[1.35, 0.05, 0.52]} />
-          <meshStandardMaterial color={s.c} roughness={0.9} />
+          <boxGeometry args={[1.48, 0.035, 0.58]} />
+          <meshStandardMaterial color={s.c} roughness={0.84} />
         </mesh>
       ))}
     </>
   );
 }
 
-// ── 敞轩（台基 + 朱柱 + 坡顶檐角 + 匾额 + 后屏） ──
+// ── 重檐主殿（台基 + 朱柱 + 歇山屋顶 + 匾额 + 格扇） ──
 function Hall({ title, warm }: { title: string; warm: number }) {
   const plaqueTex = useMemo(() => makePlaqueTexture(title), [title]);
+  // 【渲染优化】木构件、瓦面和石坪继续使用既有 PBR 贴图，只微调表面参数。
+  const roofSurface = useCourtyardSurface("roof");
+  const woodSurface = useCourtyardSurface("wood");
+  const stoneSurface = useCourtyardSurface("stone");
+  const roofGeometry = useMemo(() => makeHippedRoofGeometry(8.9, 5.3, 3.6, 1.62, 0.22), []);
+  const upperRoofGeometry = useMemo(() => makeHippedRoofGeometry(5.7, 3.55, 2.5, 1.05, 0.18), []);
   return (
     <group>
-      {/* 石地坪（席位所在，与玩法锚点齐平） */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, -4.5]}>
+      {/* 【渲染优化】石地坪使用现有青石 PBR 贴图，席位锚点保持不变。 */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, -4.5]} receiveShadow>
         <circleGeometry args={[4.9, 48]} />
-        <meshStandardMaterial color="#c9bfa4" />
+        <meshStandardMaterial {...stoneSurface} color="#e2ddd1" roughness={0.88} metalness={0.025} />
       </mesh>
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.026, -4.5]}>
         <ringGeometry args={[4.35, 4.9, 48]} />
@@ -649,46 +846,114 @@ function Hall({ title, warm }: { title: string; warm: number }) {
       {([-3.7, 3.7] as const).flatMap((x) =>
         [-2.5, -4.5, -6.5].map((z) => (
           <group key={`${x}-${z}`} position={[x, 0, z]}>
-            <mesh position={[0, 1.62, 0]}>
+            <mesh position={[0, 1.62, 0]} castShadow receiveShadow>
               <cylinderGeometry args={[0.13, 0.155, 3.24, 10]} />
-              <meshStandardMaterial color={PAL.pillar} roughness={0.6} />
+              <meshStandardMaterial {...woodSurface} color={PAL.pillar} roughness={0.84} metalness={0.02} />
             </mesh>
             <mesh position={[0, 0.11, 0]}>
               <boxGeometry args={[0.46, 0.22, 0.46]} />
               <meshStandardMaterial color={PAL.stoneDark} />
+            </mesh>
+            <mesh position={[0, 3.31, 0]}>
+              <boxGeometry args={[0.5, 0.11, 0.5]} />
+              <meshStandardMaterial {...woodSurface} color={PAL.wood} roughness={0.84} metalness={0.02} />
+            </mesh>
+            <mesh position={[0, 3.4, 0]}>
+              <boxGeometry args={[0.36, 0.09, 0.36]} />
+              <meshStandardMaterial color={PAL.gold} metalness={0.12} roughness={0.72} />
             </mesh>
           </group>
         )),
       )}
       {/* 前后横梁 + 侧梁（髹漆） */}
       {[-2.5, -6.5].map((z) => (
-        <mesh key={z} position={[0, 3.26, z]}>
+        <mesh key={z} position={[0, 3.26, z]} castShadow receiveShadow>
           <boxGeometry args={[8.1, 0.24, 0.26]} />
-          <meshStandardMaterial color={PAL.lacquer} roughness={0.55} />
+          <meshStandardMaterial {...woodSurface} color={PAL.lacquer} roughness={0.84} metalness={0.02} />
         </mesh>
       ))}
       {[-3.7, 3.7].map((x) => (
-        <mesh key={x} position={[x, 3.26, -4.5]}>
+        <mesh key={x} position={[x, 3.26, -4.5]} castShadow receiveShadow>
           <boxGeometry args={[0.26, 0.24, 4.3]} />
-          <meshStandardMaterial color={PAL.lacquer} roughness={0.55} />
+          <meshStandardMaterial {...woodSurface} color={PAL.lacquer} roughness={0.84} metalness={0.02} />
         </mesh>
       ))}
 
-      {/* 坡顶瓦面（四棱锥压扁）+ 正脊 */}
-      <mesh position={[0, 4.15, -4.5]} rotation={[0, Math.PI / 4, 0]} scale={[1, 1, 0.68]}>
-        <coneGeometry args={[4.95, 1.75, 4]} />
-        <meshStandardMaterial color={PAL.roof} roughness={0.85} flatShading />
+      {/* 下层歇山顶：前后坡面、两端山花与轻微翘檐 */}
+      <mesh geometry={roofGeometry} position={[0, 3.38, -4.5]} castShadow receiveShadow>
+        {/* 【渲染优化】微弱瓦面高光与贴图粗糙度塑造陶瓦层次。 */}
+        <meshStandardMaterial {...roofSurface} color="#d8ded0" roughness={0.8} metalness={0.03} side={THREE.DoubleSide} />
       </mesh>
+      {/* 上层殿阁与第二重屋檐，保持正中轴线和前后关系 */}
       <mesh position={[0, 4.98, -4.5]}>
-        <boxGeometry args={[3.4, 0.2, 0.28]} />
-        <meshStandardMaterial color={PAL.roofDark} roughness={0.8} />
+        <boxGeometry args={[4.1, 0.16, 2.9]} />
+        <meshStandardMaterial {...woodSurface} color={PAL.wood} roughness={0.84} metalness={0.02} />
       </mesh>
-      {[-1.85, 1.85].map((x) => (
+      {([-1.65, 1.65] as const).flatMap((x) => [-5.2, -3.8].map((z) => (
+        <group key={`upper-post-${x}-${z}`} position={[x, 0, z]}>
+          <mesh position={[0, 5.42, 0]}>
+            <cylinderGeometry args={[0.075, 0.095, 0.9, 24]} />
+            <meshStandardMaterial {...woodSurface} color={PAL.pillar} roughness={0.84} metalness={0.02} />
+          </mesh>
+          <mesh position={[0, 4.98, 0]}>
+            <boxGeometry args={[0.25, 0.1, 0.25]} />
+            <meshStandardMaterial color={PAL.gold} metalness={0.12} roughness={0.72} />
+          </mesh>
+        </group>
+      )))}
+      {[-3.72, -5.28].map((z) => (
+        <group key={`upper-screen-${z}`} position={[0, 0, z]}>
+          <mesh position={[0, 5.45, 0]}>
+            <boxGeometry args={[3.3, 0.72, 0.08]} />
+            <meshStandardMaterial {...woodSurface} color="#726657" roughness={0.92} />
+          </mesh>
+          {[-1.1, -0.55, 0, 0.55, 1.1].map((x) => (
+            <mesh key={x} position={[x, 5.45, z > -4.5 ? 0.052 : -0.052]}>
+              <boxGeometry args={[0.035, 0.62, 0.025]} />
+              <meshStandardMaterial color={PAL.gold} metalness={0.1} roughness={0.74} />
+            </mesh>
+          ))}
+        </group>
+      ))}
+      <mesh geometry={upperRoofGeometry} position={[0, 5.82, -4.5]} castShadow receiveShadow>
+        <meshStandardMaterial {...roofSurface} color="#e0e4d8" roughness={0.8} metalness={0.03} side={THREE.DoubleSide} />
+      </mesh>
+      <mesh position={[0, 6.89, -4.5]}>
+        <boxGeometry args={[2.3, 0.13, 0.16]} />
+        <meshStandardMaterial color={PAL.roofDark} roughness={0.72} />
+      </mesh>
+      {/* 正面瓦垄：细密的檐线让主殿屋面有层次，但不增加交互碰撞体 */}
+      {Array.from({ length: 6 }, (_, i) => {
+        const progress = (i + 1) / 7;
+        const width = 7.5 * (1 - progress * 0.9);
+        return (
+          <mesh key={`tile-row-${i}`} position={[0, 3.38 + (1 - progress) * 1.62 + progress * 0.18, -1.85 - progress * 2.65]}>
+            <boxGeometry args={[width, 0.045, 0.075]} />
+            <meshStandardMaterial color={i % 2 ? PAL.roofDark : "#53665e"} roughness={0.72} />
+          </mesh>
+        );
+      })}
+      {/* 檐下暗木与细金线 */}
+      <mesh position={[0, 3.34, -2.48]}>
+        <boxGeometry args={[8.45, 0.12, 0.34]} />
+        <meshStandardMaterial {...woodSurface} color={PAL.wood} roughness={0.84} metalness={0.02} />
+      </mesh>
+      <mesh position={[0, 3.28, -2.48]}>
+        <boxGeometry args={[8.48, 0.025, 0.35]} />
+        <meshStandardMaterial color={PAL.gold} metalness={0.12} roughness={0.72} />
+      </mesh>
+      <mesh position={[0, 5.03, -4.5]}>
+        <boxGeometry args={[3.6, 0.14, 0.2]} />
+        <meshStandardMaterial color={PAL.roofDark} roughness={0.76} />
+      </mesh>
+      {[-1.95, 1.95].map((x) => (
         <mesh key={x} position={[x, 4.98, -4.5]}>
-          <sphereGeometry args={[0.14, 8, 8]} />
+          <sphereGeometry args={[0.12, 16, 12]} />
           <meshStandardMaterial color={PAL.roofDark} roughness={0.8} />
         </mesh>
       ))}
+      <pointLight position={[-2.7, 2.45, -2.2]} color="#ebce92" intensity={1.7 + warm * 0.65} distance={8} decay={2} />
+      <pointLight position={[2.7, 2.45, -2.2]} color="#ebce92" intensity={1.7 + warm * 0.65} distance={8} decay={2} />
       {/* 檐角起翘（四角上挑） */}
       {[
         { p: [4.62, 3.62, -4.5] as const, r: [0, 0, -0.7] as const },
@@ -706,7 +971,7 @@ function Hall({ title, warm }: { title: string; warm: number }) {
       <group position={[0, 2.82, -2.34]}>
         <mesh position={[0, 0, -0.015]}>
           <boxGeometry args={[2.36, 0.74, 0.05]} />
-          <meshStandardMaterial color={PAL.gold} metalness={0.4} roughness={0.4} />
+          <meshStandardMaterial color={PAL.gold} metalness={0.16} roughness={0.68} />
         </mesh>
         <mesh>
           <boxGeometry args={[2.24, 0.62, 0.06]} />
@@ -723,14 +988,14 @@ function Hall({ title, warm }: { title: string; warm: number }) {
         <group key={x} position={[x, 0, -2.1]}>
           <mesh position={[0, 1.1, 0]}>
             <cylinderGeometry args={[0.05, 0.07, 2.2, 8]} />
-            <meshStandardMaterial color={PAL.wood} />
+            <meshStandardMaterial {...woodSurface} color={PAL.wood} roughness={0.84} metalness={0.02} />
           </mesh>
           <mesh position={[0, 2.35, 0]}>
             <boxGeometry args={[0.42, 0.52, 0.42]} />
             <meshStandardMaterial
-              color="#c0392b"
-              emissive="#e8a34c"
-              emissiveIntensity={0.25 + warm * 0.45}
+              color="#e1c28c"
+              emissive="#e4be7e"
+              emissiveIntensity={0.4 + warm * 0.22}
             />
           </mesh>
           <mesh position={[0, 2.68, 0]}>
@@ -748,6 +1013,19 @@ function Hall({ title, warm }: { title: string; warm: number }) {
               <boxGeometry args={[2.2, 2.7, 0.08]} />
               <meshStandardMaterial color={PAL.paper} roughness={0.9} />
             </mesh>
+            {/* 格扇木线与横枨 */}
+            {[-0.82, -0.41, 0, 0.41, 0.82].map((dx) => (
+              <mesh key={`lattice-${dx}`} position={[dx, 1.45, 0.052]}>
+                <boxGeometry args={[0.025, 2.48, 0.025]} />
+                <meshStandardMaterial color="#8d7453" roughness={0.78} />
+              </mesh>
+            ))}
+            {[0.2, 2.7].map((y) => (
+              <mesh key={`rail-${y}`} position={[0, y, 0.06]}>
+                <boxGeometry args={[2.14, 0.045, 0.028]} />
+                <meshStandardMaterial color="#765c40" roughness={0.72} />
+              </mesh>
+            ))}
             {/* 淡墨山石笔意 */}
             <mesh position={[-0.3, 1.1, 0.05]} rotation={[0, 0, 0.5]}>
               <boxGeometry args={[0.09, 1.5, 0.015]} />
@@ -806,21 +1084,21 @@ function SeatFurnishings({ count }: { count: number }) {
               {/* 酒尊 */}
               <mesh position={[-0.16, 0.39, 0]}>
                 <cylinderGeometry args={[0.075, 0.1, 0.18, 10]} />
-                <meshStandardMaterial color={PAL.bronze} metalness={0.35} roughness={0.45} />
+                <meshStandardMaterial color={PAL.bronze} metalness={0.16} roughness={0.72} />
               </mesh>
               <mesh position={[-0.16, 0.5, 0]}>
                 <cylinderGeometry args={[0.05, 0.075, 0.05, 10]} />
-                <meshStandardMaterial color={PAL.bronze} metalness={0.35} roughness={0.45} />
+                <meshStandardMaterial color={PAL.bronze} metalness={0.16} roughness={0.72} />
               </mesh>
               {/* 爵（三足小杯，简化） */}
               <mesh position={[0.16, 0.365, 0.05]}>
                 <cylinderGeometry args={[0.05, 0.035, 0.09, 8]} />
-                <meshStandardMaterial color={PAL.bronze} metalness={0.35} roughness={0.45} />
+                <meshStandardMaterial color={PAL.bronze} metalness={0.16} roughness={0.72} />
               </mesh>
               {[-0.03, 0.03].map((x) => (
                 <mesh key={x} position={[0.16 + x, 0.315, 0.05]}>
                   <cylinderGeometry args={[0.008, 0.01, 0.05, 6]} />
-                  <meshStandardMaterial color={PAL.bronze} metalness={0.35} roughness={0.45} />
+                  <meshStandardMaterial color={PAL.bronze} metalness={0.16} roughness={0.72} />
                 </mesh>
               ))}
             </group>
@@ -841,14 +1119,55 @@ function SeatFurnishings({ count }: { count: number }) {
         ))}
         <mesh position={[-0.3, 0.44, 0]}>
           <cylinderGeometry args={[0.09, 0.12, 0.24, 10]} />
-          <meshStandardMaterial color={PAL.bronze} metalness={0.35} roughness={0.45} />
+          <meshStandardMaterial color={PAL.bronze} metalness={0.16} roughness={0.72} />
         </mesh>
         <mesh position={[0.18, 0.38, 0.06]}>
           <cylinderGeometry args={[0.055, 0.04, 0.1, 8]} />
-          <meshStandardMaterial color={PAL.bronze} metalness={0.35} roughness={0.45} />
+          <meshStandardMaterial color={PAL.bronze} metalness={0.16} roughness={0.72} />
         </mesh>
       </group>
     </>
+  );
+}
+
+function DistantPavilion({ x, scale }: { x: number; scale: number }) {
+  const roofSurface = useCourtyardSurface("roof");
+  const woodSurface = useCourtyardSurface("wood");
+  const lowerRoof = useMemo(() => makeHippedRoofGeometry(6.8, 4.2, 2.8, 1.15, 0.18), []);
+  const upperRoof = useMemo(() => makeHippedRoofGeometry(4.25, 2.8, 1.8, 0.72, 0.12), []);
+  return (
+    <group position={[x, 0, -19]} scale={scale}>
+      <mesh position={[0, 0.18, 0]}>
+        <boxGeometry args={[7.2, 0.36, 4.5]} />
+        <meshStandardMaterial color={PAL.stoneDark} roughness={0.88} />
+      </mesh>
+      <mesh position={[0, 1.05, -1.72]}>
+        <boxGeometry args={[5.8, 1.45, 0.18]} />
+        <meshStandardMaterial color={PAL.paper} roughness={0.92} />
+      </mesh>
+      {([-2.65, 2.65] as const).flatMap((px) => [-1.45, 1.25].map((z) => (
+        <group key={`${px}-${z}`} position={[px, 0, z]}>
+          <mesh position={[0, 1.25, 0]}>
+            <cylinderGeometry args={[0.09, 0.12, 2.5, 20]} />
+            <meshStandardMaterial {...woodSurface} color={PAL.pillar} roughness={0.84} metalness={0.02} />
+          </mesh>
+          <mesh position={[0, 0.12, 0]}>
+            <boxGeometry args={[0.32, 0.24, 0.32]} />
+            <meshStandardMaterial color={PAL.stone} roughness={0.85} />
+          </mesh>
+        </group>
+      )))}
+      <mesh geometry={lowerRoof} position={[0, 2.35, 0]}>
+        <meshStandardMaterial {...roofSurface} color="#c7d0c4" roughness={0.8} metalness={0.03} side={THREE.DoubleSide} />
+      </mesh>
+      <mesh position={[0, 3.5, 0]}>
+        <boxGeometry args={[3.5, 0.1, 2.1]} />
+        <meshStandardMaterial {...woodSurface} color={PAL.wood} roughness={0.84} metalness={0.02} />
+      </mesh>
+      <mesh geometry={upperRoof} position={[0, 3.53, 0]}>
+        <meshStandardMaterial {...roofSurface} color="#d0d7cc" roughness={0.8} metalness={0.03} side={THREE.DoubleSide} />
+      </mesh>
+    </group>
   );
 }
 
@@ -857,15 +1176,44 @@ export function CourtyardScene({ atmosphere, title = "宾至如归" }: { atmosph
   const warm = atmosphere / 100;
   return (
     <>
+      <CourtyardColorGrade />
       <color attach="background" args={[PAL.skyTop]} />
-      <fog attach="fog" args={[PAL.fog, 30, 110]} />
-      <hemisphereLight args={["#f8f4e6", "#aebd90", 0.85 + warm * 0.2]} />
-      <directionalLight position={[30, 40, 20]} intensity={0.62 + warm * 0.12} color="#fff1d4" />
+      {/* 【渲染优化】远山分层淡雾，院内保留清晰度与材质明暗。 */}
+      <fog attach="fog" args={["#aebbb9", 30, 66]} />
+      <hemisphereLight args={["#dce6e3", "#777d70", 0.78 + warm * 0.05]} />
+      <directionalLight
+        castShadow
+        position={[-12, 20, 8]}
+        intensity={1.05}
+        color="#f0e4cb"
+        shadow-mapSize-width={1024}
+        shadow-mapSize-height={1024}
+        shadow-camera-near={0.5}
+        shadow-camera-far={70}
+        shadow-camera-left={-18}
+        shadow-camera-right={18}
+        shadow-camera-top={18}
+        shadow-camera-bottom={-18}
+        shadow-bias={-0.0002}
+        shadow-normalBias={0.025}
+        shadow-radius={3}
+        shadow-intensity={0.68}
+      />
+      {/* 【渲染优化】克制的天空漫反射补光，避免阴影面死黑。 */}
+      <directionalLight position={[10, 12, -18]} intensity={0.32} color="#c3d1d0" />
+      <ambientLight intensity={0.16} color="#c7d0ca" />
+      <MorningLightRays />
+      <mesh position={[-17, 11, -43]}>
+        <sphereGeometry args={[1.55, 20, 16]} />
+        <meshBasicMaterial color="#e8dfbd" transparent opacity={0.42} />
+      </mesh>
 
       <FarGround />
       <Fields />
       <Mountains />
       <Clouds />
+      <DistantPavilion x={-9.2} scale={0.9} />
+      <DistantPavilion x={9.2} scale={0.9} />
       {/* 院外松柏 */}
       <Pine position={[-9.5, 0, -7]} scale={1.35} />
       <Pine position={[9.8, 0, -5]} scale={1.15} />
@@ -881,6 +1229,8 @@ export function CourtyardScene({ atmosphere, title = "宾至如归" }: { atmosph
       <BambooGrove position={[-5.8, 0, 1.6]} scale={0.9} />
       <StoneLantern position={[-2.4, 0, -0.9]} warm={warm} />
       <StoneLantern position={[2.4, 0, -0.9]} warm={warm} />
+      <LanternDust position={[-2.4, 0.35, -0.9]} />
+      <LanternDust position={[2.4, 0.35, -0.9]} />
 
       <Hall title={title} warm={warm} />
       <SeatFurnishings count={4} />
@@ -944,7 +1294,7 @@ export function GuestNPC({
           <meshBasicMaterial color={PAL.glow} transparent opacity={0.55} side={THREE.DoubleSide} depthWrite={false} />
         </mesh>
       )}
-      <LowPolyPerson
+      <RiteFigure
         robeColor={meta.hex}
         hat={guest.rank}
         bowTilt={bowTilt}
