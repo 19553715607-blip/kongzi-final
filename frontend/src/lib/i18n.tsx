@@ -601,6 +601,15 @@ const DICT: Dict = {
     es: "Prueba: «¿Cómo responder al cambio climático global?» «¿Los límites de la privacidad en la era de la IA?»",
     ar: "جرّب: «كيف نواجه تغيّر المناخ العالمي؟» «حدود الخصوصية في عصر الذكاء الاصطناعي؟»",
   },
+  "chat.citeLabel": {
+    zh: "引证", en: "Citations", fr: "Références", es: "Citas", ar: "الاستشهادات",
+  },
+  "chat.inputHint": {
+    zh: "Enter 发送 · Shift+Enter 换行", en: "Enter to send · Shift+Enter for a new line",
+    fr: "Entrée pour envoyer · Maj+Entrée pour un saut de ligne",
+    es: "Enter para enviar · Mayús+Enter para nueva línea",
+    ar: "Enter للإرسال · Shift+Enter لسطر جديد",
+  },
   "chat.placeholder": { zh: "问点什么…", en: "Ask something…", fr: "Posez une question…", es: "Pregunta algo…", ar: "اسأل شيئًا…" },
   "chat.aiAssist": { zh: "AI 协助", en: "AI-assisted", fr: "Assisté par IA", es: "Asistido por IA", ar: "بمساعدة الذكاء الاصطناعي" },
   "chat.collapse": { zh: "收起 ▴", en: "Collapse ▴", fr: "Réduire ▴", es: "Contraer ▴", ar: "طيّ ▴" },
