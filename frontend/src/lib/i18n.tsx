@@ -224,7 +224,7 @@ const DICT: Dict = {
     es: "Iniciar sesión", ar: "تسجيل الدخول",
   },
   "login.noAccount": {
-    zh: "想先试试？", en: "Want to try first?", fr: "Envie d'essayer d'abord ?",
+    zh: "想先试试？", en: "Want to try first?", fr: "Souhaitez-vous d'abord essayer ?",
     es: "¿Prefieres probar primero?", ar: "تريد التجربة أولًا؟",
   },
   "login.enter": {
@@ -350,7 +350,7 @@ const DICT: Dict = {
   "me.noFavorites": {
     zh: "还没有收藏。在「读一读」点 ☆ 收藏经典。",
     en: "No favourites yet. Tap ☆ in Read to save classics.",
-    fr: "Pas encore de favoris. Touchez ☆ dans Lecture pour enregistrer des classiques.",
+    fr: "Pas encore de favoris. Cliquez sur ☆ dans Lecture pour enregistrer des classiques.",
     es: "Aún no hay favoritos. Pulsa ☆ en Lectura para guardar clásicos.",
     ar: "لا مفضّلات بعد. انقر ☆ في القراءة لحفظ النصوص.",
   },
@@ -1032,7 +1032,7 @@ const DICT: Dict = {
   "jrn.backToShu": { zh: "← 书艺", en: "← Calligraphy", fr: "← Calligraphie", es: "← Caligrafía", ar: "→ الخط" },
   "jrn.hintOrigin": { zh: "本义提示", en: "Original-meaning hint", fr: "Indice du sens originel", es: "Pista del sentido original", ar: "تلميح المعنى الأصلي" },
   "jrn.revealAfter": { zh: "拼对后揭晓", en: "Revealed once correct", fr: "Révélé une fois correct", es: "Se revela al acertar", ar: "يُكشف بعد الإجابة الصحيحة" },
-  "jrn.assembleHint": { zh: "点击部件填入空槽（多余的是干扰）", en: "Tap components to fill the slots (extras are distractors)", fr: "Touchez les composants pour remplir les cases (les autres sont des leurres)", es: "Toca los componentes para llenar las casillas (los demás son distractores)", ar: "انقر المكوّنات لملء الفراغات (والزائد مشتّتات)" },
+  "jrn.assembleHint": { zh: "点击部件填入空槽（多余的是干扰）", en: "Tap components to fill the slots (extras are distractors)", fr: "Sélectionnez les composants pour remplir les cases (les autres sont des leurres)", es: "Toca los componentes para llenar las casillas (los demás son distractores)", ar: "انقر المكوّنات لملء الفراغات (والزائد مشتّتات)" },
   "jrn.retryChar": { zh: "重试本字", en: "Retry this character", fr: "Réessayer ce caractère", es: "Reintentar este carácter", ar: "أعد محاولة هذا الحرف" },
   "jrn.nextChar": { zh: "下一字 →", en: "Next character →", fr: "Caractère suivant →", es: "Siguiente carácter →", ar: "الحرف التالي ←" },
   "jrn.assembleOk": { zh: "拼对！书艺 +{a} · xp +6", en: "Correct! Calligraphy +{a} · xp +6", fr: "Correct ! Calligraphie +{a} · xp +6", es: "¡Correcto! Caligrafía +{a} · xp +6", ar: "صحيح! الخط +{a} · خبرة +6" },
@@ -1825,7 +1825,7 @@ const DICT: Dict = {
   "home.why.visual.desc": {
     zh: "书艺、乐舞与六艺——可动手的文化实践。",
     en: "Calligraphy, music and the Six Arts — culture you can practice.",
-    fr: "Calligraphie, musique et Six Arts — une culture que l'on pratique.",
+    fr: "Calligraphie, musique et Six Arts — une culture qui se pratique.",
     es: "Caligrafía, música y Seis Artes: cultura que puedes practicar.",
     ar: "الخط والموسيقى والفنون الستة — ثقافة تمارسها بيدك.",
   },
@@ -2124,7 +2124,7 @@ const DICT: Dict = {
   "essays.justice.west.quote": { zh: "要只按照你同时能够愿意它成为普遍法则的准则去行动。", en: "Act only according to that maxim which you can at the same time will to become a universal law.", fr: "Agis uniquement d'après la maxime qui peut valoir en même temps comme loi universelle.", es: "Obra solo según la máxima que puedas querer que sea ley universal.", ar: "اعمل وفق القاعدة التي تستطيع أن تريدها قانونًا كونيًا." },
   "essays.justice.west.src": { zh: "康德《道德形而上学奠基》", en: "Immanuel Kant, Groundwork of the Metaphysics of Morals", fr: "Kant, Fondements de la métaphysique des mœurs", es: "Kant, Fundamentación de la metafísica de las costumbres", ar: "كانط، أسس ميتافيزيقا الأخلاق" },
   "essays.self.title": { zh: "修身:日日新的自己", en: "Self-cultivation", fr: "Culture de soi", es: "Cultivo de sí", ar: "تهذيب النفس" },
-  "essays.self.west.quote": { zh: "美德由习惯养成:我们通过做正义的事成为正义的人。", en: "Moral virtue is formed by habit: we become just by doing just acts.", fr: "La vertu s'acquiert par l'habitude : on devient juste en faisant des actes justes.", es: "La virtud se adquiere por el hábito: nos hacemos justos haciendo actos justos.", ar: "تتكون الفضيلة بالعادة: نصير عادلين بأفعال عادلة." },
+  "essays.self.west.quote": { zh: "美德由习惯养成:我们通过做正义的事成为正义的人。", en: "Moral virtue is formed by habit: we become just by doing just acts.", fr: "La vertu s'acquiert par l'habitude : nous devenons justes en accomplissant des actes justes.", es: "La virtud se adquiere por el hábito: nos hacemos justos haciendo actos justos.", ar: "تتكون الفضيلة بالعادة: نصير عادلين بأفعال عادلة." },
   "essays.self.west.src": { zh: "亚里士多德《尼各马可伦理学》", en: "Aristotle, Nicomachean Ethics II", fr: "Aristote, Éthique à Nicomaque II", es: "Aristóteles, Ética a Nicómaco II", ar: "أرسطو، أخلاق نيقوماخوس" },
   "essays.ritual.title": { zh: "礼:仪式与好的生活", en: "Ritual & the good life", fr: "Rite et vie bonne", es: "Rito y vida buena", ar: "الطقس والحياة الطيبة" },
   "essays.ritual.west.quote": { zh: "仪式不是迷信的残余,而是社会凝聚力的引擎。", en: "Ritual is not the residue of superstition but the engine of social solidarity.", fr: "Le rite n'est pas un résidu de superstition mais le moteur de la solidarité sociale.", es: "El rito no es residuo de superstición sino motor de la solidaridad social.", ar: "الطقس ليس بقايا خرافة بل محرّك التضامن الاجتماعي." },
