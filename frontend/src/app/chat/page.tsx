@@ -213,14 +213,6 @@ export default function ChatPage() {
       {/* 会话头：人格 + 议题筛选。横向居中，与对话列同宽 */}
       <header className="mx-auto flex w-full max-w-3xl shrink-0 flex-col gap-2.5 border-b border-line/60 pb-3">
         <div className="flex items-center gap-3">
-          {/* eslint-disable-next-line @next/next/no-img-element -- 静态小图，直接 img 即可 */}
-          <img
-            src="/avatars/ziyue.webp"
-            alt={t("chat.personaName", lang)}
-            width={36}
-            height={36}
-            className="h-9 w-9 shrink-0 rounded-full object-cover"
-          />
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-1.5 text-sm font-medium text-fg">
               <span className="truncate">{t("chat.personaName", lang)}</span>
@@ -282,15 +274,7 @@ export default function ChatPage() {
         >
           {messages.length === 0 && (
             <div className="flex flex-col items-center gap-3 px-4 py-14 text-center">
-              {/* eslint-disable-next-line @next/next/no-img-element -- 静态小图 */}
-              <img
-                src="/avatars/ziyue.webp"
-                alt=""
-                width={56}
-                height={56}
-                className="h-14 w-14 rounded-full object-cover opacity-95"
-              />
-              <div className="font-serif text-lg text-fg">{t("chat.personaName", lang)}</div>
+              <div className="font-serif text-xl text-fg">{t("chat.personaName", lang)}</div>
               <p className="max-w-md text-sm leading-relaxed text-muted">{t("chat.tryTopics", lang)}</p>
               {topics.length > 0 && (
                 <div className="mt-2 flex flex-wrap justify-center gap-2">
@@ -426,17 +410,8 @@ function AssistantBubble({ msg, onCopy }: { msg: AssistantMsg; onCopy: (m: Assis
   const visibleText = msg.text.slice(0, visibleLength);
   const typing = msg.streaming || visibleLength < msg.text.length;
   return (
-    <div className="group flex gap-3">
-      {/* 头像列：GPT 式，助手内容不再包气泡，靠留白与字重区分说话人 */}
-      {/* eslint-disable-next-line @next/next/no-img-element -- 静态小图 */}
-      <img
-        src="/avatars/ziyue.webp"
-        alt=""
-        width={28}
-        height={28}
-        className="mt-1 h-7 w-7 shrink-0 rounded-full object-cover"
-      />
-      <div className="min-w-0 flex-1 space-y-2.5">
+    <div className="group">
+      <div className="min-w-0 space-y-2.5">
       {msg.agents.length > 0 && (
         <div className="flex flex-wrap items-center gap-1.5 ps-1">
           {msg.agents.map((a) => {
