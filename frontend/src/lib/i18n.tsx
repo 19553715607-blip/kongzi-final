@@ -22,7 +22,7 @@ const DICT: Dict = {
   "brand.title": {
     zh: "孔子 · 儒家语义平台",
     en: "Kongzi · Confucian Classics Platform",
-    fr: "Kongzi · Plateforme sémantique confucéenne",
+    fr: "Kongzi · Plateforme des classiques confucéens",
     es: "Kongzi · Plataforma semántica confuciana",
     ar: "كونغ تسي · منصة المعنى الكونفوشيوسي",
   },
@@ -36,7 +36,7 @@ const DICT: Dict = {
   "nav.chat":    { zh: "问答", en: "Chat", fr: "Dialogue", es: "Diálogo", ar: "حوار" },
   "nav.cases":   { zh: "案例", en: "Cases", fr: "Cas", es: "Casos", ar: "حالات" },
   "nav.journey": { zh: "君子路", en: "Path", fr: "Voie", es: "Camino", ar: "السبيل" },
-  "nav.me":      { zh: "我", en: "Me", fr: "Moi", es: "Yo", ar: "حسابي" },
+  "nav.me":      { zh: "我", en: "Me", fr: "Compte", es: "Yo", ar: "حسابي" },
   "nav.developers": { zh: "开放接口", en: "Developers", fr: "API", es: "API", ar: "API" },
   "nav.cocreate": { zh: "共创", en: "Co-create", fr: "Co-créer", es: "Co-crear", ar: "إبداع مشترك" },
   "nav.plugins":  { zh: "插件", en: "Plugins", fr: "Modules", es: "Plugins", ar: "إضافات" },
@@ -80,13 +80,13 @@ const DICT: Dict = {
     ar: "شبكة الأشخاص والمفاهيم والقضايا.",
   },
   "home.cta": {
-    zh: "进入", en: "Open →", fr: "Entrer →", es: "Entrar →", ar: "ادخل →",
+    zh: "进入", en: "Open →", fr: "Ouvrir →", es: "Entrar →", ar: "ادخل →",
   },
 
   "corpus.title": {
     zh: "多语料库 · 跨文明对照",
     en: "Multilingual corpus · cross-civilizational comparison",
-    fr: "Corpus multilingue · transcivilisationnel",
+    fr: "Corpus multilingue · comparaison entre civilisations",
     es: "Corpus multilingüe · transcivilizacional",
     ar: "مدونة متعددة اللغات وعبر الحضارات",
   },
@@ -103,7 +103,7 @@ const DICT: Dict = {
   },
   "corpus.cases": {
     zh: "跨文明对话案例", en: "cross-civilizational dialogue cases",
-    fr: "cas de dialogue inter-civilisations",
+    fr: "cas de dialogue entre civilisations",
     es: "casos de diálogo intercivilizacional",
     ar: "حالات الحوار بين الحضارات",
   },
@@ -164,7 +164,7 @@ const DICT: Dict = {
   "read.aiReadingNote": {
     zh: "AI 解读由智能体运行时生成（区别于权威注释）。",
     en: "AI readings are generated on demand and are not authoritative annotations.",
-    fr: "Les lectures par IA sont générées à la demande ; elles ne valent pas annotation faisant autorité.",
+    fr: "Les lectures par IA sont générées à la demande ; elles ne constituent pas des annotations de référence.",
     es: "Las lecturas de IA se generan a petición y no son anotaciones autorizadas.",
     ar: "تُولَّد القراءات الآلية أثناء التشغيل بواسطة الوكلاء (وهي مختلفة عن الشروح المعتمدة).",
   },
@@ -173,7 +173,7 @@ const DICT: Dict = {
     es: "Interpreta: ", ar: "فسّر: ",
   },
   "read.askAgent": {
-    zh: "问问子曰君 →", en: "Ask Kongzi →", fr: "Demander à l'agent →",
+    zh: "问问子曰君 →", en: "Ask Kongzi →", fr: "Demander à Kongzi →",
     es: "Preguntar al agente →", ar: "اسأل العميل ←",
   },
 
@@ -288,12 +288,12 @@ const DICT: Dict = {
   },
   "me.upgraded": {
     zh: "升级成功，进度已保留。", en: "Upgraded — your progress is kept.",
-    fr: "Mise à niveau réussie. Votre progression est conservée.",
+    fr: "Compte créé. Votre progression est conservée.",
     es: "Actualizado. Tu progreso se conserva.", ar: "تمت الترقية. تقدّمك محفوظ.",
   },
   "me.upgradeFail": {
     zh: "升级失败：邮箱可能已被注册。", en: "Upgrade failed: the email may already be registered.",
-    fr: "Échec : l'e-mail est peut-être déjà enregistré.",
+    fr: "Échec : cet e-mail est peut-être déjà utilisé.",
     es: "Falló: el correo quizá ya esté registrado.",
     ar: "فشلت الترقية: قد يكون البريد مسجّلًا بالفعل.",
   },
@@ -320,14 +320,14 @@ const DICT: Dict = {
     zh: "头像上传失败（需 jpg/png/webp，≤6MB）", en: "Avatar upload failed (jpg/png/webp, ≤6MB)", fr: "Échec de l'envoi (jpg/png/webp, ≤6 Mo)", es: "Error al subir (jpg/png/webp, ≤6 MB)", ar: "فشل الرفع (jpg/png/webp، ≤6 ميغابايت)",
   },
   "me.avatar.reset": {
-    zh: "恢复默认头像", en: "Reset avatar", fr: "Réinitialiser", es: "Restaurar", ar: "استعادة الافتراضية",
+    zh: "恢复默认头像", en: "Reset avatar", fr: "Rétablir l'avatar par défaut", es: "Restaurar", ar: "استعادة الافتراضية",
   },
   "me.guest": {
     zh: "游客", en: "Guest", fr: "Invité", es: "Invitado", ar: "زائر",
   },
   "me.upgradeTitle": {
     zh: "升级为正式账号", en: "Upgrade to a full account",
-    fr: "Passer à un compte complet", es: "Pasar a una cuenta completa",
+    fr: "Créer un compte permanent", es: "Pasar a una cuenta completa",
     ar: "الترقية إلى حساب كامل",
   },
   "me.upgradeDesc": {
@@ -345,7 +345,7 @@ const DICT: Dict = {
     es: "Contraseña (≥6 caracteres)", ar: "كلمة المرور (٦ أحرف على الأقل)",
   },
   "me.upgrade": {
-    zh: "升级", en: "Upgrade", fr: "Mettre à niveau", es: "Actualizar", ar: "ترقية",
+    zh: "升级", en: "Upgrade", fr: "Créer un compte", es: "Actualizar", ar: "ترقية",
   },
   "me.noFavorites": {
     zh: "还没有收藏。在「读一读」点 ☆ 收藏经典。",
@@ -364,12 +364,12 @@ const DICT: Dict = {
   "me.switchGuestConfirm": {
     zh: "换游客身份后，当前游客名下的进度（打卡/勋章/礼分/收藏）将无法找回。\n\n建议先绑定邮箱再切换。\n\n确认换一个游客身份？",
     en: "After switching, the progress under the current guest (check-ins / badges / points / favourites) cannot be recovered.\n\nWe suggest binding an email first.\n\nSwitch to another guest?",
-    fr: "Après le changement, la progression du compte invité actuel (présences / badges / points / favoris) sera irrécupérable.\n\nNous vous conseillons d'associer d'abord un e-mail.\n\nChanger d'invité ?",
+    fr: "Après le changement, la progression du compte invité actuel (présences / badges / points / favoris) sera irrécupérable.\n\nNous vous conseillons d'associer d'abord un e-mail.\n\nChanger de session invité ?",
     es: "Tras el cambio, el progreso del invitado actual (registros / insignias / puntos / favoritos) no se podrá recuperar.\n\nLe sugerimos vincular un correo primero.\n\n¿Cambiar de invitado?",
     ar: "بعد التبديل، لن يمكن استرجاع تقدّم الزائر الحالي (التسجيلات / الشارات / النقاط / المفضلة).\n\nننصح بربط بريد إلكتروني أولًا.\n\nهل تريد التبديل إلى زائر آخر؟",
   },
   "me.switchGuest": {
-    zh: "换一个游客身份", en: "Switch to another guest", fr: "Changer d'invité",
+    zh: "换一个游客身份", en: "Switch to another guest", fr: "Changer de session invité",
     es: "Cambiar de invitado", ar: "تبديل هوية الزائر",
   },
   "me.logout": {
@@ -402,7 +402,7 @@ const DICT: Dict = {
   // ── 首页补充 ─────────────────────────────────────────────────────────
   "home.corpus.cases": {
     zh: "跨文明对话案例（条）", en: "Cross-civilizational dialogue cases",
-    fr: "Cas de dialogue inter-civilisations",
+    fr: "Cas de dialogue entre civilisations",
     es: "Casos de diálogo intercivilizacional",
     ar: "حالات الحوار بين الحضارات",
   },
@@ -460,17 +460,17 @@ const DICT: Dict = {
   },
   "corpus.bd.civHeadline": {
     zh: "跨文明立场（headline）", en: "Cross-civilizational stances (summary)",
-    fr: "Positions inter-civilisations (accroche)", es: "Posturas intercivilizacionales (titular)",
+    fr: "Positions de chaque civilisation (accroche)", es: "Posturas intercivilizacionales (titular)",
     ar: "المواقف بين الحضارات (العنوان)",
   },
   "corpus.bd.civArgument": {
     zh: "跨文明立场（论证）", en: "Cross-civilizational stances (argument)",
-    fr: "Positions inter-civilisations (argument)", es: "Posturas intercivilizacionales (argumento)",
+    fr: "Positions de chaque civilisation (argument)", es: "Posturas intercivilizacionales (argumento)",
     ar: "المواقف بين الحضارات (الحجة)",
   },
   "corpus.bd.cases": {
     zh: "跨文明对话案例（条）", en: "Cross-civilizational dialogue cases",
-    fr: "Cas de dialogue inter-civilisations", es: "Casos de diálogo intercivilizacional",
+    fr: "Cas de dialogue entre civilisations", es: "Casos de diálogo intercivilizacional",
     ar: "حالات الحوار بين الحضارات",
   },
   "corpus.bd.caseCivUnits": {
@@ -542,13 +542,13 @@ const DICT: Dict = {
     es: "El camino del junzi", ar: "طريق الجنز",
   },
   "user.switchGuest": {
-    zh: "换游客身份", en: "Switch guest", fr: "Changer d'invité",
+    zh: "换游客身份", en: "Switch guest", fr: "Changer de session invité",
     es: "Cambiar de invitado", ar: "تبديل الزائر",
   },
   "user.switchGuestConfirm": {
     zh: "换游客身份后，当前游客名下的进度（打卡/勋章/礼分/收藏）将无法找回。\n\n建议先在「我的中心」绑定邮箱再切换。\n\n确认换一个游客身份？",
     en: "After switching, the progress under the current guest (check-ins / badges / points / favourites) cannot be recovered.\n\nWe suggest binding an email in My space first.\n\nSwitch to another guest?",
-    fr: "Après le changement, la progression du compte invité actuel (présences / badges / points / favoris) sera irrécupérable.\n\nNous vous conseillons d'associer d'abord un e-mail dans Mon espace.\n\nChanger d'invité ?",
+    fr: "Après le changement, la progression du compte invité actuel (présences / badges / points / favoris) sera irrécupérable.\n\nNous vous conseillons d'associer d'abord un e-mail dans Mon espace.\n\nChanger de session invité ?",
     es: "Tras el cambio, el progreso del invitado actual (registros / insignias / puntos / favoritos) no se podrá recuperar.\n\nLe sugerimos vincular un correo en Mi espacio primero.\n\n¿Cambiar de invitado?",
     ar: "بعد التبديل، لن يمكن استرجاع تقدّم الزائر الحالي (التسجيلات / الشارات / النقاط / المفضلة).\n\nننصح بربط بريد إلكتروني من مساحتي أولًا.\n\nهل تريد التبديل إلى زائر آخر؟",
   },
@@ -561,7 +561,7 @@ const DICT: Dict = {
   "chat.agent.retrieval": { zh: "经典检索", en: "Text retrieval", fr: "Recherche dans les textes", es: "Búsqueda en los textos", ar: "البحث في النصوص" },
   "chat.agent.synthesis": { zh: "合成", en: "Synthesis", fr: "Synthèse", es: "Síntesis", ar: "التركيب" },
   "chat.agent.topic": { zh: "议题引擎", en: "Topic engine", fr: "Moteur de thèmes", es: "Motor de temas", ar: "محرّك الموضوعات" },
-  "chat.agent.crossciv": { zh: "跨文明对照", en: "Cross-civilizational contrast", fr: "Comparaison inter-civilisations", es: "Contraste intercivilizacional", ar: "المقارنة بين الحضارات" },
+  "chat.agent.crossciv": { zh: "跨文明对照", en: "Cross-civilizational contrast", fr: "Comparaison entre civilisations", es: "Contraste intercivilizacional", ar: "المقارنة بين الحضارات" },
   "chat.agent.translate": { zh: "翻译", en: "Translation", fr: "Traduction", es: "Traducción", ar: "الترجمة" },
   "chat.agent.crossculture": { zh: "跨文化", en: "Cross-cultural", fr: "Interculturel", es: "Intercultural", ar: "بين الثقافات" },
   "chat.agent.verify": { zh: "校验", en: "Verification", fr: "Vérification", es: "Verificación", ar: "التحقق" },
@@ -583,7 +583,7 @@ const DICT: Dict = {
     es: "Servicio backend no disponible. Inténtalo de nuevo en un momento.",
     ar: "خدمة الخادم غير متاحة حاليًا. أعد المحاولة بعد قليل.",
   },
-  "chat.personaName": { zh: "子曰君", en: "Master Ziyue", fr: "Maître Yue", es: "Maestro Yue", ar: "المعلم يويه" },
+  "chat.personaName": { zh: "子曰君", en: "Master Ziyue", fr: "Maître Ziyue", es: "Maestro Yue", ar: "المعلم يويه" },
   "chat.avatar": { zh: "曰", en: "Say", fr: "Dit", es: "Dice", ar: "قال" },
   "chat.tagline": {
     zh: "儒家经典 · 同行者，不是老师",
@@ -733,8 +733,8 @@ const DICT: Dict = {
   "plugins.copy": { zh: "复制", en: "Copy", fr: "Copier", es: "Copiar", ar: "نسخ" },
 
   // ── 大屏轮播 ─────────────────────────────────────────────────────────
-  "kiosk.brand": { zh: "孔子 · 儒家语义平台", en: "Kongzi · Confucian Classics Platform", fr: "Kongzi · Plateforme sémantique confucéenne", es: "Kongzi · Plataforma semántica confuciana", ar: "كونغ تسي · منصة المعنى الكونفوشيوسي" },
-  "kiosk.brandSuffix": { zh: "儒家语义平台", en: "Confucian Classics Platform", fr: "Plateforme sémantique confucéenne", es: "Plataforma semántica confuciana", ar: "منصة المعنى الكونفوشيوسي" },
+  "kiosk.brand": { zh: "孔子 · 儒家语义平台", en: "Kongzi · Confucian Classics Platform", fr: "Kongzi · Plateforme des classiques confucéens", es: "Kongzi · Plataforma semántica confuciana", ar: "كونغ تسي · منصة المعنى الكونفوشيوسي" },
+  "kiosk.brandSuffix": { zh: "儒家语义平台", en: "Confucian Classics Platform", fr: "Plateforme des classiques confucéens", es: "Plataforma semántica confuciana", ar: "منصة المعنى الكونفوشيوسي" },
   "kiosk.paused": { zh: "已暂停 · 点击继续", en: "Paused · click to resume", fr: "En pause · cliquez pour reprendre", es: "En pausa · haz clic para continuar", ar: "متوقّف · انقر للمتابعة" },
   "kiosk.playing": { zh: "自动轮播 · 点击暂停", en: "Auto-rotating · click to pause", fr: "Rotation auto · cliquez pour mettre en pause", es: "Rotación automática · haz clic para pausar", ar: "عرض تلقائي · انقر للإيقاف" },
   "kiosk.footer": { zh: "kongzi.platform · 扫码继续阅读", en: "kongzi.platform · scan to keep reading", fr: "kongzi.platform · scannez pour continuer", es: "kongzi.platform · escanea para seguir leyendo", ar: "kongzi.platform · امسح الرمز لمتابعة القراءة" },
@@ -801,7 +801,7 @@ const DICT: Dict = {
   // ── 案例详情 ─────────────────────────────────────────────────────────
   "case.shareSign": {
     zh: "——孔子·儒家语义平台", en: "— Kongzi · Confucian Classics Platform",
-    fr: "— Kongzi · Plateforme sémantique confucéenne",
+    fr: "— Kongzi · Plateforme des classiques confucéens",
     es: "— Kongzi · Plataforma semántica confuciana",
     ar: "— كونغ تسي · منصة المعنى الكونفوشيوسي",
   },
@@ -834,14 +834,14 @@ const DICT: Dict = {
   "co.intro1": {
     zh: "研究者、教育者、学习者都可以补充跨文明立场、对话与注解，不限文化背景。",
     en: "Researchers, educators and learners can contribute cross-civilizational stances, dialogues and annotations, whatever their tradition.",
-    fr: "Les chercheurs, enseignants et apprenants de toute tradition culturelle sont invités à enrichir les positions, dialogues et annotations inter-civilisations.",
+    fr: "Les chercheurs, enseignants et apprenants de toute tradition culturelle sont invités à enrichir les positions, dialogues et annotations entre civilisations.",
     es: "Investigadores, docentes y estudiantes de cualquier tradición cultural pueden aportar posturas, diálogos y anotaciones intercivilizacionales.",
     ar: "نرحّب بالباحثين والمعلمين والمتعلمين من أي تقليد ثقافي للمساهمة بمواقف وحوارات وشروح بين الحضارات.",
   },
   "co.intro2": {
     zh: "经审核后将进入「跨文明立场库」与 AI 对话引擎。",
     en: "Once reviewed, contributions enter the cross-civilizational stance library and the AI dialogue engine.",
-    fr: "Après relecture, les contributions rejoignent la bibliothèque de positions inter-civilisations et le moteur de dialogue IA.",
+    fr: "Après relecture, les contributions rejoignent la bibliothèque de positions entre civilisations et le moteur de dialogue IA.",
     es: "Tras la revisión, las aportaciones entran en la biblioteca de posturas intercivilizacionales y en el motor de diálogo de IA.",
     ar: "بعد المراجعة، تدخل المساهمات إلى مكتبة المواقف بين الحضارات ومحرّك الحوار الذكي.",
   },
@@ -932,7 +932,7 @@ const DICT: Dict = {
   "dev.ep.passage": { zh: "经典原文五层信息", en: "Five-layer passage info", fr: "Informations à cinq couches", es: "Información en cinco capas", ar: "معلومات النص في خمس طبقات" },
   "dev.ep.topics": { zh: "5 大全球议题列表", en: "List of the 5 global topics", fr: "Liste des 5 thèmes mondiaux", es: "Lista de los 5 temas globales", ar: "قائمة الموضوعات العالمية الخمسة" },
   "dev.ep.topicStances": { zh: "议题 + 5 文明对照立场", en: "Topic + 5-civilization stances", fr: "Thème + positions de 5 civilisations", es: "Tema + posturas de 5 civilizaciones", ar: "الموضوع + مواقف ٥ حضارات" },
-  "dev.ep.cases": { zh: "跨文明对话案例列表（已审）", en: "Cross-civilizational dialogue cases (reviewed)", fr: "Cas de dialogue inter-civilisations (relus)", es: "Casos de diálogo intercivilizacional (revisados)", ar: "حالات الحوار بين الحضارات (مراجَعة)" },
+  "dev.ep.cases": { zh: "跨文明对话案例列表（已审）", en: "Cross-civilizational dialogue cases (reviewed)", fr: "Cas de dialogue entre civilisations (relus)", es: "Casos de diálogo intercivilizacional (revisados)", ar: "حالات الحوار بين الحضارات (مراجَعة)" },
   "dev.ep.caseDetail": { zh: "案例详情", en: "Case detail", fr: "Détail du cas", es: "Detalle del caso", ar: "تفاصيل الحالة" },
   "dev.ep.corpus": { zh: "平台语料规模", en: "Corpus scale", fr: "Taille du corpus", es: "Escala del corpus", ar: "حجم المدونة" },
 
@@ -1165,14 +1165,14 @@ const DICT: Dict = {
   "chat.crossBanner": {
     zh: "跨文明对照 · 同议题 {n} 文明并陈",
     en: "Cross-civilizational contrast · {n} civilizations on this topic",
-    fr: "Comparaison inter-civilisations · {n} civilisations sur ce thème",
+    fr: "Comparaison entre civilisations · {n} civilisations sur ce thème",
     es: "Contraste intercivilizacional · {n} civilizaciones sobre este tema",
     ar: "مقارنة بين الحضارات · {n} حضارات حول هذا الموضوع",
   },
   "cases.crossBanner": {
     zh: "跨文明对照 · {n} 文明并陈",
     en: "Cross-civilizational contrast · {n} civilizations",
-    fr: "Comparaison inter-civilisations · {n} civilisations",
+    fr: "Comparaison entre civilisations · {n} civilisations",
     es: "Contraste intercivilizacional · {n} civilizaciones",
     ar: "مقارنة بين الحضارات · {n} حضارات",
   },
@@ -1706,14 +1706,14 @@ const DICT: Dict = {
     ar: "أكاديمية هادئة: النص الأصلي والترجمة والشروح والتعريفات متعددة اللغات جنبًا إلى جنب، وكل جملة قابلة للتتبّع.",
   },
   "home.hero.ctaRead": { zh: "开始读经", en: "Start reading", fr: "Commencer", es: "Comenzar", ar: "ابدأ القراءة" },
-  "home.hero.ctaChat": { zh: "向子曰君提问", en: "Ask Kongzi", fr: "Questionner l'agent", es: "Pregunta al agente", ar: "اسأل العميل" },
+  "home.hero.ctaChat": { zh: "向子曰君提问", en: "Ask Kongzi", fr: "Interroger Kongzi", es: "Pregunta al agente", ar: "اسأل العميل" },
   "home.hero.ctaJourney": { zh: "开始六艺", en: "Enter the Six Arts", fr: "Entrer dans les six arts", es: "Entrar en las seis artes", ar: "ادخل الفنون الستة" },
 
   // 夜游博物馆首屏（破晓底图）：大标题、装饰拉丁行、入口行标签
   "home.night.title": {
     zh: "切问近思",
     en: "Inquire & Reflect",
-    fr: "Interroger & Réfléchir",
+    fr: "Interroger et réfléchir",
     es: "Preguntar & Reflexionar",
     ar: "اسأل وتأمّل",
   },
@@ -1790,7 +1790,7 @@ const DICT: Dict = {
   "home.civ.q4": {
     zh: "礼与法：两种秩序观如何对话？",
     en: "Ritual and law: how do two views of order converse?",
-    fr: "Rite et loi : dialogue entre deux conceptions de l'ordre ?",
+    fr: "Le rite et la loi : deux conceptions de l'ordre en dialogue ?",
     es: "Rito y ley: ¿cómo dialogan dos visiones del orden?",
     ar: "الطقوس والقانون: كيف يتحاور تصوّران للنظام؟",
   },
@@ -1843,7 +1843,7 @@ const DICT: Dict = {
   "home.need.business.desc": {
     zh: "礼与和的当代含义，跨文明对话案例。",
     en: "Contemporary meaning of ritual and harmony; cross-civ cases.",
-    fr: "Sens actuel du rite et de l'harmonie ; cas inter-civilisations.",
+    fr: "Sens actuel du rite et de l'harmonie ; cas entre civilisations.",
     es: "Sentido actual del rito y la armonía; casos intercivilizacionales.",
     ar: "المعنى المعاصر للطقوس والوئام؛ حالات بين الحضارات.",
   },
@@ -1873,7 +1873,7 @@ const DICT: Dict = {
   "paths.lineage.desc": { zh: "孔子—孟子—荀子—宋明理学的关系网络。", en: "Confucius—Mencius—Xunzi—Song-Ming Neo-Confucianism as a graph.", fr: "Confucius—Mencius—Xunzi—Néoconfucianisme Song-Ming en graphe.", es: "Confucio—Mencio—Xunzi—Neoconfucianismo Song-Ming en grafo.", ar: "كونفوشيوس—منسيوس—شونزي—الكونفوشية الجديدة في رسم بياني." },
   "paths.arts.title": { zh: "六艺实操", en: "Six Arts, hands-on", fr: "Six Arts en pratique", es: "Seis Artes prácticas", ar: "الفنون الستة عمليًا" },
   "paths.arts.desc": { zh: "礼、乐、射、御、书、数——游戏化通关。", en: "Rites, music, archery, charioteering, calligraphy, numbers — gamified.", fr: "Rites, musique, tir, char, calligraphie, chiffres — en jeu.", es: "Ritos, música, arquería, carro, caligrafía, números: en juego.", ar: "الطقوس والموسيقى والرمي والقيادة والخط والحساب — بأسلوب الألعاب." },
-  "paths.crossciv.title": { zh: "跨文明对话", en: "Cross-civilizational dialogue", fr: "Dialogue inter-civilisations", es: "Diálogo intercivilizacional", ar: "الحوار بين الحضارات" },
+  "paths.crossciv.title": { zh: "跨文明对话", en: "Cross-civilizational dialogue", fr: "Dialogue entre civilisations", es: "Diálogo intercivilizacional", ar: "الحوار بين الحضارات" },
   "paths.crossciv.desc": { zh: "同一议题，儒家与基督教、启蒙、佛教并陈。", en: "One topic, set beside Christian, Enlightenment and Buddhist stances.", fr: "Un thème, mis en regard des positions chrétienne, lumiériste et bouddhique.", es: "Un tema, junto a posiciones cristiana, ilustrada y budista.", ar: "موضوع واحد بموازاة المواقف المسيحية والتنويرية والبوذية." },
   "paths.feedEntry.title": { zh: "刷刷 · 流式经典", en: "Feed · swipe through the classics", fr: "Fil · faites défiler les classiques", es: "Feed · desliza por los clásicos", ar: "تصفّح · مرّر النصوص الكلاسيكية" },
   "paths.feedEntry.sub": { zh: "不用规划路径，直接流式刷：一条金句、一段注疏，往下滑就好。", en: "No path to plan — just scroll: one quote, one gloss, keep swiping.", fr: "Aucun parcours à planifier : défilez, une citation, une glose, continuez.", es: "Sin ruta que planificar: desplázate, una cita, una glosa, sigue.", ar: "لا مسار تخطّط له — فقط مرّر: حكمة واحدة، شرح واحد، تابع التمرير." },
