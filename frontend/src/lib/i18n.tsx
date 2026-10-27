@@ -30,13 +30,13 @@ const DICT: Dict = {
     zh: "孔子", en: "Kongzi", fr: "Kongzi", es: "Kongzi", ar: "كونغ تسي",
   },
   "nav.home":    { zh: "首页", en: "Home", fr: "Accueil", es: "Inicio", ar: "الرئيسية" },
-  "nav.feed":    { zh: "刷刷", en: "Feed", fr: "Fil", es: "Feed", ar: "تصفح" },
+  "nav.feed":    { zh: "刷刷", en: "Feed", fr: "Fil", es: "Muro", ar: "تصفح" },
   "nav.read":    { zh: "读经", en: "Read", fr: "Lecture", es: "Lectura", ar: "قراءة" },
-  "nav.graph":   { zh: "图谱", en: "Graph", fr: "Graphe", es: "Grafo", ar: "الرسم" },
+  "nav.graph":   { zh: "图谱", en: "Graph", fr: "Graphe", es: "Grafo", ar: "الرسم البياني" },
   "nav.chat":    { zh: "问答", en: "Chat", fr: "Dialogue", es: "Diálogo", ar: "حوار" },
   "nav.cases":   { zh: "案例", en: "Cases", fr: "Cas", es: "Casos", ar: "حالات" },
   "nav.journey": { zh: "君子路", en: "Path", fr: "Voie", es: "Camino", ar: "السبيل" },
-  "nav.me":      { zh: "我", en: "Me", fr: "Moi", es: "Yo", ar: "أنا" },
+  "nav.me":      { zh: "我", en: "Me", fr: "Moi", es: "Yo", ar: "حسابي" },
   "nav.developers": { zh: "开放接口", en: "Developers", fr: "API", es: "API", ar: "API" },
   "nav.cocreate": { zh: "共创", en: "Co-create", fr: "Co-créer", es: "Co-crear", ar: "إبداع مشترك" },
   "nav.plugins":  { zh: "插件", en: "Plugins", fr: "Modules", es: "Plugins", ar: "إضافات" },
@@ -52,10 +52,10 @@ const DICT: Dict = {
   },
   "home.entry.chat.desc": {
     zh: "向智能体提问，得到可溯源的经典解读。",
-    en: "Ask the agents; get traceable classical interpretations.",
-    fr: "Interrogez les agents pour une exégèse traçable des classiques.",
-    es: "Pregunta a los agentes y obtén interpretaciones clásicas trazables.",
-    ar: "اسأل الوكلاء واحصل على تفسيرات كلاسيكية يمكن تتبعها.",
+    en: "Ask Kongzi; every reading is traceable to the classics.",
+    fr: "Posez votre question à Kongzi : chaque lecture renvoie au texte classique.",
+    es: "Pregunta a Kongzi: cada interpretación remite al texto clásico.",
+    ar: "اسأل كونفوشيوس؛ كل تفسير يُحال إلى النص الكلاسيكي.",
   },
   "home.entry.read": {
     zh: "读一读", en: "Read the classics",
@@ -102,7 +102,7 @@ const DICT: Dict = {
     fr: "langues couvertes", es: "idiomas cubiertos", ar: "لغة مغطاة",
   },
   "corpus.cases": {
-    zh: "跨文明对话案例", en: "cross-civ dialog cases",
+    zh: "跨文明对话案例", en: "cross-civilizational dialogue cases",
     fr: "cas de dialogue inter-civilisations",
     es: "casos de diálogo intercivilizacional",
     ar: "حالات الحوار بين الحضارات",
@@ -401,7 +401,7 @@ const DICT: Dict = {
 
   // ── 首页补充 ─────────────────────────────────────────────────────────
   "home.corpus.cases": {
-    zh: "跨文明对话案例（条）", en: "Cross-civ dialogue cases",
+    zh: "跨文明对话案例（条）", en: "Cross-civilizational dialogue cases",
     fr: "Cas de dialogue inter-civilisations",
     es: "Casos de diálogo intercivilizacional",
     ar: "حالات الحوار بين الحضارات",
@@ -419,7 +419,7 @@ const DICT: Dict = {
   },
   "corpus.bd.pinyin": {
     zh: "拼音标注", en: "Pinyin annotations", fr: "Annotations pinyin",
-    es: "Anotaciones pinyin", ar: "ترقيم بينين",
+    es: "Anotaciones pinyin", ar: "الرومنة البينينية",
   },
   "corpus.bd.translations": {
     zh: "多语译文", en: "Multilingual translations", fr: "Traductions multilingues",
@@ -431,40 +431,40 @@ const DICT: Dict = {
     ar: "الشروح (تقليدية وحديثة)",
   },
   "corpus.bd.annoI18n": {
-    zh: "注释多语扩展", en: "Annotation i18n units", fr: "Unités i18n d'annotations",
-    es: "Unidades i18n de anotaciones", ar: "وحدات الشروح متعددة اللغات",
+    zh: "注释多语扩展", en: "Multilingual annotations", fr: "Annotations multilingues",
+    es: "Anotaciones multilingües", ar: "شروح متعددة اللغات",
   },
   "corpus.bd.concepts": {
     zh: "概念条目", en: "Concept entries", fr: "Entrées conceptuelles",
     es: "Entradas conceptuales", ar: "مدخلات المفاهيم",
   },
   "corpus.bd.conceptTerms": {
-    zh: "概念多语术语", en: "Concept term i18n", fr: "Termes i18n des concepts",
-    es: "Términos i18n de conceptos", ar: "مصطلحات المفاهيم متعددة اللغات",
+    zh: "概念多语术语", en: "Concept terms (multilingual)", fr: "Termes multilingues des concepts",
+    es: "Términos multilingües de los conceptos", ar: "مصطلحات المفاهيم بعدة لغات",
   },
   "corpus.bd.conceptDefs": {
-    zh: "概念多语定义", en: "Concept definition i18n", fr: "Définitions i18n des concepts",
-    es: "Definiciones i18n de conceptos", ar: "تعريفات المفاهيم متعددة اللغات",
+    zh: "概念多语定义", en: "Concept definitions (multilingual)", fr: "Définitions multilingues des concepts",
+    es: "Definiciones multilingües de los conceptos", ar: "تعريفات المفاهيم بعدة لغات",
   },
   "corpus.bd.topics": {
     zh: "全球议题", en: "Global topics", fr: "Thèmes mondiaux",
     es: "Temas globales", ar: "الموضوعات العالمية",
   },
   "corpus.bd.topicNames": {
-    zh: "议题多语名称", en: "Topic name i18n", fr: "Noms i18n des thèmes",
-    es: "Nombres i18n de temas", ar: "أسماء الموضوعات متعددة اللغات",
+    zh: "议题多语名称", en: "Topic names (multilingual)", fr: "Noms multilingues des thèmes",
+    es: "Nombres multilingües de los temas", ar: "أسماء الموضوعات بعدة لغات",
   },
   "corpus.bd.topicDescs": {
-    zh: "议题多语描述", en: "Topic description i18n", fr: "Descriptions i18n des thèmes",
-    es: "Descripciones i18n de temas", ar: "أوصاف الموضوعات متعددة اللغات",
+    zh: "议题多语描述", en: "Topic descriptions (multilingual)", fr: "Descriptions multilingues des thèmes",
+    es: "Descripciones multilingües de los temas", ar: "أوصاف الموضوعات بعدة لغات",
   },
   "corpus.bd.civHeadline": {
-    zh: "跨文明立场（headline）", en: "Cross-civ stances (headline)",
-    fr: "Positions inter-civilisations (titre)", es: "Posturas intercivilizacionales (titular)",
+    zh: "跨文明立场（headline）", en: "Cross-civilizational stances (summary)",
+    fr: "Positions inter-civilisations (accroche)", es: "Posturas intercivilizacionales (titular)",
     ar: "المواقف بين الحضارات (العنوان)",
   },
   "corpus.bd.civArgument": {
-    zh: "跨文明立场（论证）", en: "Cross-civ stances (argument)",
+    zh: "跨文明立场（论证）", en: "Cross-civilizational stances (argument)",
     fr: "Positions inter-civilisations (argument)", es: "Posturas intercivilizacionales (argumento)",
     ar: "المواقف بين الحضارات (الحجة)",
   },
@@ -474,32 +474,32 @@ const DICT: Dict = {
     ar: "حالات الحوار بين الحضارات",
   },
   "corpus.bd.caseCivUnits": {
-    zh: "案例文明对照单元", en: "Case civ-comparison units",
+    zh: "案例文明对照单元", en: "Civilization comparison units",
     fr: "Unités de comparaison de civilisations", es: "Unidades de comparación de civilizaciones",
     ar: "وحدات مقارنة الحضارات",
   },
   "corpus.bd.caseCivI18n": {
-    zh: "案例文明多语单元", en: "Case civ i18n units", fr: "Unités i18n de civilisations",
-    es: "Unidades i18n de civilizaciones", ar: "وحدات الحضارات متعددة اللغات",
+    zh: "案例文明多语单元", en: "Multilingual civilization notes", fr: "Notes multilingues sur les civilisations",
+    es: "Notas multilingües sobre civilizaciones", ar: "ملاحظات متعددة اللغات عن الحضارات",
   },
   "corpus.bd.caseCitations": {
-    zh: "案例经典引用单元", en: "Case citation units", fr: "Unités de citation classique",
+    zh: "案例经典引用单元", en: "Case citation units", fr: "Unités de citations classiques",
     es: "Unidades de cita clásica", ar: "وحدات الاستشهاد النصي",
   },
   "corpus.bd.caseCiteI18n": {
-    zh: "案例引用多语标签", en: "Case citation i18n labels",
-    fr: "Étiquettes i18n des citations", es: "Etiquetas i18n de citas",
-    ar: "وسوم الاستشهاد متعددة اللغات",
+    zh: "案例引用多语标签", en: "Multilingual citation labels",
+    fr: "Étiquettes multilingues des citations", es: "Etiquetas multilingües de las citas",
+    ar: "تسميات متعددة اللغات للاقتباسات",
   },
   "corpus.bd.caseTagsI18n": {
-    zh: "案例多语标签", en: "Case i18n labels", fr: "Étiquettes i18n des cas",
-    es: "Etiquetas i18n de casos", ar: "وسوم الحالات متعددة اللغات",
+    zh: "案例多语标签", en: "Multilingual case tags", fr: "Étiquettes multilingues des cas",
+    es: "Etiquetas multilingües de los casos", ar: "وسوم متعددة اللغات للحالات",
   },
   "corpus.bd.caseQuestionI18n": {
-    zh: "案例问题多语真译", en: "Case question i18n (real translations)",
-    fr: "Questions des cas en i18n (vraies traductions)",
-    es: "Preguntas de casos en i18n (traducciones reales)",
-    ar: "أسئلة الحالات مترجمة ترجمة حقيقية",
+    zh: "案例问题多语真译", en: "Case questions, human-translated",
+    fr: "Questions des cas, traduites à la main",
+    es: "Preguntas de los casos, traducidas a mano",
+    ar: "أسئلة الحالات، مترجمة بشريًا",
   },
 
   // ── 主题切换 ─────────────────────────────────────────────────────────
@@ -558,10 +558,10 @@ const DICT: Dict = {
 
   // ── 对话页 ───────────────────────────────────────────────────────────
   "chat.agent.chief": { zh: "总控", en: "Orchestrator", fr: "Orchestrateur", es: "Orquestador", ar: "المنسّق" },
-  "chat.agent.retrieval": { zh: "经典检索", en: "Retrieval", fr: "Récupération", es: "Recuperación", ar: "الاسترجاع" },
+  "chat.agent.retrieval": { zh: "经典检索", en: "Text retrieval", fr: "Recherche dans les textes", es: "Búsqueda en los textos", ar: "البحث في النصوص" },
   "chat.agent.synthesis": { zh: "合成", en: "Synthesis", fr: "Synthèse", es: "Síntesis", ar: "التركيب" },
   "chat.agent.topic": { zh: "议题引擎", en: "Topic engine", fr: "Moteur de thèmes", es: "Motor de temas", ar: "محرّك الموضوعات" },
-  "chat.agent.crossciv": { zh: "跨文明对照", en: "Cross-civ contrast", fr: "Comparaison inter-civilisations", es: "Contraste intercivilizacional", ar: "المقارنة بين الحضارات" },
+  "chat.agent.crossciv": { zh: "跨文明对照", en: "Cross-civilizational contrast", fr: "Comparaison inter-civilisations", es: "Contraste intercivilizacional", ar: "المقارنة بين الحضارات" },
   "chat.agent.translate": { zh: "翻译", en: "Translation", fr: "Traduction", es: "Traducción", ar: "الترجمة" },
   "chat.agent.crossculture": { zh: "跨文化", en: "Cross-cultural", fr: "Interculturel", es: "Intercultural", ar: "بين الثقافات" },
   "chat.agent.verify": { zh: "校验", en: "Verification", fr: "Vérification", es: "Verificación", ar: "التحقق" },
@@ -759,7 +759,7 @@ const DICT: Dict = {
     ar: "مكتبة الحالات · ٥ موضوعات × ٥ حضارات",
   },
   "cases.published": { zh: "条已发布", en: "published", fr: "publiés", es: "publicados", ar: "منشور" },
-  "cases.desc1": { zh: "真实世界的问题,先听儒家怎么说,再听斯多葛、启蒙与功利主义怎么说。每条案例都引用经典原文与多文明立场,", en: "Real-world questions, answered twice: what the Analects say, then what Stoicism, the Enlightenment and utilitarianism say. Every case cites the classical text and multi-civilizational stances —", fr: "Des questions du monde réel, répondues deux fois : ce que disent les Entretiens, puis le stoïcisme, les Lumières et l'utilitarisme. Chaque cas cite le texte classique et des positions multi-civilisationnelles —", es: "Preguntas del mundo real, respondidas dos veces: lo que dicen las Analectas y lo que dicen el estoicismo, la Ilustración y el utilitarismo. Cada caso cita el texto clásico y posturas multiculturales —", ar: "أسئلة من العالم الحقيقي تُجاب مرتين: ما تقوله «المنتخبات» ثم ما يقوله الرواقية والتنوير والنفعية. كل حالة تستشهد بالنص الكلاسيكي وبمواقف حضارات متعددة —" },
+  "cases.desc1": { zh: "真实世界的问题,先听儒家怎么说,再听斯多葛、启蒙与功利主义怎么说。每条案例都引用经典原文与多文明立场,", en: "Real-world questions, answered twice: what the Analects say, then what Stoicism, the Enlightenment and utilitarianism say. Every case cites the classical text and multi-civilizational stances —", fr: "Des questions du monde réel, traitées deux fois : ce que disent les Entretiens, puis ce que disent le stoïcisme, les Lumières et l’utilitarisme. Chaque cas cite le texte classique et des positions de plusieurs civilisations —", es: "Preguntas del mundo real, respondidas dos veces: lo que dicen las Analectas y lo que dicen el estoicismo, la Ilustración y el utilitarismo. Cada caso cita el texto clásico y posturas de varias civilizaciones —", ar: "أسئلة من العالم الحقيقي تُجاب مرتين: ما تقوله «المنتخبات» ثم ما يقوله الرواقية والتنوير والنفعية. كل حالة تستشهد بالنص الكلاسيكي وبمواقف حضارات متعددة —" },
   "cases.desc2": { zh: "可直接用于课堂讨论、论文写作与跨文化对话。", en: "ready for seminar debates, essays and cross-cultural dialogue.", fr: "prêtes pour les débats, les dissertations et le dialogue interculturel.", es: "listas para debates, ensayos y diálogo intercultural.", ar: "جاهزة للنقاش الصفّي والكتابة الأكاديمية والحوار بين الثقافات." },
   "cases.topic": { zh: "议题：", en: "Topics: ", fr: "Thèmes : ", es: "Temas: ", ar: "الموضوعات: " },
   "cases.all": { zh: "全部", en: "All", fr: "Tous", es: "Todos", ar: "الكل" },
@@ -1080,13 +1080,13 @@ const DICT: Dict = {
   "jrn.grade.none": { zh: "未起", en: "Not started", fr: "Non commencé", es: "Sin empezar", ar: "لم يبدأ" },
 
   // ── 新增交互（首页金句卡 / 读经页 / 对话页）─────────────────────
-  "home.quote.daily": { zh: "每日一典", en: "Daily", fr: "Quotidien", es: "Diario", ar: "اليومي" },
+  "home.quote.daily": { zh: "每日一典", en: "Daily", fr: "Du jour", es: "Diario", ar: "اليومي" },
   "home.quote.random": { zh: "随机一句", en: "Random", fr: "Aléatoire", es: "Aleatorio", ar: "عشوائي" },
   "home.quote.copy": { zh: "复制", en: "Copy", fr: "Copier", es: "Copiar", ar: "نسخ" },
   "home.quote.copied": { zh: "已复制", en: "Copied", fr: "Copié", es: "Copiado", ar: "تم النسخ" },
   "home.quote.copyFail": { zh: "复制失败", en: "Copy failed", fr: "Échec de copie", es: "Error al copiar", ar: "فشل النسخ" },
   "home.quote.listen": { zh: "朗读", en: "Listen", fr: "Écouter", es: "Escuchar", ar: "استمع" },
-  "home.quote.share": { zh: "分享卡", en: "Share card", fr: "Carte", es: "Tarjeta", ar: "بطاقة" },
+  "home.quote.share": { zh: "分享卡", en: "Share card", fr: "Carte de partage", es: "Tarjeta", ar: "بطاقة" },
   "home.quote.shared": { zh: "分享卡已生成,请在下载中查看", en: "Share card generated — check your downloads", fr: "Carte générée — voir vos téléchargements", es: "Tarjeta generada — mira tus descargas", ar: "تم إنشاء البطاقة — راجع التنزيلات" },
   "home.quote.shareFail": { zh: "分享卡生成失败", en: "Failed to generate card", fr: "Échec de génération", es: "Error al generar", ar: "فشل إنشاء البطاقة" },
   "home.quote.cite": { zh: "引用", en: "Cite", fr: "Citer", es: "Citar", ar: "استشهاد" },
