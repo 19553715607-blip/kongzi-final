@@ -280,6 +280,7 @@ export default function Brush3DGame() {
       {(phase === "writing" || phase === "submitting" || phase === "scored") && current && (
         <section className="relative select-none overflow-hidden rounded-2xl border border-line" style={{ height: "min(66vh, 580px)", minHeight: 360 }}>
           <Canvas
+          shadows
             key={`${current.id}-${runId}`}
             dpr={[1, 2]}
             camera={{ position: [0, 4.35, 4.9], fov: 50, near: 0.1, far: 300 }}

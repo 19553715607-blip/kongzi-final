@@ -14,6 +14,7 @@
 import { useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
 import { useMemo, useRef, type MutableRefObject } from "react";
 import * as THREE from "three";
+import { InkWorld, InkMat, AutoCastShadow } from "@/components/three/inkwash";
 import { CANVAS_SIZE, type BrushEngineState } from "./brushEngine";
 
 // ── 共享可变状态 ──
@@ -41,8 +42,6 @@ export function createBrushRefs(): BrushRefs {
 }
 
 // ── 场景常量（同一宣纸色调） ──
-const SKY = "#f1ead7";
-const FOG = "#ece4cd";
 const GOLD = "#d9a521";
 const WOOD = "#6b4a2e";
 const WOOD_DARK = "#4a3520";
@@ -68,15 +67,23 @@ export function BrushScene({ g }: { g: BrushRefs }) {
 
   return (
     <>
-      <color attach="background" args={[SKY]} />
-      <fog attach="fog" args={[FOG, 30, 110]} />
-      <hemisphereLight args={["#f8f4e6", "#aebd90", 0.9]} />
-      <directionalLight position={[30, 40, 20]} intensity={0.65} color="#fff1d4" />
-
-      <Ground />
-      <Fields />
-      <Mountains />
-      <Clouds />
+      <InkWorld
+        fogRange={[30, 110]}
+        groundSize={[110, 90]}
+        groundPosition={[0, 0, -2]}
+        mountains={[
+          { z: -58, hBase: 12, f1: 0.9, f2: 0.31, phase: 1.2, color: "#93a495", opacity: 0.5, span: 220 },
+          { z: -46, hBase: 8.5, f1: 1.1, f2: 0.4, phase: 4.1, color: "#849a8c", opacity: 0.6, span: 220 },
+          { z: -34, hBase: 5.5, f1: 0.8, f2: 0.35, phase: 2.2, color: "#8b9c8d", opacity: 0.45, span: 220 },
+        ]}
+        clouds={[
+          { x: -22, y: 16, z: -42, s: 3.6 }, { x: 16, y: 19, z: -52, s: 4.4 }, { x: 2, y: 15, z: -36, s: 2.8 },
+        ]}
+        sun={{ focus: [0, 0.9, -1.5], size: 16, offset: [10, 14, 6], mapSize: 1024 }}
+      >
+        <AutoCastShadow />
+        <Fields />
+      </InkWorld>
       <BambooScreen />
       <Desk />
       <InkStone />
@@ -89,16 +96,7 @@ export function BrushScene({ g }: { g: BrushRefs }) {
   );
 }
 
-// ── 环境（同款） ──
-function Ground() {
-  return (
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, -2]}>
-      <planeGeometry args={[110, 90]} />
-      <meshStandardMaterial color="#b3c091" />
-    </mesh>
-  );
-}
-
+/** 田野色块 */
 function Fields() {
   const strips = useMemo(() => {
     const arr: { x: number; z: number; w: number; d: number; c: string }[] = [];
@@ -114,80 +112,10 @@ function Fields() {
       {strips.map((s, i) => (
         <mesh key={i} rotation={[-Math.PI / 2, 0, 0]} position={[s.x, 0.02, s.z]}>
           <planeGeometry args={[s.w, s.d]} />
-          <meshStandardMaterial color={s.c} />
+          <InkMat color={s.c} />
         </mesh>
       ))}
     </>
-  );
-}
-
-function Mountains() {
-  const ridges = useMemo(() => {
-    const mk = (z: number, hBase: number, f1: number, f2: number, phase: number) => {
-      const pts: number[] = [];
-      const n = 30;
-      for (let i = 0; i <= n; i++) {
-        const x = -110 + (220 * i) / n;
-        const h = hBase + Math.sin(i * f1 + phase) * hBase * 0.45 + Math.sin(i * f2) * hBase * 0.2;
-        pts.push(x, 0, z, x, h, z);
-      }
-      const idx: number[] = [];
-      for (let i = 0; i < n; i++) {
-        const a = i * 2;
-        idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2);
-      }
-      const geo = new THREE.BufferGeometry();
-      geo.setAttribute("position", new THREE.Float32BufferAttribute(pts, 3));
-      geo.setIndex(idx);
-      return geo;
-    };
-    return [
-      { geo: mk(-58, 12, 0.9, 0.31, 1.2), color: "#93a495", opacity: 0.5 },
-      { geo: mk(-46, 8.5, 1.1, 0.4, 4.1), color: "#849a8c", opacity: 0.6 },
-      { geo: mk(-34, 5.5, 0.8, 0.35, 2.2), color: "#8b9c8d", opacity: 0.45 },
-    ];
-  }, []);
-  return (
-    <>
-      {ridges.map((r, i) => (
-        <mesh key={i} geometry={r.geo}>
-          <meshBasicMaterial color={r.color} transparent opacity={r.opacity} side={THREE.DoubleSide} />
-        </mesh>
-      ))}
-    </>
-  );
-}
-
-function Clouds() {
-  const ref = useRef<THREE.Group>(null);
-  useFrame((state) => {
-    if (ref.current) ref.current.position.x = Math.sin(state.clock.elapsedTime * 0.03) * 5;
-  });
-  const clouds = useMemo(
-    () => [
-      { x: -22, y: 16, z: -42, s: 3.6 }, { x: 16, y: 19, z: -52, s: 4.4 }, { x: 2, y: 15, z: -36, s: 2.8 },
-    ],
-    [],
-  );
-  return (
-    <group ref={ref}>
-      {clouds.map((c, i) => (
-        <group key={i} position={[c.x, c.y, c.z]} scale={c.s}>
-          <mesh>
-            <sphereGeometry args={[1, 12, 10]} />
-            <meshBasicMaterial color="#fbf8ee" transparent opacity={0.85} />
-          </mesh>
-          <mesh position={[0.9, -0.15, 0]} scale={0.7}>
-            <sphereGeometry args={[1, 12, 10]} />
-            <meshBasicMaterial color="#fbf8ee" transparent opacity={0.8} />
-          </mesh>
-          <mesh position={[-0.9, -0.2, 0]} scale={0.65}>
-            <sphereGeometry args={[1, 12, 10]} />
-            <meshBasicMaterial color="#fbf8ee" transparent opacity={0.75} />
-          </mesh>
-        </group>
-      ))}
-    </group>
   );
 }
 
@@ -205,14 +133,14 @@ function BambooScreen() {
       {slats.map((s, i) => (
         <mesh key={i} position={[s.x, 3.1, 0]}>
           <boxGeometry args={[0.4, 6.2, 0.06]} />
-          <meshStandardMaterial color={s.c} />
+          <InkMat color={s.c} />
         </mesh>
       ))}
       {/* 帘上横梁 */}
       {[5.4, 3.4].map((y) => (
         <mesh key={y} position={[0, y, 0.06]}>
           <boxGeometry args={[17.4, 0.09, 0.04]} />
-          <meshStandardMaterial color={WOOD_DARK} />
+          <InkMat color={WOOD_DARK} />
         </mesh>
       ))}
     </group>
@@ -225,17 +153,17 @@ function Desk() {
     <group position={[0, 0, -1.2]}>
       <mesh position={[0, DESK_Y - 0.16, 0]}>
         <boxGeometry args={[7.6, 0.32, 4.8]} />
-        <meshStandardMaterial color={WOOD} />
+        <InkMat color={WOOD} />
       </mesh>
       {/* 案沿 */}
       <mesh position={[0, DESK_Y + 0.005, 0]}>
         <boxGeometry args={[7.7, 0.03, 4.9]} />
-        <meshStandardMaterial color={WOOD_DARK} />
+        <InkMat color={WOOD_DARK} />
       </mesh>
       {[[-3.4, -2.0], [3.4, -2.0], [-3.4, 2.0], [3.4, 2.0]].map(([x, z], i) => (
         <mesh key={i} position={[x, DESK_Y / 2 - 0.16, z]}>
           <boxGeometry args={[0.3, DESK_Y - 0.3, 0.3]} />
-          <meshStandardMaterial color={WOOD_DARK} />
+          <InkMat color={WOOD_DARK} />
         </mesh>
       ))}
     </group>
@@ -266,12 +194,12 @@ function BrushRest() {
       {[-0.28, 0, 0.28].map((x, i) => (
         <mesh key={i} position={[x, 0.16, 0]}>
           <coneGeometry args={[0.16, 0.32 + (i === 1 ? 0.1 : 0), 8]} />
-          <meshStandardMaterial color="#7a8a96" />
+          <InkMat color="#7a8a96" />
         </mesh>
       ))}
       <mesh position={[0, 0.03, 0]}>
         <boxGeometry args={[0.9, 0.06, 0.3]} />
-        <meshStandardMaterial color="#5a6a76" />
+        <InkMat color="#5a6a76" />
       </mesh>
     </group>
   );
@@ -311,7 +239,7 @@ function Candle() {
     <group position={[3.2, DESK_Y + 0.02, -2.6]}>
       <mesh position={[0, 0.5, 0]}>
         <cylinderGeometry args={[0.035, 0.05, 1.0, 8]} />
-        <meshStandardMaterial color={WOOD_DARK} />
+        <InkMat color={WOOD_DARK} />
       </mesh>
       <mesh position={[0, 1.02, 0]}>
         <cylinderGeometry args={[0.22, 0.14, 0.1, 12]} />
@@ -453,22 +381,22 @@ function Brush({ g }: { g: BrushRefs }) {
       {/* 竹杆 */}
       <mesh position={[0, 0.62, 0]}>
         <cylinderGeometry args={[0.045, 0.05, 1.25, 10]} />
-        <meshStandardMaterial color="#b08d57" />
+        <InkMat color="#b08d57" />
       </mesh>
       {/* 杆顶挂绳 */}
       <mesh position={[0, 1.28, 0]}>
         <cylinderGeometry args={[0.015, 0.015, 0.1, 6]} />
-        <meshStandardMaterial color={WOOD_DARK} />
+        <InkMat color={WOOD_DARK} />
       </mesh>
       {/* 笔斗 */}
       <mesh position={[0, -0.03, 0]}>
         <cylinderGeometry args={[0.06, 0.055, 0.12, 10]} />
-        <meshStandardMaterial color="#e8dcc0" />
+        <InkMat color="#e8dcc0" />
       </mesh>
       {/* 笔头（锥形墨尖，按压压扁） */}
       <mesh ref={tip} position={[0, -0.2, 0]}>
         <coneGeometry args={[0.062, 0.26, 10]} />
-        <meshStandardMaterial color="#2a2118" />
+        <InkMat color="#2a2118" />
       </mesh>
       <mesh position={[0, -0.31, 0]}>
         <sphereGeometry args={[0.03, 8, 6]} />

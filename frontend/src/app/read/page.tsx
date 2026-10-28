@@ -264,12 +264,12 @@ function ReadContent() {
   return (
     <div className="grid gap-4 md:grid-cols-[220px_1fr]">
       {/* 左栏 */}
-      <aside className="space-y-3">
+      <aside className="min-w-0 space-y-3">
         <div className="flex gap-2">
           <select
             value={bookId}
             onChange={(e) => setBookId(e.target.value)}
-            className="flex-1 rounded-lg border border-line bg-surface px-2 py-1.5 text-sm text-fg"
+            className="min-w-0 flex-1 rounded-lg border border-line bg-surface px-2 py-1.5 text-sm text-fg"
           >
             {books.map((b) => (
               <option key={b.id} value={b.id}>{b.title ?? b.title_zh}</option>
@@ -278,7 +278,7 @@ function ReadContent() {
           <select
             value={chapterId}
             onChange={(e) => setChapterId(e.target.value)}
-            className="flex-1 rounded-lg border border-line bg-surface px-2 py-1.5 text-sm text-fg"
+            className="min-w-0 flex-1 rounded-lg border border-line bg-surface px-2 py-1.5 text-sm text-fg"
           >
             {chapters.map((c) => (
               <option key={c.id} value={c.id}>{c.title ?? c.title_zh}</option>
@@ -303,7 +303,7 @@ function ReadContent() {
       </aside>
 
       {/* 右栏 */}
-      <section className="relative space-y-4">
+      <section className="relative min-w-0 space-y-4">
         <ChineseBackdrop variant="mountains" />
         {/* 章节胶片条：章节卡横滑（下拉为辅） */}
         {chapters.length > 0 && (

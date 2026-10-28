@@ -43,9 +43,10 @@ export default function NightHero({
 
   return (
     <section ref={heroRef} className="nz-hero -mt-14 min-h-svh" aria-label={t("brand.title", lang)}>
-      {/* 双时辰底图：暗=破晓夜雾，明=天亮晨光；由 .dark 切换显示（见 globals.css） */}
+      {/* 双时辰底图：暗=破晓夜雾，明=天亮晨光；由 .dark 切换显示（见 globals.css）。
+          v 参数随图迭代递增，击穿浏览器与优化器对同名 URL 的陈旧缓存。 */}
       <Image
-        src="/home/hero-dawn.webp"
+        src="/home/hero-dawn.webp?v=6"
         alt=""
         fill
         priority
@@ -53,7 +54,7 @@ export default function NightHero({
         className="nz-img nz-img-dark"
       />
       <Image
-        src="/home/hero-morning.webp"
+        src="/home/hero-morning.webp?v=6"
         alt=""
         fill
         sizes="100vw"

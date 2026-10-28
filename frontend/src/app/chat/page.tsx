@@ -72,6 +72,14 @@ export default function ChatPage() {
       : "conv-" + Math.random().toString(36).slice(2) + Date.now().toString(36),
   );
   const scrollRef = useRef<HTMLDivElement>(null);
+  const taRef = useRef<HTMLTextAreaElement>(null);
+  /** 输入框随内容增高，最高 10rem（约 6 行）后内部滚动 */
+  const autoGrow = () => {
+    const el = taRef.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${Math.min(el.scrollHeight, 160)}px`;
+  };
   const abortRef = useRef<AbortController | null>(null);
 
   // 议题清单随语言切换；用取消标志避免 zh→ar 首次加载时旧请求后到覆盖新结果
@@ -107,6 +115,10 @@ export default function ChatPage() {
     setBusy(true);
     setFollowups([]);
     setInput("");
+    // 复位输入框高度，否则发送后仍留着上一条的高度
+    requestAnimationFrame(() => {
+      if (taRef.current) taRef.current.style.height = "auto";
+    });
     setMessages((m) => [
       ...m,
       { role: "user", text: q },
@@ -197,146 +209,178 @@ export default function ChatPage() {
   };
 
   return (
-    <div className="flex h-[calc(100dvh-11rem)] flex-col md:h-[calc(100dvh-7.5rem)]">
-      {/* AI 人格名片 */}
-      <Reveal className="mb-3 flex items-center gap-3 rounded-xl border border-line bg-surface px-4 py-2.5">
-        {/* 子曰君形象：青铜孔子浮雕，与站点晨光金视觉一致 */}
-        {/* eslint-disable-next-line @next/next/no-img-element -- 静态小图，直接 img 即可 */}
-        <img
-          src="/avatars/ziyue.webp"
-          alt={t("chat.personaName", lang)}
-          width={36}
-          height={36}
-          className="h-9 w-9 shrink-0 rounded-full object-cover"
-        />
-        <div className="flex-1">
-          <div className="flex items-center gap-1.5 text-sm font-medium text-fg">
-            {t("chat.personaName", lang)} <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
+    <div className="flex h-[calc(100dvh-11rem-var(--notice-h,0px))] flex-col md:h-[calc(100dvh-7.5rem-var(--notice-h,0px))]">
+      {/* 会话头：人格 + 议题筛选。横向居中，与对话列同宽 */}
+      <header className="mx-auto flex w-full max-w-3xl shrink-0 flex-col gap-2.5 border-b border-line/60 pb-3">
+        <div className="flex items-center gap-3">
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-1.5 text-sm font-medium text-fg">
+              <span className="truncate">{t("chat.personaName", lang)}</span>
+              <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-green-500" />
+            </div>
+            <div className="truncate text-xs text-faint">{t("chat.tagline", lang)}</div>
           </div>
-          <div className="text-xs text-faint">{t("chat.tagline", lang)}</div>
-        </div>
-        <span className="hidden rounded-full bg-surface-2 px-2 py-0.5 text-[10px] text-faint sm:inline">
-          {lang.toUpperCase()}
-        </span>
-        {messages.length > 0 && (
-          <button
-            onClick={clearAll}
-            className="flex items-center gap-1 rounded-full border border-line px-2.5 py-1 text-[11px] text-muted transition hover:bg-surface-2 hover:text-accent"
-            title={t("chat.clear", lang)}
-          >
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6" />
-            </svg>
-            {t("chat.clear", lang)}
-          </button>
-        )}
-      </Reveal>
-
-      {/* 议题 chip 选择器（申报书 5 大全球议题） */}
-      {topics.length > 0 && (
-        <Reveal delay={60} className="mb-2 flex items-center gap-1.5 overflow-x-auto pb-1">
-          <span className="shrink-0 text-xs text-faint">{t("chat.topicPrefix", lang)}</span>
-          <button
-            onClick={() => setTopicHint(null)}
-            className={`shrink-0 rounded-full px-2.5 py-1 text-xs ${topicHint === null
-              ? "bg-accent text-on-accent"
-              : "border border-line text-muted"
-              }`}
-          >
-            {t("chat.auto", lang)}
-          </button>
-          {topics.map((t) => (
+          <span className="hidden rounded-full bg-surface-2 px-2 py-0.5 text-[10px] text-faint sm:inline">
+            {lang.toUpperCase()}
+          </span>
+          {messages.length > 0 && (
             <button
-              key={t.id}
-              onClick={() => setTopicHint(t.id)}
-              className={`shrink-0 rounded-full px-2.5 py-1 text-xs ${topicHint === t.id ? "text-white" : "border border-line text-muted"
-                }`}
-              style={topicHint === t.id ? { background: t.color } : undefined}
+              onClick={clearAll}
+              className="flex shrink-0 items-center gap-1 rounded-full border border-line px-2.5 py-1 text-[11px] text-muted transition hover:bg-surface-2 hover:text-accent"
+              title={t("chat.clear", lang)}
             >
-              {t.name}
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6" />
+              </svg>
+              {t("chat.clear", lang)}
             </button>
-          ))}
-        </Reveal>
-      )}
+          )}
+        </div>
 
-      {/* 消息流 */}
-      <div ref={scrollRef} className="flex-1 space-y-3 overflow-y-auto pe-1">
-        {messages.length === 0 && (
-          <div className="empty-state">
-            <span className="icon-plate">曰</span>
-            <span className="state-title">{t("state.empty.title", lang)}</span>
-            <span className="state-sub">{t("chat.tryTopics", lang)}</span>
+        {/* 议题 chip 选择器（申报书 5 大全球议题） */}
+        {topics.length > 0 && (
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5">
+            <span className="shrink-0 text-[11px] text-faint">{t("chat.topicPrefix", lang)}</span>
+            <button
+              onClick={() => setTopicHint(null)}
+              className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] ${
+                topicHint === null ? "bg-accent text-on-accent" : "border border-line text-muted"
+              }`}
+            >
+              {t("chat.auto", lang)}
+            </button>
+            {topics.map((tp) => (
+              <button
+                key={tp.id}
+                onClick={() => setTopicHint(tp.id)}
+                className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] ${
+                  topicHint === tp.id ? "text-white" : "border border-line text-muted"
+                }`}
+                style={topicHint === tp.id ? { background: tp.color } : undefined}
+              >
+                {tp.name}
+              </button>
+            ))}
           </div>
         )}
-        {messages.map((m, i) =>
-          m.role === "user" ? (
-            <Reveal key={i} delay={i * 60}>
-              <div className="flex justify-end">
-                <div className="max-w-[80%] rounded-2xl rounded-ee-sm bg-cinnabar px-4 py-2 text-sm leading-relaxed text-cinnabar-soft">
+      </header>
+
+      {/* 消息流：整列居中，宽度对齐阅读舒适区 */}
+      <div ref={scrollRef} className="flex-1 overflow-y-auto">
+        <div
+          className={`mx-auto w-full max-w-3xl py-5 ${
+            messages.length === 0 ? "flex min-h-full flex-col justify-center" : "space-y-7"
+          }`}
+        >
+          {messages.length === 0 && (
+            <div className="flex flex-col items-center gap-3 px-4 py-14 text-center">
+              <div className="font-serif text-xl text-fg">{t("chat.personaName", lang)}</div>
+              <p className="max-w-md text-sm leading-relaxed text-muted">{t("chat.tryTopics", lang)}</p>
+              {topics.length > 0 && (
+                <div className="mt-2 flex flex-wrap justify-center gap-2">
+                  {topics.slice(0, 3).map((tp) => (
+                    <button
+                      key={tp.id}
+                      onClick={() => {
+                        setTopicHint(tp.id);
+                        taRef.current?.focus();
+                      }}
+                      className="rounded-full border border-line bg-surface px-3 py-1.5 text-xs text-muted transition hover:border-accent hover:text-accent"
+                    >
+                      {tp.name}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {messages.map((m, i) =>
+            m.role === "user" ? (
+              <div key={i} className="flex justify-end">
+                <div className="max-w-[85%] whitespace-pre-wrap rounded-3xl rounded-ee-lg bg-surface-2 px-4 py-2.5 text-[15px] leading-relaxed text-fg">
                   {m.text}
                 </div>
               </div>
-            </Reveal>
-          ) : (
-            <Reveal key={i} delay={i * 60}>
-              <AssistantBubble msg={m} onCopy={doCopy} />
-            </Reveal>
-          ),
-        )}
+            ) : (
+              <AssistantBubble key={i} msg={m} onCopy={doCopy} />
+            ),
+          )}
+        </div>
       </div>
 
-      {/* 追问 chips */}
-      {followups.length > 0 && (
-        <Reveal delay={100} className="flex flex-wrap gap-2 py-2">
-          {followups.map((f) => (
-            <button
-              key={f}
-              onClick={() => send(f)}
-              className="rounded-full border border-line bg-surface-2 px-3 py-1.5 text-xs text-muted hover:bg-accent-soft hover:text-accent"
-            >
-              {f}
-            </button>
-          ))}
-        </Reveal>
-      )}
-
-      {/* 输入框 */}
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          void send(input);
-        }}
-        className="mt-2 flex items-center gap-2"
-      >
-        <input
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder={t("chat.placeholder", lang)}
-          disabled={busy}
-          className="flex-1 rounded-full border border-line bg-surface px-4 py-2.5 text-sm text-fg outline-none focus:border-accent disabled:opacity-50"
-        />
-        {busy ? (
-          <button
-            type="button"
-            onClick={stop}
-            className="flex h-10 w-16 items-center justify-center gap-1 rounded-full bg-surface-2 text-sm text-accent"
-            title={t("chat.stop", lang)}
-          >
-            <span className="h-3 w-3 rounded-[3px] bg-accent" />
-            {t("chat.stop", lang)}
-          </button>
-        ) : (
-          <TactileButton
-            type="submit"
-            variant="cel"
-            disabled={!input.trim()}
-            className="h-10 w-10 !rounded-full !p-0"
-            aria-label={t("chat.send", lang)}
-          >
-            ↑
-          </TactileButton>
+      {/* 输入区：圆角容器 + 自适应高度 textarea，Enter 发送 / Shift+Enter 换行 */}
+      <div className="mx-auto w-full max-w-3xl shrink-0 pt-2">
+        {followups.length > 0 && (
+          <div className="mb-2 flex flex-wrap gap-2">
+            {followups.map((f) => (
+              <button
+                key={f}
+                onClick={() => send(f)}
+                className="rounded-full border border-line bg-surface px-3 py-1.5 text-xs text-muted transition hover:border-accent hover:text-accent"
+              >
+                {f}
+              </button>
+            ))}
+          </div>
         )}
-      </form>
+
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            void send(input);
+          }}
+          className="rounded-2xl border border-line bg-surface shadow-[0_1px_2px_rgba(0,0,0,0.04)] transition focus-within:border-accent/70"
+        >
+          <textarea
+            ref={taRef}
+            rows={1}
+            value={input}
+            onChange={(e) => {
+              setInput(e.target.value);
+              autoGrow();
+            }}
+            onKeyDown={(e) => {
+              // 中文/日文输入法组合期间的回车不能当发送
+              if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) {
+                e.preventDefault();
+                void send(input);
+              }
+            }}
+            placeholder={t("chat.placeholder", lang)}
+            disabled={busy}
+            className="max-h-40 w-full resize-none bg-transparent px-4 pb-1 pt-3.5 text-[15px] leading-relaxed text-fg outline-none placeholder:text-faint disabled:opacity-60"
+          />
+          <div className="flex items-center gap-2 px-2 pb-2">
+            <span className="ps-2 text-[10px] text-faint">{t("chat.inputHint", lang)}</span>
+            <div className="ms-auto flex items-center gap-1.5">
+              {busy ? (
+                <button
+                  type="button"
+                  onClick={stop}
+                  className="flex h-8 items-center gap-1.5 rounded-full border border-line px-3 text-xs text-muted transition hover:border-accent hover:text-accent"
+                  title={t("chat.stop", lang)}
+                >
+                  <span className="h-2.5 w-2.5 rounded-[2px] bg-current" />
+                  {t("chat.stop", lang)}
+                </button>
+              ) : (
+                <button
+                  type="submit"
+                  disabled={!input.trim()}
+                  aria-label={t("chat.send", lang)}
+                  title={t("chat.send", lang)}
+                  className="flex h-8 w-8 items-center justify-center rounded-full bg-accent text-on-accent transition hover:opacity-90 disabled:opacity-30"
+                >
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 19V5M5 12l7-7 7 7" />
+                  </svg>
+                </button>
+              )}
+            </div>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }
@@ -366,7 +410,8 @@ function AssistantBubble({ msg, onCopy }: { msg: AssistantMsg; onCopy: (m: Assis
   const visibleText = msg.text.slice(0, visibleLength);
   const typing = msg.streaming || visibleLength < msg.text.length;
   return (
-    <div className="group space-y-2">
+    <div className="group">
+      <div className="min-w-0 space-y-2.5">
       {msg.agents.length > 0 && (
         <div className="flex flex-wrap items-center gap-1.5 ps-1">
           {msg.agents.map((a) => {
@@ -385,7 +430,7 @@ function AssistantBubble({ msg, onCopy }: { msg: AssistantMsg; onCopy: (m: Assis
       {/* 议题识别横幅 */}
       {msg.topic && (
         <div
-          className="max-w-[88%] rounded-lg px-3 py-2 text-xs"
+          className="rounded-lg px-3 py-2 text-xs"
           style={{
             background: `${msg.topic.color}1A`,
             borderInlineStart: `3px solid ${msg.topic.color}`,
@@ -399,21 +444,29 @@ function AssistantBubble({ msg, onCopy }: { msg: AssistantMsg; onCopy: (m: Assis
         </div>
       )}
 
-      {msg.citations.map((c) => (
-        <div
-          key={c.ref_id}
-          className="max-w-[88%] rounded-e-lg border-s-[3px] border-accent bg-accent-soft px-3 py-2"
-        >
-          <div className="font-serif text-[15px] font-medium tracking-wide text-accent-ink">
-            {c.text}
+      {/* 引证：合并成一个紧凑区块，避免五张卡把正文挤到屏幕外 */}
+      {msg.citations.length > 0 && (
+        <div className="overflow-hidden rounded-xl border border-line bg-surface-2/40">
+          <div className="flex items-center gap-1.5 border-b border-line/60 px-3 py-1.5 text-[10px] tracking-wide text-faint">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M4 19.5A2.5 2.5 0 016.5 17H20M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" />
+            </svg>
+            {t("chat.citeLabel", lang)} · {msg.citations.length}
           </div>
-          <div className="mt-1 text-[10px] text-accent">{c.ref_label}</div>
+          <ol className="divide-y divide-line/50">
+            {msg.citations.map((c) => (
+              <li key={c.ref_id} className="px-3 py-2">
+                <div className="font-serif text-[13.5px] leading-relaxed text-fg">{c.text}</div>
+                <div className="mt-0.5 text-[10px] text-accent">{c.ref_label}</div>
+              </li>
+            ))}
+          </ol>
         </div>
-      ))}
+      )}
 
       {(msg.text || msg.streaming) && (
-        <div className="flex items-start gap-2">
-          <div className="max-w-[88%] rounded-2xl rounded-es-sm bg-surface-2 px-4 py-2.5 text-sm leading-relaxed text-fg">
+        <div>
+          <div className="text-[15px] leading-[1.8] text-fg">
             {renderAssistantMarkdown(visibleText)}
             {typing && (
               <span
@@ -421,21 +474,31 @@ function AssistantBubble({ msg, onCopy }: { msg: AssistantMsg; onCopy: (m: Assis
                 aria-hidden="true"
               />
             )}
+            {/* 首个 token 到达前的空窗：给一个呼吸点，避免看起来卡住 */}
+            {!msg.text && msg.streaming && (
+              <span className="inline-flex items-center gap-1 align-middle">
+                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-faint [animation-delay:-0.3s]" />
+                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-faint [animation-delay:-0.15s]" />
+                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-faint" />
+              </span>
+            )}
           </div>
           {!msg.streaming && msg.text && (
-            <button
-              onClick={() => onCopy(msg)}
-              title={t("chat.copy", lang)}
-              className="mt-1 shrink-0 rounded-full border border-line px-2 py-1 text-[10px] text-faint opacity-0 transition hover:bg-surface-2 hover:text-accent group-hover:opacity-100"
-            >
-              {t("chat.copy", lang)}
-            </button>
+            <div className="mt-1.5 flex items-center gap-1">
+              <button
+                onClick={() => onCopy(msg)}
+                title={t("chat.copy", lang)}
+                className="rounded-md px-1.5 py-1 text-[11px] text-faint opacity-0 transition hover:bg-surface-2 hover:text-accent group-hover:opacity-100 focus:opacity-100"
+              >
+                {t("chat.copy", lang)}
+              </button>
+            </div>
           )}
         </div>
       )}
 
       {msg.verify && (
-        <div className="flex flex-wrap gap-1.5 ps-1">
+        <div className="flex flex-wrap gap-1.5">
           {VERIFY_KEYS.map(([k, key]) => {
             const v = msg.verify![k];
             const good = v >= 0.8;
@@ -454,7 +517,7 @@ function AssistantBubble({ msg, onCopy }: { msg: AssistantMsg; onCopy: (m: Assis
 
       {/* 跨文明对照（并列卡片网格） */}
       {msg.crossCiv && msg.crossCiv.length > 0 && (
-        <div className="ps-1">
+        <div>
           <div className="mb-2 mt-1 text-xs text-faint">
             {t("chat.crossBanner", lang).replace("{n}", String(msg.crossCiv.length))}
           </div>
@@ -465,6 +528,7 @@ function AssistantBubble({ msg, onCopy }: { msg: AssistantMsg; onCopy: (m: Assis
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

@@ -137,36 +137,36 @@ export default function ShuJourneyPage() {
         </Link>
         <Link
           href="/journey/shu/write"
-          className="card-hover group rounded-2xl border-2 border-rose-400 bg-rose-50 p-5"
+          className="card-hover group rounded-2xl border-2 border-rose-400 bg-rose-500/10 p-5 dark:border-rose-500/60"
         >
           <div className="flex items-start justify-between">
             <div>
-              <div className="text-xs tracking-widest text-rose-600">{gt("游戏 · 2", lang)}</div>
-              <div className="mt-1 font-serif text-xl text-rose-900">{gt("描红写字 →", lang)}</div>
+              <div className="text-xs tracking-widest text-rose-600 dark:text-rose-400">{gt("游戏 · 2", lang)}</div>
+              <div className="mt-1 font-serif text-xl text-rose-900 dark:text-rose-200">{gt("描红写字 →", lang)}</div>
               <p className="mt-2 text-xs text-muted">
                 {gt("在灰色字上摹写。Canvas + 米字格。", lang)}
                 <br/>
                 {gt("体验「书」的动作，写过 +书艺 2。", lang)}
               </p>
             </div>
-            <div className="font-serif text-5xl text-rose-900 opacity-50 group-hover:opacity-90">书</div>
+            <div className="font-serif text-5xl text-rose-900 opacity-50 group-hover:opacity-90 dark:text-rose-200">书</div>
           </div>
         </Link>
         <Link
           href="/journey/shu/brush3d"
-          className="card-hover group rounded-2xl border-2 border-amber-600 bg-amber-50 p-5"
+          className="card-hover group rounded-2xl border-2 border-amber-600 bg-amber-500/10 p-5 dark:border-amber-500/60"
         >
           <div className="flex items-start justify-between">
             <div>
-              <div className="text-xs tracking-widest text-amber-700">{gt("游戏 · 3", lang)}</div>
-              <div className="mt-1 font-serif text-xl text-amber-900">{gt("竹简挥毫 →", lang)}</div>
+              <div className="text-xs tracking-widest text-amber-700 dark:text-amber-400">{gt("游戏 · 3", lang)}</div>
+              <div className="mt-1 font-serif text-xl text-amber-900 dark:text-amber-200">{gt("竹简挥毫 →", lang)}</div>
               <p className="mt-2 text-xs text-muted">
                 {gt("在书案上执笔写大字。提按转折，墨入竹简。", lang)}
                 <br/>
                 {gt("3D 书斋描红，交卷定品第。", lang)}
               </p>
             </div>
-            <div className="font-serif text-5xl text-amber-900 opacity-50 group-hover:opacity-90">筆</div>
+            <div className="font-serif text-5xl text-amber-900 opacity-50 group-hover:opacity-90 dark:text-amber-200">筆</div>
           </div>
         </Link>
       </section>

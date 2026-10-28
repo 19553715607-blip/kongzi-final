@@ -13,6 +13,7 @@
 import { useFrame, useThree } from "@react-three/fiber";
 import { useMemo, useRef } from "react";
 import * as THREE from "three";
+import { InkWorld, InkMat, AutoCastShadow } from "@/components/three/inkwash";
 import type { MathScenarioBrief } from "@/lib/types";
 import {
   createEngine,
@@ -37,8 +38,6 @@ export function createMathRefs(): MathRefs {
 export { createEngine };
 
 // ── 场景常量（与御场景同一宣纸色调） ──
-const SKY = "#f1ead7";
-const FOG = "#ece4cd";
 const GOLD = "#d9a521";
 const GRAIN = "#ddb45e";
 const THATCH = "#a8894f";
@@ -229,30 +228,31 @@ export function MathScene({ g }: { g: MathRefs }) {
 
   return (
     <>
-      <color attach="background" args={[SKY]} />
-      <fog attach="fog" args={[FOG, 38, 130]} />
-      <hemisphereLight args={["#f8f4e6", "#aebd90", 0.95]} />
-      <directionalLight position={[30, 40, 20]} intensity={0.7} color="#fff1d4" />
-
-      <Ground />
-      <Fields />
-      <Mountains />
-      <Pines />
-      <Clouds />
+      <InkWorld
+        fogRange={[38, 130]}
+        groundSize={[110, 90]}
+        groundPosition={[0, 0, -2]}
+        mountains={[
+          { z: -58, hBase: 12, f1: 0.9, f2: 0.31, phase: 1.2, color: "#93a495", opacity: 0.5, span: 220 },
+          { z: -46, hBase: 8.5, f1: 1.1, f2: 0.4, phase: 4.1, color: "#849a8c", opacity: 0.6, span: 220 },
+          { z: -34, hBase: 5.5, f1: 0.8, f2: 0.35, phase: 2.2, color: "#8b9c8d", opacity: 0.45, span: 220 },
+        ]}
+        pines={[
+          { x: -17, z: -8, s: 1.3 }, { x: 16, z: -11, s: 1.1 }, { x: -21, z: 4, s: 1.5 },
+          { x: 20, z: 2, s: 1.2 }, { x: -13, z: -18, s: 1.0 }, { x: 13, z: -21, s: 1.4 },
+        ]}
+        clouds={[
+          { x: -22, y: 16, z: -42, s: 3.6 }, { x: 16, y: 19, z: -52, s: 4.4 }, { x: 2, y: 15, z: -36, s: 2.8 },
+        ]}
+        sun={{ focus: [0, 1.0, -3], size: 26, offset: [14, 20, 9] }}
+      >
+        <AutoCastShadow />
+        <Fields />
+      </InkWorld>
       <Granary g={g} />
       {sc && <Villages g={g} scenario={sc} />}
       {sc && <PourParticles g={g} />}
     </>
-  );
-}
-
-// ── 环境（与御场景同款） ──
-function Ground() {
-  return (
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, -2]}>
-      <planeGeometry args={[110, 90]} />
-      <meshStandardMaterial color="#b3c091" />
-    </mesh>
   );
 }
 
@@ -271,114 +271,13 @@ function Fields() {
       {strips.map((s, i) => (
         <mesh key={i} rotation={[-Math.PI / 2, 0, 0]} position={[s.x, 0.02, s.z]}>
           <planeGeometry args={[s.w, s.d]} />
-          <meshStandardMaterial color={s.c} />
+          <InkMat color={s.c} />
         </mesh>
       ))}
     </>
   );
 }
 
-function Mountains() {
-  const ridges = useMemo(() => {
-    const mk = (z: number, hBase: number, f1: number, f2: number, phase: number) => {
-      const pts: number[] = [];
-      const n = 30;
-      for (let i = 0; i <= n; i++) {
-        const x = -110 + (220 * i) / n;
-        const h = hBase + Math.sin(i * f1 + phase) * hBase * 0.45 + Math.sin(i * f2) * hBase * 0.2;
-        pts.push(x, 0, z, x, h, z);
-      }
-      const idx: number[] = [];
-      for (let i = 0; i < n; i++) {
-        const a = i * 2;
-        idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2);
-      }
-      const geo = new THREE.BufferGeometry();
-      geo.setAttribute("position", new THREE.Float32BufferAttribute(pts, 3));
-      geo.setIndex(idx);
-      return geo;
-    };
-    return [
-      { geo: mk(-58, 12, 0.9, 0.31, 1.2), color: "#93a495", opacity: 0.5 },
-      { geo: mk(-46, 8.5, 1.1, 0.4, 4.1), color: "#849a8c", opacity: 0.6 },
-      { geo: mk(-34, 5.5, 0.8, 0.35, 2.2), color: "#8b9c8d", opacity: 0.45 },
-    ];
-  }, []);
-  return (
-    <>
-      {ridges.map((r, i) => (
-        <mesh key={i} geometry={r.geo}>
-          <meshBasicMaterial color={r.color} transparent opacity={r.opacity} side={THREE.DoubleSide} />
-        </mesh>
-      ))}
-    </>
-  );
-}
-
-function Pines() {
-  const trees = useMemo(
-    () => [
-      { x: -17, z: -8, s: 1.3 }, { x: 16, z: -11, s: 1.1 }, { x: -21, z: 4, s: 1.5 },
-      { x: 20, z: 2, s: 1.2 }, { x: -13, z: -18, s: 1.0 }, { x: 13, z: -21, s: 1.4 },
-    ],
-    [],
-  );
-  return (
-    <>
-      {trees.map((t, i) => (
-        <group key={i} position={[t.x, 0, t.z]} scale={t.s}>
-          <mesh position={[0, 0.5, 0]}>
-            <cylinderGeometry args={[0.09, 0.13, 1, 7]} />
-            <meshStandardMaterial color="#5a4632" />
-          </mesh>
-          <mesh position={[0, 1.5, 0]}>
-            <coneGeometry args={[0.85, 1.6, 8]} />
-            <meshStandardMaterial color="#40543d" />
-          </mesh>
-          <mesh position={[0, 2.4, 0]}>
-            <coneGeometry args={[0.6, 1.3, 8]} />
-            <meshStandardMaterial color="#4a6044" />
-          </mesh>
-        </group>
-      ))}
-    </>
-  );
-}
-
-function Clouds() {
-  const ref = useRef<THREE.Group>(null);
-  useFrame((state) => {
-    if (ref.current) ref.current.position.x = Math.sin(state.clock.elapsedTime * 0.03) * 5;
-  });
-  const clouds = useMemo(
-    () => [
-      { x: -22, y: 16, z: -42, s: 3.6 }, { x: 16, y: 19, z: -52, s: 4.4 }, { x: 2, y: 15, z: -36, s: 2.8 },
-    ],
-    [],
-  );
-  return (
-    <group ref={ref}>
-      {clouds.map((c, i) => (
-        <group key={i} position={[c.x, c.y, c.z]} scale={c.s}>
-          <mesh>
-            <sphereGeometry args={[1, 12, 10]} />
-            <meshBasicMaterial color="#fbf8ee" transparent opacity={0.85} />
-          </mesh>
-          <mesh position={[0.9, -0.15, 0]} scale={0.7}>
-            <sphereGeometry args={[1, 12, 10]} />
-            <meshBasicMaterial color="#fbf8ee" transparent opacity={0.8} />
-          </mesh>
-          <mesh position={[-0.9, -0.2, 0]} scale={0.65}>
-            <sphereGeometry args={[1, 12, 10]} />
-            <meshBasicMaterial color="#fbf8ee" transparent opacity={0.75} />
-          </mesh>
-        </group>
-      ))}
-    </group>
-  );
-}
-
-// ── 官仓：圆仓 + 茅草锥顶 + 粮堆（随剩余量缩小） ──
 function Granary({ g }: { g: MathRefs }) {
   const grainRef = useRef<THREE.Mesh>(null);
   const grainMat = useRef<THREE.MeshStandardMaterial>(null);
@@ -396,18 +295,18 @@ function Granary({ g }: { g: MathRefs }) {
       {/* 台基 */}
       <mesh position={[0, 0.14, 0]}>
         <cylinderGeometry args={[2.6, 2.9, 0.28, 24]} />
-        <meshStandardMaterial color="#bfae87" />
+        <InkMat color="#bfae87" />
       </mesh>
       {/* 仓壁（圆仓） */}
       <mesh position={[0, 0.95, 0]}>
         <cylinderGeometry args={[1.75, 1.85, 1.4, 24]} />
-        <meshStandardMaterial color="#c9a86b" />
+        <InkMat color="#c9a86b" />
       </mesh>
       {/* 壁箍 */}
       {[0.55, 1.35].map((y) => (
         <mesh key={y} position={[0, y, 0]}>
           <torusGeometry args={[1.83, 0.05, 8, 32]} />
-          <meshStandardMaterial color={WOOD} />
+          <InkMat color={WOOD} />
         </mesh>
       ))}
       {/* 粮堆锥体（随剩余量缩放） */}
@@ -419,12 +318,12 @@ function Granary({ g }: { g: MathRefs }) {
       {[[-1.5, -1.5], [1.5, -1.5], [-1.5, 1.5], [1.5, 1.5]].map(([x, z], i) => (
         <mesh key={i} position={[x, 2.3, z]}>
           <cylinderGeometry args={[0.07, 0.09, 2.2, 8]} />
-          <meshStandardMaterial color={WOOD} />
+          <InkMat color={WOOD} />
         </mesh>
       ))}
       <mesh position={[0, 4.05, 0]}>
         <coneGeometry args={[2.5, 1.5, 20]} />
-        <meshStandardMaterial color={THATCH} />
+        <InkMat color={THATCH} />
       </mesh>
       <mesh position={[0, 4.9, 0]}>
         <sphereGeometry args={[0.14, 10, 8]} />
@@ -433,13 +332,13 @@ function Granary({ g }: { g: MathRefs }) {
       {/* 仓口斜槽 */}
       <mesh position={[0, 1.95, 1.65]} rotation={[0.6, 0, 0]}>
         <boxGeometry args={[0.5, 0.14, 1.1]} />
-        <meshStandardMaterial color={WOOD} />
+        <InkMat color={WOOD} />
       </mesh>
       {/* 仓前粮袋装饰 */}
       {[[-2.6, 1.2], [-3.1, 0.5], [2.7, 1.0]].map(([x, z], i) => (
         <mesh key={i} position={[x, 0.32, z]} scale={[1, 0.75, 1]}>
           <sphereGeometry args={[0.42, 12, 10]} />
-          <meshStandardMaterial color="#c9b18a" />
+          <InkMat color="#c9b18a" />
         </mesh>
       ))}
     </group>
@@ -506,15 +405,15 @@ function Village({ g, scenario, idx }: { g: MathRefs; scenario: MathScenarioBrie
       <group position={[v.x, 0, v.z]} rotation={[0, -v.angle, 0]}>
         <mesh position={[0, 0.55, 0]}>
           <boxGeometry args={[1.5, 1.1, 1.3]} />
-          <meshStandardMaterial color="#d8c8a2" />
+          <InkMat color="#d8c8a2" />
         </mesh>
         <mesh position={[0, 1.5, 0]} rotation={[0, Math.PI / 4, 0]}>
           <coneGeometry args={[1.35, 0.95, 4]} />
-          <meshStandardMaterial color={THATCH} />
+          <InkMat color={THATCH} />
         </mesh>
         <mesh position={[0, 0.42, 0.66]}>
           <boxGeometry args={[0.42, 0.7, 0.04]} />
-          <meshStandardMaterial color="#6b4a2e" />
+          <InkMat color="#6b4a2e" />
         </mesh>
         {/* 炊烟 */}
         <mesh position={[0.4, 2.3, 0]}>
@@ -530,7 +429,7 @@ function Village({ g, scenario, idx }: { g: MathRefs; scenario: MathScenarioBrie
         {/* 底 */}
         <mesh position={[0, 0.05, 0]}>
           <boxGeometry args={[1.25, 0.1, 1.25]} />
-          <meshStandardMaterial color={WOOD} />
+          <InkMat color={WOOD} />
         </mesh>
         {/* 四壁 */}
         {[
@@ -541,7 +440,7 @@ function Village({ g, scenario, idx }: { g: MathRefs; scenario: MathScenarioBrie
         ].map((w, i) => (
           <mesh key={i} position={[w.p[0], w.p[1], w.p[2]]}>
             <boxGeometry args={[w.s[0], w.s[1], w.s[2]]} />
-            <meshStandardMaterial color={i % 2 ? "#8a6a3f" : "#96764a"} />
+            <InkMat color={i % 2 ? "#8a6a3f" : "#96764a"} />
           </mesh>
         ))}
         {/* 填充粮块（随分量长高） */}
@@ -558,11 +457,11 @@ function Village({ g, scenario, idx }: { g: MathRefs; scenario: MathScenarioBrie
         <group ref={flagRef} position={[0.85, 0, 0.85]} visible={false}>
           <mesh position={[0, 0.9, 0]}>
             <cylinderGeometry args={[0.03, 0.04, 1.8, 6]} />
-            <meshStandardMaterial color={WOOD} />
+            <InkMat color={WOOD} />
           </mesh>
           <mesh position={[0.32, 1.5, 0]}>
             <boxGeometry args={[0.6, 0.36, 0.03]} />
-            <meshStandardMaterial color={kindColor} />
+            <InkMat color={kindColor} />
           </mesh>
         </group>
         {/* 分量标签 */}

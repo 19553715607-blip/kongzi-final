@@ -90,7 +90,7 @@ export default function Nav({ ghost = false }: { ghost?: boolean }) {
             ))}
           </nav>
 
-          <div className="ms-auto flex items-center gap-2 md:ms-0">
+          <div className="ms-auto flex min-w-0 items-center gap-1.5 sm:gap-2 md:ms-0">
             <LangSwitcher />
             <ThemeToggle />
             <UserMenu />
@@ -220,7 +220,7 @@ export default function Nav({ ghost = false }: { ghost?: boolean }) {
               </Link>
               <Link
                 href="/login"
-                className={`rounded-lg border border-line px-3 py-2.5 text-sm ${
+                className={`whitespace-nowrap rounded-lg border border-line px-3 py-2.5 text-sm ${
                   isActive(path, "/login")
                     ? "border-accent/40 bg-accent-soft text-accent"
                     : "bg-surface text-fg"

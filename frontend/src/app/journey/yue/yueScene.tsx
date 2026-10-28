@@ -14,6 +14,7 @@
 import { useFrame, useThree } from "@react-three/fiber";
 import { useMemo, useRef, type MutableRefObject } from "react";
 import * as THREE from "three";
+import { InkWorld, InkMat, AutoCastShadow } from "@/components/three/inkwash";
 import type { YueNote } from "@/lib/types";
 import { useGT } from "@/lib/gameDict";
 import { NOTES, type YueEngineState } from "./yueEngine";
@@ -51,8 +52,6 @@ export function createYueRefs(): YueRefs {
 }
 
 // ── 场景常量（与数场景同一宣纸色调） ──
-const SKY = "#f1ead7";
-const FOG = "#ece4cd";
 const GOLD = "#d9a521";
 const BRONZE = "#a8905a";
 const BRONZE_DARK = "#8a7448";
@@ -147,16 +146,27 @@ export function YueScene({ g }: { g: YueRefs }) {
 
   return (
     <>
-      <color attach="background" args={[SKY]} />
-      <fog attach="fog" args={[FOG, 38, 130]} />
-      <hemisphereLight args={["#f8f4e6", "#aebd90", 0.95]} />
-      <directionalLight position={[30, 40, 20]} intensity={0.7} color="#fff1d4" />
-
-      <Ground />
-      <Fields />
-      <Mountains />
-      <Pines />
-      <Clouds />
+      <InkWorld
+        fogRange={[38, 130]}
+        groundSize={[110, 90]}
+        groundPosition={[0, 0, -2]}
+        mountains={[
+          { z: -58, hBase: 12, f1: 0.9, f2: 0.31, phase: 1.2, color: "#93a495", opacity: 0.5, span: 220 },
+          { z: -46, hBase: 8.5, f1: 1.1, f2: 0.4, phase: 4.1, color: "#849a8c", opacity: 0.6, span: 220 },
+          { z: -34, hBase: 5.5, f1: 0.8, f2: 0.35, phase: 2.2, color: "#8b9c8d", opacity: 0.45, span: 220 },
+        ]}
+        pines={[
+          { x: -17, z: -8, s: 1.3 }, { x: 16, z: -11, s: 1.1 }, { x: -21, z: 4, s: 1.5 },
+          { x: 20, z: 2, s: 1.2 }, { x: -13, z: -18, s: 1.0 }, { x: 13, z: -21, s: 1.4 },
+        ]}
+        clouds={[
+          { x: -22, y: 16, z: -42, s: 3.6 }, { x: 16, y: 19, z: -52, s: 4.4 }, { x: 2, y: 15, z: -36, s: 2.8 },
+        ]}
+        sun={{ focus: [0, 1.2, -4], size: 24, offset: [14, 20, 9] }}
+      >
+        <AutoCastShadow />
+        <Fields />
+      </InkWorld>
       <Platform />
       <Lanterns />
       <BellRack g={g} />
@@ -167,16 +177,7 @@ export function YueScene({ g }: { g: YueRefs }) {
   );
 }
 
-// ── 环境（与数场景同款） ──
-function Ground() {
-  return (
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, -2]}>
-      <planeGeometry args={[110, 90]} />
-      <meshStandardMaterial color="#b3c091" />
-    </mesh>
-  );
-}
-
+/** 田野色块 */
 function Fields() {
   const strips = useMemo(() => {
     const arr: { x: number; z: number; w: number; d: number; c: string }[] = [];
@@ -192,110 +193,10 @@ function Fields() {
       {strips.map((s, i) => (
         <mesh key={i} rotation={[-Math.PI / 2, 0, 0]} position={[s.x, 0.02, s.z]}>
           <planeGeometry args={[s.w, s.d]} />
-          <meshStandardMaterial color={s.c} />
+          <InkMat color={s.c} />
         </mesh>
       ))}
     </>
-  );
-}
-
-function Mountains() {
-  const ridges = useMemo(() => {
-    const mk = (z: number, hBase: number, f1: number, f2: number, phase: number) => {
-      const pts: number[] = [];
-      const n = 30;
-      for (let i = 0; i <= n; i++) {
-        const x = -110 + (220 * i) / n;
-        const h = hBase + Math.sin(i * f1 + phase) * hBase * 0.45 + Math.sin(i * f2) * hBase * 0.2;
-        pts.push(x, 0, z, x, h, z);
-      }
-      const idx: number[] = [];
-      for (let i = 0; i < n; i++) {
-        const a = i * 2;
-        idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2);
-      }
-      const geo = new THREE.BufferGeometry();
-      geo.setAttribute("position", new THREE.Float32BufferAttribute(pts, 3));
-      geo.setIndex(idx);
-      return geo;
-    };
-    return [
-      { geo: mk(-58, 12, 0.9, 0.31, 1.2), color: "#93a495", opacity: 0.5 },
-      { geo: mk(-46, 8.5, 1.1, 0.4, 4.1), color: "#849a8c", opacity: 0.6 },
-      { geo: mk(-34, 5.5, 0.8, 0.35, 2.2), color: "#8b9c8d", opacity: 0.45 },
-    ];
-  }, []);
-  return (
-    <>
-      {ridges.map((r, i) => (
-        <mesh key={i} geometry={r.geo}>
-          <meshBasicMaterial color={r.color} transparent opacity={r.opacity} side={THREE.DoubleSide} />
-        </mesh>
-      ))}
-    </>
-  );
-}
-
-function Pines() {
-  const trees = useMemo(
-    () => [
-      { x: -17, z: -8, s: 1.3 }, { x: 16, z: -11, s: 1.1 }, { x: -21, z: 4, s: 1.5 },
-      { x: 20, z: 2, s: 1.2 }, { x: -13, z: -18, s: 1.0 }, { x: 13, z: -21, s: 1.4 },
-    ],
-    [],
-  );
-  return (
-    <>
-      {trees.map((t, i) => (
-        <group key={i} position={[t.x, 0, t.z]} scale={t.s}>
-          <mesh position={[0, 0.5, 0]}>
-            <cylinderGeometry args={[0.09, 0.13, 1, 7]} />
-            <meshStandardMaterial color="#5a4632" />
-          </mesh>
-          <mesh position={[0, 1.5, 0]}>
-            <coneGeometry args={[0.85, 1.6, 8]} />
-            <meshStandardMaterial color="#40543d" />
-          </mesh>
-          <mesh position={[0, 2.4, 0]}>
-            <coneGeometry args={[0.6, 1.3, 8]} />
-            <meshStandardMaterial color="#4a6044" />
-          </mesh>
-        </group>
-      ))}
-    </>
-  );
-}
-
-function Clouds() {
-  const ref = useRef<THREE.Group>(null);
-  useFrame((state) => {
-    if (ref.current) ref.current.position.x = Math.sin(state.clock.elapsedTime * 0.03) * 5;
-  });
-  const clouds = useMemo(
-    () => [
-      { x: -22, y: 16, z: -42, s: 3.6 }, { x: 16, y: 19, z: -52, s: 4.4 }, { x: 2, y: 15, z: -36, s: 2.8 },
-    ],
-    [],
-  );
-  return (
-    <group ref={ref}>
-      {clouds.map((c, i) => (
-        <group key={i} position={[c.x, c.y, c.z]} scale={c.s}>
-          <mesh>
-            <sphereGeometry args={[1, 12, 10]} />
-            <meshBasicMaterial color="#fbf8ee" transparent opacity={0.85} />
-          </mesh>
-          <mesh position={[0.9, -0.15, 0]} scale={0.7}>
-            <sphereGeometry args={[1, 12, 10]} />
-            <meshBasicMaterial color="#fbf8ee" transparent opacity={0.8} />
-          </mesh>
-          <mesh position={[-0.9, -0.2, 0]} scale={0.65}>
-            <sphereGeometry args={[1, 12, 10]} />
-            <meshBasicMaterial color="#fbf8ee" transparent opacity={0.75} />
-          </mesh>
-        </group>
-      ))}
-    </group>
   );
 }
 
@@ -305,11 +206,11 @@ function Platform() {
     <group position={[0, 0, RACK_Z]}>
       <mesh position={[0, 0.09, 0.6]}>
         <boxGeometry args={[9.4, 0.18, 4.6]} />
-        <meshStandardMaterial color="#c9bfa4" />
+        <InkMat color="#c9bfa4" />
       </mesh>
       <mesh position={[0, 0.22, 0.4]}>
         <boxGeometry args={[8.2, 0.16, 3.6]} />
-        <meshStandardMaterial color="#d4c9ac" />
+        <InkMat color="#d4c9ac" />
       </mesh>
     </group>
   );
@@ -323,7 +224,7 @@ function Lanterns() {
         <group key={x} position={[x, 0.3, RACK_Z + 0.6]}>
           <mesh position={[0, 1.1, 0]}>
             <cylinderGeometry args={[0.05, 0.07, 2.2, 8]} />
-            <meshStandardMaterial color={WOOD} />
+            <InkMat color={WOOD} />
           </mesh>
           <mesh position={[0, 2.35, 0]}>
             <boxGeometry args={[0.42, 0.52, 0.42]} />
@@ -331,7 +232,7 @@ function Lanterns() {
           </mesh>
           <mesh position={[0, 2.68, 0]}>
             <coneGeometry args={[0.36, 0.22, 4]} />
-            <meshStandardMaterial color={LACQUER} />
+            <InkMat color={LACQUER} />
           </mesh>
         </group>
       ))}
@@ -348,11 +249,11 @@ function BellRack({ g }: { g: YueRefs }) {
         <group key={x} position={[x, 0, RACK_Z]}>
           <mesh position={[0, 1.9, 0]}>
             <cylinderGeometry args={[0.13, 0.17, 3.8, 10]} />
-            <meshStandardMaterial color={LACQUER} />
+            <InkMat color={LACQUER} />
           </mesh>
           <mesh position={[0, 0.12, 0]}>
             <boxGeometry args={[0.6, 0.24, 0.6]} />
-            <meshStandardMaterial color={WOOD} />
+            <InkMat color={WOOD} />
           </mesh>
           <mesh position={[0, 3.86, 0]}>
             <sphereGeometry args={[0.14, 10, 8]} />
@@ -363,7 +264,7 @@ function BellRack({ g }: { g: YueRefs }) {
       {/* 横梁（髹漆彩绘：朱梁金缘） */}
       <mesh position={[0, BEAM_Y, RACK_Z]}>
         <boxGeometry args={[7.4, 0.22, 0.26]} />
-        <meshStandardMaterial color={LACQUER} />
+        <InkMat color={LACQUER} />
       </mesh>
       <mesh position={[0, BEAM_Y + 0.13, RACK_Z]}>
         <boxGeometry args={[7.4, 0.05, 0.28]} />
@@ -412,7 +313,7 @@ function Bell({ g, note, idx }: { g: YueRefs; note: YueNote; idx: number }) {
       {/* 挂索 */}
       <mesh position={[0, (BEAM_Y - center.y) / 2 + 0.05, 0]}>
         <cylinderGeometry args={[0.03, 0.03, BEAM_Y - center.y - 0.1, 6]} />
-        <meshStandardMaterial color={WOOD} />
+        <InkMat color={WOOD} />
       </mesh>
       <group ref={grp} onPointerDown={(e) => { e.stopPropagation(); g.onStrike.current(note); }}>
         {/* 甬柄 */}
@@ -478,12 +379,12 @@ function Hammer({ g }: { g: YueRefs }) {
         {/* 槌柄（斜持） */}
         <mesh position={[0, -0.34, 0]} rotation={[0.5, 0, 0]}>
           <cylinderGeometry args={[0.045, 0.055, 1.05, 8]} />
-          <meshStandardMaterial color="#8a6a3f" />
+          <InkMat color="#8a6a3f" />
         </mesh>
         {/* 槌头 */}
         <mesh position={[0, -0.8, 0.26]} scale={[1, 1, 1.3]}>
           <sphereGeometry args={[0.17, 12, 10]} />
-          <meshStandardMaterial color="#a8865a" />
+          <InkMat color="#a8865a" />
         </mesh>
       </group>
     </group>

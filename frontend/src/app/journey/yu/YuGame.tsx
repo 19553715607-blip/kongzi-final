@@ -264,6 +264,7 @@ export default function YuGame() {
         <section className="relative select-none overflow-hidden rounded-2xl border border-line" style={{ height: "min(64vh, 560px)", minHeight: 340 }}>
           <Canvas
             key={`${current.id}-${runId}`}
+            shadows
             dpr={[1, 2]}
             camera={{ position: [0, 4.3, 8.6], fov: 55, near: 0.1, far: 900 }}
             onCreated={({ camera }) => camera.lookAt(0, 1.4, -7)}

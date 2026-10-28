@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { getCaseStats, getCases, getTopics, isAuthError } from "@/lib/api";
 import { t, useLang } from "@/lib/i18n";
 import { Reveal, CountUp } from "@/lib/motion";
-import { CollectionCard } from "@/components/museum";
+import { CaseCard } from "@/components/CaseCard";
 import type { CaseBrief, CaseStats, TopicBrief } from "@/lib/types";
 
 const PAGE_SIZE = 12;
@@ -153,22 +153,14 @@ export default function CasesPage() {
           {items.map((c, i) => {
             const topic = topics.find((tp) => tp.id === c.topic_id);
             return (
-              <Reveal key={c.id} delay={Math.min(i, 8) * 60}>
-                <CollectionCard
-                  className="h-full text-start"
-                  href={`/cases/${c.slug ?? c.id}`}
-                  title={c.question}
-                  
-                  thumb={
-                    topic ? (
-                      <span
-                        className="flex h-full items-center justify-center px-4 text-center font-serif text-sm leading-snug"
-                        style={{ background: `${topic.color}1A`, color: topic.color }}
-                      >
-                        {topic.name}
-                      </span>
-                    ) : undefined
-                  }
+              <Reveal key={c.id} delay={Math.min(i, 8) * 60} className="h-full">
+                {/* 纯文本卡：案例没有封面图，不设缩略图位 */}
+                <CaseCard
+                  className="h-full"
+                  c={c}
+                  lang={lang}
+                  topicName={topic?.name}
+                  topicColor={topic?.color}
                 />
               </Reveal>
             );

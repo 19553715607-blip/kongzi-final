@@ -423,6 +423,7 @@ export default function SheGame() {
         onPointerCancel={releaseDraw}
       >
         <Canvas
+          shadows
           dpr={[1, 2]}
           camera={{ position: [0, 1.7, 0], fov: 55, near: 0.1, far: 200 }}
           onCreated={({ camera }) => camera.lookAt(0, 1.6, -30)}
