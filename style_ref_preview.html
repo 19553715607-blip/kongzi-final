@@ -1,0 +1,619 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>国外五站设计风格参考 · 预览稿</title>
+<style>
+:root{--bg:#0d0f12;--panel:#14171c;--line:#242a31;--fg:#e8eaed;--muted:#9aa3ad;--faint:#6b7480}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:"PingFang SC","Noto Sans SC",system-ui,sans-serif;line-height:1.65;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1140px;margin:0 auto;padding:60px 28px 110px}
+.h1{font-size:32px;font-weight:600;margin:0 0 12px;letter-spacing:-.01em}
+.lead{color:var(--muted);font-size:14px;max-width:800px;margin:0}
+.note{color:var(--faint);font-size:12.5px;margin:16px 0 0;padding:12px 16px;border-left:2px solid #3a424b;background:#12151a}
+.overview{margin-top:36px;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.overview table{width:100%;border-collapse:collapse;font-size:12.5px}
+.overview th{background:#171b21;color:var(--muted);font-weight:500;text-align:left;padding:11px 14px;border-bottom:1px solid var(--line);white-space:nowrap}
+.overview td{padding:11px 14px;border-bottom:1px solid var(--line);color:var(--muted);vertical-align:top}
+.overview tr:last-child td{border-bottom:0}
+.overview td:first-child{color:var(--fg);font-weight:500;white-space:nowrap}
+.sw{display:inline-flex;gap:3px;vertical-align:middle;margin-right:6px}
+.sw i{width:11px;height:11px;border-radius:3px;display:block;border:1px solid rgba(255,255,255,.12)}
+.site{margin-top:72px;border-top:1px solid var(--line);padding-top:34px}
+.site-head{display:flex;align-items:flex-start;gap:16px;margin-bottom:22px;flex-wrap:wrap}
+.idx{font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--faint);padding-top:6px}
+.site-head h2{font-size:22px;font-weight:600;margin:0}
+.site-head .meta{color:var(--muted);font-size:13px;margin:3px 0 0}
+.tags{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap;padding-top:4px}
+.tags span{font-size:11px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:3px 10px}
+.frame{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff}
+.chrome{display:flex;align-items:center;gap:6px;padding:9px 13px;background:#1b1f25;border-bottom:1px solid var(--line)}
+.chrome i{width:9px;height:9px;border-radius:50%;background:#39414a;display:block}
+.chrome span{margin-left:10px;font-size:11px;color:#8b949e;font-family:ui-monospace,Menlo,monospace}
+.screen{position:relative;overflow:hidden}
+.notes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;margin-top:22px}
+.notes h3{font-size:13px;font-weight:600;margin:0 0 9px;color:var(--fg)}
+.notes ul{margin:0;padding-left:17px;color:var(--muted);font-size:13px}
+.notes li{margin-bottom:6px}
+.notes table{width:100%;border-collapse:collapse;font-size:12px}
+.notes td{padding:4px 0;border-bottom:1px solid var(--line);color:var(--muted)}
+.notes td:first-child{color:var(--faint);width:46%}
+.takeaway{margin-top:20px;padding:14px 18px;border:1px solid var(--line);border-radius:12px;background:#12151a;font-size:13px;color:var(--muted)}
+.takeaway b{color:var(--fg);font-weight:600}
+@media(max-width:860px){.notes{grid-template-columns:1fr}.tags{display:none}.overview{overflow-x:auto}}
+
+/* ---------- 01 Google Arts & Culture ---------- */
+.gac{background:#fff;color:#1f1f1f;font-family:system-ui,"PingFang SC",sans-serif}
+.gac-nav{display:flex;align-items:center;gap:22px;padding:14px 26px;border-bottom:1px solid #ececec}
+.gac-logo{font-size:15px;font-weight:600;letter-spacing:-.01em}
+.gac-links{font-size:12px;color:#5f6368;display:flex;gap:18px}
+.gac-search{margin-left:auto;font-size:12px;color:#5f6368;border:1px solid #e2e2e2;border-radius:999px;padding:5px 15px}
+.gac-hero{position:relative;height:310px;overflow:hidden}
+.gac-hero svg{width:100%;height:100%;display:block}
+.gac-hero-txt{position:absolute;left:34px;bottom:30px;right:34px;color:#fff}
+.gac-kicker{font-size:11px;letter-spacing:.2em;color:#9dc0e4;text-transform:uppercase}
+.gac-hero-txt h1{font-size:35px;line-height:1.16;font-weight:600;margin:11px 0 9px;letter-spacing:-.02em}
+.gac-hero-txt p{font-size:13px;color:#c6d7e8;margin:0 0 15px;max-width:430px}
+.gac-btn{display:inline-block;font-size:13px;background:#fff;color:#123a63;border-radius:999px;padding:9px 19px;font-weight:600}
+.gac-sec{display:flex;align-items:baseline;gap:12px;padding:22px 26px 0}
+.gac-sec b{font-size:14px;font-weight:600}
+.gac-sec span{font-size:11.5px;color:#80868b}
+.gac-sec em{margin-left:auto;font-size:12px;color:#1a73e8;font-style:normal}
+.gac-rail{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;padding:14px 26px 28px}
+.gac-card .thumb{height:96px;border-radius:10px;margin-bottom:9px}
+.gac-card b{font-size:12.5px;font-weight:600;display:block;line-height:1.4}
+.gac-card span{font-size:11px;color:#80868b}
+
+/* ---------- 02 Duolingo ---------- */
+.duo{background:#fff;color:#3c3c3c;font-family:system-ui,"PingFang SC",sans-serif}
+.duo-nav{display:flex;align-items:center;gap:20px;padding:14px 24px;border-bottom:2px solid #e5e5e5}
+.duo-logo{font-size:17px;font-weight:700;color:#58cc02;letter-spacing:-.02em}
+.duo-links{font-size:12px;color:#777;display:flex;gap:16px;font-weight:700}
+.duo-cta{margin-left:auto;font-size:12px;font-weight:700;color:#1cb0f6;border:2px solid #e5e5e5;border-radius:12px;padding:6px 13px;letter-spacing:.04em}
+.duo-hero{display:grid;grid-template-columns:1.08fr .92fr;gap:22px;padding:34px 32px 6px;align-items:center}
+.duo-hero h1{font-size:31px;line-height:1.22;font-weight:700;margin:0 0 12px;color:#3c3c3c}
+.duo-hero p{font-size:13px;color:#777;margin:0 0 20px}
+.duo-btn{display:inline-block;background:#58cc02;color:#fff;font-size:13px;font-weight:700;letter-spacing:.07em;border-radius:14px;padding:12px 24px;box-shadow:0 4px 0 #46a302;text-transform:uppercase}
+.duo-btn.ghost{background:#fff;color:#1cb0f6;border:2px solid #e5e5e5;box-shadow:0 4px 0 #e5e5e5;margin-left:10px}
+.duo-art{display:grid;place-items:center}
+.duo-hud{display:flex;gap:20px;padding:16px 32px 6px;font-size:12px;color:#777;align-items:center;font-weight:700}
+.duo-hud b{color:#58cc02}
+.duo-bar{flex:1;height:16px;border-radius:999px;background:#e5e5e5;overflow:hidden;max-width:220px}
+.duo-bar i{display:block;height:100%;width:62%;background:#ffc800;border-radius:999px}
+.duo-path{display:flex;align-items:center;padding:18px 32px 34px}
+.node{width:58px;height:58px;border-radius:50%;display:grid;place-items:center;font-size:16px;font-weight:700;flex:0 0 auto;font-family:serif}
+.n-done{background:#58cc02;color:#fff;box-shadow:0 4px 0 #46a302}
+.n-cur{background:#fff;border:3px solid #58cc02;color:#58cc02}
+.n-lock{background:#e5e5e5;color:#afafaf;box-shadow:0 4px 0 #d4d4d4}
+.link{flex:1;height:3px;background:#e5e5e5;margin:0 9px;border-radius:2px}
+
+/* ---------- 03 Brilliant ---------- */
+.brl{background:#0f1014;color:#f4f5f7;font-family:system-ui,"PingFang SC",sans-serif;padding-bottom:30px}
+.brl-prog{height:4px;background:#22252c}
+.brl-prog i{display:block;height:100%;width:38%;background:#3ddc97}
+.brl-nav{display:flex;align-items:center;padding:15px 28px;font-size:12.5px;color:#8d949f;gap:20px}
+.brl-logo{font-size:15px;font-weight:700;color:#f4f5f7;letter-spacing:-.02em}
+.brl-nav em{margin-left:auto;font-style:normal;font-size:12px;color:#c9f169;border:1px solid #3a3f36;border-radius:8px;padding:5px 12px}
+.brl-hero{text-align:center;padding:26px 60px 8px}
+.brl-step{font-size:11px;letter-spacing:.16em;color:#6f7683;text-transform:uppercase}
+.brl-hero h1{font-size:26px;line-height:1.4;font-weight:600;margin:12px 0 0;letter-spacing:-.01em}
+.brl-hero h1 u{text-decoration:none;color:#c9f169;border-bottom:2px solid #c9f169;padding-bottom:2px}
+.brl-opts{max-width:560px;margin:26px auto 0;display:grid;gap:10px}
+.brl-opt{display:flex;align-items:center;gap:12px;border:1px solid #262a32;background:#15171d;border-radius:12px;padding:14px 18px;font-size:13.5px;color:#c8cdd6}
+.brl-opt .k{width:22px;height:22px;border-radius:6px;background:#22262e;color:#8d949f;font-size:11px;display:grid;place-items:center;font-weight:700;flex:0 0 auto}
+.brl-opt.ok{border-color:#3ddc97;background:#12211b;color:#eafff5}
+.brl-opt.ok .k{background:#3ddc97;color:#0f1014}
+.brl-opt.bad{border-color:#e2585b;background:#221416;color:#f4d9da}
+.brl-opt.bad .k{background:#e2585b;color:#fff}
+.brl-foot{max-width:560px;margin:22px auto 0;display:flex;align-items:center;gap:14px}
+.brl-exp{flex:1;font-size:12.5px;color:#8d949f}
+.brl-exp b{color:#c9f169}
+.brl-cta{background:#c9f169;color:#10130c;font-size:13px;font-weight:700;border-radius:11px;padding:11px 26px;letter-spacing:.02em}
+
+/* ---------- 04 The Met ---------- */
+.met{background:#fbfaf7;color:#141414;font-family:system-ui,"PingFang SC",sans-serif}
+.met-bar{background:#141414;color:#f0efeb;font-size:11.5px;padding:8px 26px;letter-spacing:.04em;display:flex;gap:14px;align-items:center}
+.met-bar b{color:#e4002b;font-weight:700}
+.met-nav{display:flex;align-items:center;gap:24px;padding:15px 26px;border-bottom:1px solid #e3e1da;background:#fff}
+.met-logo{font-family:Georgia,"Songti SC",serif;font-size:20px;font-weight:700;letter-spacing:.02em}
+.met-links{font-size:12px;color:#4a4a4a;display:flex;gap:17px}
+.met-search{margin-left:auto;font-size:12px;color:#6a6a6a;border-bottom:1px solid #cfcdc6;padding-bottom:2px}
+.met-hero{position:relative;height:280px;overflow:hidden}
+.met-hero svg{width:100%;height:100%;display:block}
+.met-hero-txt{position:absolute;left:30px;bottom:26px;color:#fff;right:30px}
+.met-hero-txt h1{font-family:Georgia,"Songti SC",serif;font-size:30px;line-height:1.2;font-weight:700;margin:0 0 8px;letter-spacing:-.01em}
+.met-cap{font-size:11.5px;color:#ded8cc;border-top:1px solid rgba(255,255,255,.28);padding-top:8px;display:flex;gap:14px;flex-wrap:wrap}
+.met-cap b{font-weight:600;color:#fff}
+.met-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding:22px 26px 8px}
+.met-card .thumb{height:104px;border-radius:6px;margin-bottom:9px}
+.met-card b{font-family:Georgia,"Songti SC",serif;font-size:13.5px;font-weight:600;display:block;line-height:1.4}
+.met-card .acc{font-family:ui-monospace,Menlo,monospace;font-size:10.5px;color:#8a8781;margin-top:3px;display:block}
+.met-tl{padding:20px 26px 28px}
+.met-tl .cap{font-size:11px;letter-spacing:.16em;color:#8a8781;text-transform:uppercase;margin-bottom:12px}
+.met-tl .track{position:relative;height:2px;background:#dcd9d1;margin:26px 0 12px}
+.met-tl .track i{position:absolute;top:-5px;width:12px;height:12px;border-radius:50%;background:#e4002b;display:block}
+.met-tl .lbls{display:flex;justify-content:space-between;font-size:11px;color:#8a8781}
+
+/* ---------- 05 Lusion ---------- */
+.lz{background:#08090a;color:#f2f3f4;font-family:system-ui,"PingFang SC",sans-serif;padding-bottom:0}
+.lz-nav{display:flex;align-items:center;gap:22px;padding:16px 28px;font-size:12px;color:#8a8f96;letter-spacing:.06em}
+.lz-logo{font-size:14px;font-weight:700;color:#f2f3f4;letter-spacing:.14em}
+.lz-nav em{margin-left:auto;font-style:normal;color:#f2f3f4;border:1px solid #2c3035;border-radius:999px;padding:5px 13px}
+.lz-hero{padding:36px 28px 22px;position:relative}
+.lz-hero .kick{font-size:11px;letter-spacing:.28em;color:#ff4d2e;text-transform:uppercase}
+.lz-hero h1{font-size:64px;line-height:.96;font-weight:700;margin:14px 0 0;letter-spacing:-.045em}
+.lz-hero .sub{font-size:13px;color:#8a8f96;margin:18px 0 0;max-width:400px}
+.lz-marquee{border-top:1px solid #1c1f23;border-bottom:1px solid #1c1f23;padding:11px 0;overflow:hidden;white-space:nowrap;font-size:12px;color:#5c6167;letter-spacing:.2em;text-transform:uppercase}
+.lz-rows{padding:6px 0 10px}
+.lz-row{display:flex;align-items:center;gap:18px;padding:15px 28px;border-bottom:1px solid #16181b;font-size:14px}
+.lz-row .no{font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#4d5257;width:26px}
+.lz-row b{font-weight:600;flex:1;letter-spacing:-.01em}
+.lz-row .go{font-size:11px;color:#00e0c7;letter-spacing:.1em}
+.lz-badge{position:absolute;right:30px;top:44px;font-size:11px;color:#00e0c7;border:1px solid #1e3a38;border-radius:999px;padding:5px 12px;font-family:ui-monospace,Menlo,monospace}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="h1">国外五站设计风格参考 · 预览稿</div>
+  <p class="lead">面向「切问近思」的横向对标：五家受年轻用户欢迎的站点，按首页布局、交互逻辑、字体与美术风格四个维度拆解，并各自还原一版版式稿。</p>
+  <p class="note">说明：版式与设计语言按参考站还原，<b>文案与内容替换为「切问近思」的实际场景</b>（六艺关卡、典籍馆藏、对读推演），以便直接评估适配效果。字体权重按各站真实取值渲染；正式落地时中文字体需另行配对。本文件为独立预览稿，未改动项目内任何文件。</p>
+
+  <div class="overview">
+    <table>
+      <tr><th>站点</th><th>类型</th><th>首页布局</th><th>核心交互</th><th>字体策略</th><th>美术风格</th></tr>
+      <tr>
+        <td>Google Arts &amp; Culture</td>
+        <td>文化遗产策展</td>
+        <td>全出血主视觉 + 文字压底，下接横向滑轨与分栏网格</td>
+        <td>拖拽滑轨、360° 环视、吉像素缩放</td>
+        <td>几何无衬线，标题 34–64px 紧行距</td>
+        <td>藏品即装饰，界面近乎隐形</td>
+      </tr>
+      <tr>
+        <td>Duolingo</td>
+        <td>游戏化学习</td>
+        <td>左文案右插画，下接纵向关卡路径</td>
+        <td>路径解锁、连击/经验条、4px 立体按压按钮</td>
+        <td>圆体无衬线，700 权重，字距 +0.07em</td>
+        <td>高饱和猫头鹰绿 #58CC02 + 厚描边卡通</td>
+      </tr>
+      <tr>
+        <td>Brilliant</td>
+        <td>交互式课程</td>
+        <td>顶部进度条 + 居中单题卡，一屏一交互</td>
+        <td>即时判定（绿对红错）、逐步解锁</td>
+        <td>无衬线，标题 26–40px，关键词高亮下划线</td>
+        <td>近黑底 + 荧光柠檬绿点睛</td>
+      </tr>
+      <tr>
+        <td>The Met</td>
+        <td>开放馆藏</td>
+        <td>公告条 + 主视觉带图注，下接三栏藏品网格与时间轴</td>
+        <td>藏品筛选、高清缩放、时间轴检索</td>
+        <td>衬线标题（Georgia 系）+ 无衬线界面文字</td>
+        <td>米白纸感 + 大都会红 #E4002B 作唯一强调</td>
+      </tr>
+      <tr>
+        <td>Lusion</td>
+        <td>WebGL 工作室</td>
+        <td>满屏巨字主视觉 + 跑马灯 + 项目行列表</td>
+        <td>滚动驱动 3D 相机、磁吸光标、文字错位动效</td>
+        <td>超大号无衬线，96–200px，字距 −0.045em</td>
+        <td>纯黑 + 高对比亮色，留白即节奏</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- 01 -->
+  <section class="site">
+    <div class="site-head">
+      <div class="idx">01</div>
+      <div>
+        <h2>Google Arts &amp; Culture</h2>
+        <p class="meta">文化遗产策展平台 · 对标「典籍」板块</p>
+      </div>
+      <div class="tags"><span>策展式叙事</span><span>全出血大图</span><span>横向滑轨</span><span>藏品缩放</span></div>
+    </div>
+    <div class="frame">
+      <div class="chrome"><i></i><i></i><i></i><span>artsandculture.google.com</span></div>
+      <div class="screen gac">
+        <div class="gac-nav">
+          <span class="gac-logo">Arts &amp; Culture</span>
+          <span class="gac-links">馆藏 · 故事 · 探索 · 游戏</span>
+          <span class="gac-search">搜索</span>
+        </div>
+        <div class="gac-hero">
+          <svg viewBox="0 0 1000 310" preserveAspectRatio="xMidYMid slice" role="img" aria-label="青花瓷主题抽象主视觉">
+            <rect width="1000" height="310" fill="#0f3255"/>
+            <circle cx="792" cy="158" r="128" fill="#1c5a94"/>
+            <circle cx="905" cy="66" r="72" fill="#2c7cb8" opacity="0.75"/>
+            <path d="M406 310 Q462 168 424 74 Q396 16 470 0 L566 0 Q640 16 612 74 Q574 168 630 310 Z" fill="#e9f2f9"/>
+            <circle cx="518" cy="86" r="30" fill="#0f3255" opacity="0.42"/>
+            <circle cx="518" cy="150" r="16" fill="#0f3255" opacity="0.28"/>
+            <rect x="96" y="212" width="196" height="98" fill="#0a2743" opacity="0.72"/>
+            <rect x="140" y="176" width="108" height="36" fill="#1c5a94" opacity="0.6"/>
+          </svg>
+          <div class="gac-hero-txt">
+            <div class="gac-kicker">馆藏 · 曲阜孔庙 · 宋刻本</div>
+            <h1>一部经典如何流传：<br>《论语》的五个版本</h1>
+            <p>从汉简到宋刻，从抄本到活字——器物、题跋与流传路径如何共同构成证据链。</p>
+            <span class="gac-btn">进入专题 →</span>
+          </div>
+        </div>
+        <div class="gac-sec"><b>继续探索</b><span>基于你的阅读记录推荐</span><em>查看全部 →</em></div>
+        <div class="gac-rail">
+          <div class="gac-card"><div class="thumb" style="background:#1c5a94"></div><b>汉简《论语》残卷</b><span>文物 · 12 件</span></div>
+          <div class="gac-card"><div class="thumb" style="background:#8a6a3a"></div><b>宋刻本避讳考</b><span>考据 · 8 篇</span></div>
+          <div class="gac-card"><div class="thumb" style="background:#3f6b5c"></div><b>孔门弟子图谱</b><span>图谱 · 76 人</span></div>
+          <div class="gac-card"><div class="thumb" style="background:#7a3b2e"></div><b>乡党篇·礼器复原</b><span>3D · 5 件</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="notes">
+      <div>
+        <h3>设计要点</h3>
+        <ul>
+          <li>界面元素近乎隐形：无卡片描边、无投影，内容自己撑起视觉</li>
+          <li>主视觉全出血，文字压在图像左下角，标题 35px 紧行距</li>
+          <li>滑轨横向溢出，暗示"还有更多"，制造探索惯性</li>
+          <li>每张卡只给标题 + 一句类型/数量，信息密度刻意压低</li>
+        </ul>
+      </div>
+      <div>
+        <h3>可迁移到本项目</h3>
+        <ul>
+          <li>「典籍」首页改为策展式：一条主线专题（如《论语》版本流传）替代功能入口罗列</li>
+          <li>把"可溯源"做成视觉主角：图注固定展示 出处 / 版本 / 编号</li>
+          <li>读经页保留横向滑轨切换章节，替代左右翻页按钮</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Token</h3>
+        <table>
+          <tr><td>底色 / 文字</td><td>#FFFFFF / #1F1F1F</td></tr>
+          <tr><td>深蓝主色</td><td>#0F3255</td></tr>
+          <tr><td>次级蓝</td><td>#1C5A94</td></tr>
+          <tr><td>正文灰</td><td>#5F6368</td></tr>
+          <tr><td>圆角</td><td>10px / 全圆 999px</td></tr>
+          <tr><td>标题字重</td><td>600 · 行距 1.16</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="takeaway"><b>一句话：</b>内容即装饰。把"可溯源"从一句口号变成版面结构——出处和图注占的位置，比装饰图更重要。</div>
+  </section>
+
+  <!-- 02 -->
+  <section class="site">
+    <div class="site-head">
+      <div class="idx">02</div>
+      <div>
+        <h2>Duolingo</h2>
+        <p class="meta">游戏化学习 · 对标「六艺关卡」</p>
+      </div>
+      <div class="tags"><span>关卡路径</span><span>连击/经验</span><span>立体按钮</span><span>吉祥物</span></div>
+    </div>
+    <div class="frame">
+      <div class="chrome"><i></i><i></i><i></i><span>duolingo.com</span></div>
+      <div class="screen duo">
+        <div class="duo-nav">
+          <span class="duo-logo">duolingo</span>
+          <span class="duo-links">站点语言 · 效果 · 课程 · 方法</span>
+          <span class="duo-cta">开始学习</span>
+        </div>
+        <div class="duo-hero">
+          <div>
+            <h1>免费、有趣、有效的<br>学经典方式！</h1>
+            <p>每天 5 分钟，在六艺关卡里把理解练成判断力。</p>
+            <span class="duo-btn">开始吧</span>
+            <span class="duo-btn ghost">我已经有账号</span>
+          </div>
+          <div class="duo-art">
+            <svg viewBox="0 0 200 200" width="180" height="180" role="img" aria-label="关卡吉祥物占位">
+              <circle cx="100" cy="100" r="82" fill="#d7ffb8"/>
+              <circle cx="100" cy="96" r="56" fill="#58cc02"/>
+              <circle cx="82" cy="86" r="15" fill="#fff"/>
+              <circle cx="122" cy="86" r="15" fill="#fff"/>
+              <circle cx="84" cy="88" r="7" fill="#3c3c3c"/>
+              <circle cx="124" cy="88" r="7" fill="#3c3c3c"/>
+              <path d="M100 106 L88 128 L112 128 Z" fill="#ffc800"/>
+            </svg>
+          </div>
+        </div>
+        <div class="duo-hud">
+          <span>🔥 <b>12</b> 天</span>
+          <span>经验 <b>840</b></span>
+          <span>体力 <b>5</b></span>
+          <span class="duo-bar"><i></i></span>
+          <span>今日目标 62%</span>
+        </div>
+        <div class="duo-path">
+          <span class="node n-done">礼</span><span class="link"></span>
+          <span class="node n-done">乐</span><span class="link"></span>
+          <span class="node n-cur">射</span><span class="link"></span>
+          <span class="node n-lock">御</span><span class="link"></span>
+          <span class="node n-lock">书</span><span class="link"></span>
+          <span class="node n-lock">数</span>
+        </div>
+      </div>
+    </div>
+    <div class="notes">
+      <div>
+        <h3>设计要点</h3>
+        <ul>
+          <li>按钮底部 4px 实色投影，点击时下移 4px，形成物理按压感</li>
+          <li>路径节点用圆形 + 状态色区分已通/当前/未解锁，一眼可读进度</li>
+          <li>顶部常驻状态栏：连续天数、经验、体力，把"回访"变成可见资产</li>
+          <li>文案口语化、短句、第二人称，按钮文字全大写 + 字距 0.07em</li>
+        </ul>
+      </div>
+      <div>
+        <h3>可迁移到本项目</h3>
+        <ul>
+          <li>六艺关卡改为路径式推进，节点即六艺，当前节点呼吸高亮</li>
+          <li>把"连续研读天数"做成可炫耀的资产，而非埋在个人中心</li>
+          <li>演练页的选项按钮统一为立体按压，答对给绿色顶出反馈</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Token</h3>
+        <table>
+          <tr><td>猫头鹰绿</td><td>#58CC02</td></tr>
+          <tr><td>按压投影</td><td>#46A302（4px）</td></tr>
+          <tr><td>浅绿底</td><td>#D7FFB8</td></tr>
+          <tr><td>信息蓝</td><td>#1CB0F6</td></tr>
+          <tr><td>文字</td><td>#3C3C3C / #777777</td></tr>
+          <tr><td>圆角</td><td>12px / 14px</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="takeaway"><b>一句话：</b>这套视觉的全部目的是"降低启动成本、提高回访率"。它把学习拆成 5 分钟一格，用可见进度替代意志力。</div>
+  </section>
+
+  <!-- 03 -->
+  <section class="site">
+    <div class="site-head">
+      <div class="idx">03</div>
+      <div>
+        <h2>Brilliant</h2>
+        <p class="meta">交互式课程 · 对标「对读与推演」</p>
+      </div>
+      <div class="tags"><span>一屏一交互</span><span>即时判定</span><span>深色高对比</span><span>进度前置</span></div>
+    </div>
+    <div class="frame">
+      <div class="chrome"><i></i><i></i><i></i><span>brilliant.org</span></div>
+      <div class="screen brl">
+        <div class="brl-prog"><i></i></div>
+        <div class="brl-nav">
+          <span class="brl-logo">brilliant</span>
+          <span>课程</span><span>练习</span><span>今日</span>
+          <em>继续上次</em>
+        </div>
+        <div class="brl-hero">
+          <div class="brl-step">第 3 步 / 共 8 步 · 里仁篇</div>
+          <h1>「学而不思则<u>罔</u>」中的「罔」，<br>最接近下列哪一项？</h1>
+          <div class="brl-opts">
+            <div class="brl-opt"><span class="k">A</span>欺骗、蒙蔽他人</div>
+            <div class="brl-opt ok"><span class="k">✓</span>迷惘无所得，思维空转</div>
+            <div class="brl-opt bad"><span class="k">✕</span>勤勉而不知疲倦</div>
+          </div>
+          <div class="brl-foot">
+            <div class="brl-exp">正确。原文与朱熹《集注》均取"昏而无得"义。<b>已附 3 条出处</b></div>
+            <span class="brl-cta">继续</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="notes">
+      <div>
+        <h3>设计要点</h3>
+        <ul>
+          <li>一屏只承载一个交互，绝不堆叠第二个问题</li>
+          <li>顶部进度条贯穿全程，随时告知"还剩几步"</li>
+          <li>判定后立即在同屏给出解释 + 出处，不跳页</li>
+          <li>近黑底 + 单一荧光色，把注意力锁在正确项上</li>
+        </ul>
+      </div>
+      <div>
+        <h3>可迁移到本项目</h3>
+        <ul>
+          <li>「近思」演练页去掉侧边栏与导航，一次只问一个问题</li>
+          <li>判定后不跳转，直接在同屏展开证据链（这是本项目的核心创新点）</li>
+          <li>深色版可作对读页的可选主题，降低长时间阅读疲劳</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Token</h3>
+        <table>
+          <tr><td>底色</td><td>#0F1014</td></tr>
+          <tr><td>卡片面</td><td>#15171D</td></tr>
+          <tr><td>描边</td><td>#262A32</td></tr>
+          <tr><td>强调柠檬绿</td><td>#C9F169</td></tr>
+          <tr><td>正确 / 错误</td><td>#3DDC97 / #E2585B</td></tr>
+          <tr><td>正文</td><td>#C8CDD6</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="takeaway"><b>一句话：</b>把"解释"放进答题卡里，而不是放进另一个页面。判定与溯源同屏，是本项目最能拉开差距的一处。</div>
+  </section>
+
+  <!-- 04 -->
+  <section class="site">
+    <div class="site-head">
+      <div class="idx">04</div>
+      <div>
+        <h2>The Met（含 MetKids）</h2>
+        <p class="meta">开放馆藏 · 对标「图谱与人物关系」</p>
+      </div>
+      <div class="tags"><span>衬线标题</span><span>图注即溯源</span><span>时间轴</span><span>米白纸感</span></div>
+    </div>
+    <div class="frame">
+      <div class="chrome"><i></i><i></i><i></i><span>metmuseum.org</span></div>
+      <div class="screen met">
+        <div class="met-bar"><b>新展</b> 汉唐之间：孔门图像的生成 · 9 月 26 日开幕</div>
+        <div class="met-nav">
+          <span class="met-logo">The Met</span>
+          <span class="met-links">参观 · 展览 · 馆藏 · 学习 · 出版</span>
+          <span class="met-search">搜索馆藏</span>
+        </div>
+        <div class="met-hero">
+          <svg viewBox="0 0 1000 280" preserveAspectRatio="xMidYMid slice" role="img" aria-label="馆藏主题抽象主视觉">
+            <rect width="1000" height="280" fill="#1a1a1a"/>
+            <circle cx="286" cy="146" r="112" fill="#e4002b"/>
+            <rect x="500" y="46" width="188" height="188" fill="#c9a227" opacity="0.92"/>
+            <path d="M760 234 L860 60 L960 234 Z" fill="#f0efeb" opacity="0.9"/>
+            <rect x="120" y="228" width="120" height="52" fill="#3a3a3a"/>
+          </svg>
+          <div class="met-hero-txt">
+            <h1>孔子圣迹图 · 册页</h1>
+            <div class="met-cap">
+              <span>明 · 佚名</span><span>绢本设色</span><span>馆藏编号 <b>1987.241</b></span><span>公有领域 · 可下载高清</span>
+            </div>
+          </div>
+        </div>
+        <div class="met-grid">
+          <div class="met-card"><div class="thumb" style="background:#c9a227"></div><b>《论语》郑玄注残卷</b><span class="acc">ACC. 2019.114</span></div>
+          <div class="met-card"><div class="thumb" style="background:#7a3b2e"></div><b>杏坛讲学图轴</b><span class="acc">ACC. 1978.062</span></div>
+          <div class="met-card"><div class="thumb" style="background:#3f4a5c"></div><b>周礼器物拓本</b><span class="acc">ACC. 2004.331</span></div>
+        </div>
+        <div class="met-tl">
+          <div class="cap">时间轴 · 孔子生平与经典成型</div>
+          <div class="track">
+            <i style="left:4%"></i><i style="left:27%"></i><i style="left:52%"></i><i style="left:74%"></i><i style="left:94%"></i>
+          </div>
+          <div class="lbls"><span>前551 出生</span><span>前517 适周</span><span>前484 归鲁</span><span>前479 卒</span><span>汉 立经</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="notes">
+      <div>
+        <h3>设计要点</h3>
+        <ul>
+          <li>衬线标题承载"权威与年代感"，无衬线只管界面文字，两套分工清晰</li>
+          <li>图注不是装饰：作者 / 年代 / 材质 / 馆藏编号 固定成一行，本身就是溯源</li>
+          <li>米白 #FBFAF7 而非纯白，模拟纸面，降低长时间阅读的冷感</li>
+          <li>全站只用一种强调色（大都会红），且只用在时间轴节点与新展标识</li>
+        </ul>
+      </div>
+      <div>
+        <h3>可迁移到本项目</h3>
+        <ul>
+          <li>「图谱」页的时间轴可直接复用此形态，节点即事件，点击展开原文</li>
+          <li>把宋体标题 + 黑体界面文字的配对固化进设计规范（项目已接近）</li>
+          <li>藏品卡固定一行元数据（出处 / 版本 / 编号），把"可核验"做成组件</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Token</h3>
+        <table>
+          <tr><td>纸面底</td><td>#FBFAF7</td></tr>
+          <tr><td>大都会红</td><td>#E4002B</td></tr>
+          <tr><td>墨色</td><td>#141414</td></tr>
+          <tr><td>辅助金</td><td>#C9A227</td></tr>
+          <tr><td>分割线</td><td>#E3E1DA</td></tr>
+          <tr><td>标题字体</td><td>Georgia / 宋体系衬线</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="takeaway"><b>一句话：</b>权威感来自"元数据的确定性"，不是来自视觉的厚重。一行编号比一段说明文字更有说服力。</div>
+  </section>
+
+  <!-- 05 -->
+  <section class="site">
+    <div class="site-head">
+      <div class="idx">05</div>
+      <div>
+        <h2>Lusion</h2>
+        <p class="meta">WebGL 工作室 · 对标「六艺沉浸式体验」</p>
+      </div>
+      <div class="tags"><span>满屏巨字</span><span>滚动驱动 3D</span><span>跑马灯</span><span>高对比留白</span></div>
+    </div>
+    <div class="frame">
+      <div class="chrome"><i></i><i></i><i></i><span>lusion.co</span></div>
+      <div class="screen lz">
+        <div class="lz-nav">
+          <span class="lz-logo">LUSION</span>
+          <span>作品</span><span>能力</span><span>关于</span>
+          <em>开始合作</em>
+        </div>
+        <div class="lz-hero">
+          <div class="lz-badge">WebGL · 60fps</div>
+          <div class="kick">六艺 · 沉浸式演练</div>
+          <h1>切问<br>近思</h1>
+          <p class="sub">把经典放回具体情境。滚动即推进，每一次选择都留下痕迹。</p>
+        </div>
+        <div class="lz-marquee">礼 · 乐 · 射 · 御 · 书 · 数 · 可溯源 · 可核验 · 可演练 · 礼 · 乐 · 射 · 御 · 书 · 数 · 可溯源 · 可核验 · 可演练 ·</div>
+        <div class="lz-rows">
+          <div class="lz-row"><span class="no">01</span><b>礼 · 乡党篇的进退之节</b><span class="go">进入 →</span></div>
+          <div class="lz-row"><span class="no">02</span><b>乐 · 郑声与雅乐的边界</b><span class="go">进入 →</span></div>
+          <div class="lz-row"><span class="no">03</span><b>射 · 射不主皮的两难</b><span class="go">进入 →</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="notes">
+      <div>
+        <h3>设计要点</h3>
+        <ul>
+          <li>标题做到 64–200px，字距收到 −0.045em，字本身成为图形</li>
+          <li>跑马灯横贯全屏，用重复的文字制造速度感与场域感</li>
+          <li>列表行以序号 + 名称 + 动作三段式排列，悬停整行变色，不做卡片</li>
+          <li>纯黑底 + 单一亮色（#00E0C7 / #FF4D2E），其余全靠留白撑节奏</li>
+        </ul>
+      </div>
+      <div>
+        <h3>可迁移到本项目</h3>
+        <ul>
+          <li>六艺关卡入口页可用满屏巨字 + 跑马灯，替代六宫格卡片，辨识度更高</li>
+          <li>R3F 场景做滚动驱动相机推进，比点击跳转更贴合"演练"的叙事感</li>
+          <li>务必配套「动效开关」（参考美国国家美术馆），并保证无 3D 时的降级形态</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Token</h3>
+        <table>
+          <tr><td>底色</td><td>#08090A</td></tr>
+          <tr><td>亮青</td><td>#00E0C7</td></tr>
+          <tr><td>亮橙红</td><td>#FF4D2E</td></tr>
+          <tr><td>正文灰</td><td>#8A8F96</td></tr>
+          <tr><td>分割线</td><td>#1C1F23</td></tr>
+          <tr><td>标题字距</td><td>−0.045em · 行高 0.96</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="takeaway"><b>一句话：</b>大字与黑底是"年轻感"最省力的来源，但风险同样最高——必须配动效开关与降级方案，否则评委机器上会直接卡住。</div>
+  </section>
+
+  <section class="site">
+    <div class="site-head">
+      <div class="idx">+</div>
+      <div>
+        <h2>延伸备选</h2>
+        <p class="meta">同类方向，备查</p>
+      </div>
+    </div>
+    <div class="notes" style="grid-template-columns:repeat(2,minmax(0,1fr))">
+      <div>
+        <h3>同题材，可继续看</h3>
+        <ul>
+          <li><b>My Grandmother's Lingo</b>（SBS）——原住民语言抢救主题，黑白高对比 + 声音作为核心交互，与"经典传承"最贴题</li>
+          <li><b>Rijksmuseum / Rijksstudio</b>——开放馆藏 + 个人收藏夹，对应"可核验"与用户沉淀</li>
+          <li><b>MoMA</b>——数字导览 + 互动地图；AI 生成图片描述明确标注，可借鉴其透明度处理</li>
+          <li><b>Rock &amp; Roll Hall of Fame</b>——近黑底 + 霓虹强调色，把"档案库"做成出版物质感</li>
+        </ul>
+      </div>
+      <div>
+        <h3>同调性，可继续看</h3>
+        <ul>
+          <li><b>Khan Academy</b>——技能树 + 掌握度可视化，比 Duolingo 更克制，适合成人向</li>
+          <li><b>Kahoot!</b>——游戏节目式高饱和界面，若要做多人对抗演练可参考</li>
+          <li><b>Nomadic Tribe</b>（makemepulse）——每页一个可交互物件，滚动叙事教科书</li>
+          <li><b>Are.na</b>——极简知识组织界面，适合"图谱"类信息架构参考</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,22 @@
+# 可选：本地起 Neo4j，用于真实图谱后端。
+#   docker compose -f docker-compose.neo4j.yml up -d
+#   浏览器打开 http://localhost:7474 （账号 neo4j / kongzi-graph）
+# 然后：
+#   pip install neo4j
+#   NEO4J_URI=bolt://localhost:7687 .venv/bin/python -m app.graph_ingest
+#   在 .env 设 GRAPH_BACKEND=neo4j 并重启后端
+services:
+  neo4j:
+    image: neo4j:5-community
+    container_name: kongzi-neo4j
+    ports:
+      - "7474:7474"   # HTTP 浏览器
+      - "7687:7687"   # Bolt 驱动
+    environment:
+      NEO4J_AUTH: "neo4j/kongzi-graph"
+      NEO4J_PLUGINS: '["apoc"]'
+    volumes:
+      - neo4j_data:/data
+
+volumes:
+  neo4j_data:

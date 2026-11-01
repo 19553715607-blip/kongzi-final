@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>孔子平台 · 短视频与对话</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+<style>
+:root {
+  --color-background-primary: #ffffff;
+  --color-background-secondary: #F5F0E6;
+  --color-text-primary: #2C2C2A;
+  --color-text-secondary: #5F5E5A;
+  --color-text-tertiary: #888780;
+  --color-border-tertiary: rgba(0,0,0,0.12);
+  --color-border-secondary: rgba(0,0,0,0.2);
+  --font-serif: "Songti SC", "STSong", "SimSun", "Noto Serif SC", serif;
+  --font-sans: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", -apple-system, sans-serif;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+}
+body { margin: 0; font-family: var(--font-sans); background: #EFEAE0; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+.gz-stage { background: var(--color-background-secondary); border-radius: var(--border-radius-lg); padding: 20px 12px; display: flex; gap: 12px; justify-content: center; align-items: flex-start; }
+.gz-phone { width: 315px; background: var(--color-background-primary); border: 0.5px solid var(--color-border-secondary); border-radius: 28px; overflow: hidden; position: relative; }
+.gz-phone-label { font-size: 11px; color: var(--color-text-tertiary); text-align: center; margin-top: 8px; letter-spacing: 0.5px; }
+.gz-status { height: 24px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; font-size: 11px; color: var(--color-text-secondary); }
+.gz-tabbar { position: absolute; bottom: 0; left: 0; right: 0; height: 50px; border-top: 0.5px solid var(--color-border-tertiary); background: var(--color-background-primary); display: flex; }
+.gz-tabbar .item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: 10px; color: var(--color-text-tertiary); }
+.gz-tabbar .item.active { color: #993C1D; }
+.gz-tabbar .item i { font-size: 18px; }
+/* video */
+.v-screen { position: absolute; inset: 0; background: #2C2C2A; border-radius: 28px; overflow: hidden; }
+.v-bg { position: absolute; inset: 0; background: #2C2C2A; }
+.v-bg::before { content: ""; position: absolute; top: 0; right: -40px; width: 220px; height: 220px; background: #712B13; border-radius: 50%; opacity: 0.35; }
+.v-bg::after { content: ""; position: absolute; bottom: 80px; left: -40px; width: 180px; height: 180px; background: #085041; border-radius: 50%; opacity: 0.3; }
+.v-status { position: relative; height: 24px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; font-size: 11px; color: #F1EFE8; }
+.v-top { position: relative; padding: 10px 18px; display: flex; gap: 18px; font-size: 13px; color: #B4B2A9; }
+.v-top .on { color: #F1EFE8; font-weight: 500; border-bottom: 2px solid #F0997B; padding-bottom: 2px; }
+.v-quote { position: relative; padding: 80px 28px 0; text-align: center; }
+.v-quote .body { font-family: var(--font-serif); font-size: 30px; color: #F5F0E6; letter-spacing: 5px; line-height: 1.55; font-weight: 500; }
+.v-quote .en { font-family: var(--font-serif); font-size: 12px; color: #D3D1C7; margin-top: 18px; line-height: 1.5; font-style: italic; }
+.v-quote .src { display: inline-block; margin-top: 18px; padding: 4px 12px; background: rgba(245,240,230,0.12); color: #F5F0E6; font-size: 11px; border-radius: 999px; }
+.v-actions { position: absolute; right: 10px; bottom: 140px; display: flex; flex-direction: column; gap: 18px; align-items: center; }
+.v-actions .a { display: flex; flex-direction: column; align-items: center; gap: 2px; color: #F5F0E6; font-size: 10px; }
+.v-actions .a i { font-size: 26px; }
+.v-actions .a.heart i { color: #F0997B; }
+.v-bottom-info { position: absolute; left: 14px; right: 70px; bottom: 70px; color: #F5F0E6; }
+.v-bottom-info .who { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; margin-bottom: 4px; }
+.v-bottom-info .who .av { width: 22px; height: 22px; border-radius: 50%; background: #BA7517; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #412402; font-family: var(--font-serif); }
+.v-bottom-info .tags { font-size: 11px; color: #FAC775; }
+.v-tabbar { position: absolute; bottom: 0; left: 0; right: 0; height: 50px; background: rgba(20,20,20,0.7); display: flex; border-top: 0.5px solid rgba(255,255,255,0.08); }
+.v-tabbar .item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: 10px; color: #888780; }
+.v-tabbar .item.active { color: #F5F0E6; }
+.v-tabbar .item i { font-size: 18px; }
+/* chat */
+.c-header { display: flex; align-items: center; gap: 10px; padding: 8px 14px 12px; border-bottom: 0.5px solid var(--color-border-tertiary); }
+.c-header .av { width: 36px; height: 36px; border-radius: 50%; background: #5DCAA5; color: #04342C; display: flex; align-items: center; justify-content: center; font-family: var(--font-serif); font-weight: 500; font-size: 15px; }
+.c-header .who { flex: 1; }
+.c-header .who .n { font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 4px; }
+.c-header .who .n .dot { width: 7px; height: 7px; border-radius: 50%; background: #639922; }
+.c-header .who .s { font-size: 11px; color: var(--color-text-tertiary); }
+.c-header .swap { font-size: 18px; color: var(--color-text-secondary); }
+.c-chat { padding: 12px 12px 0; display: flex; flex-direction: column; gap: 10px; }
+.c-msg { max-width: 80%; padding: 8px 12px; border-radius: 16px; font-size: 12px; line-height: 1.6; }
+.c-msg.user { align-self: flex-end; background: #993C1D; color: #FAECE7; border-bottom-right-radius: 4px; }
+.c-msg.ai { align-self: flex-start; background: var(--color-background-secondary); color: var(--color-text-primary); border-bottom-left-radius: 4px; }
+.c-msg.ai-soft { align-self: flex-start; background: #E1F5EE; color: #04342C; border-bottom-left-radius: 4px; }
+.c-classic { align-self: flex-start; background: #FAECE7; border-left: 3px solid #993C1D; border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0; padding: 10px 12px; max-width: 88%; }
+.c-classic .ct { font-family: var(--font-serif); font-size: 15px; color: #4A1B0C; letter-spacing: 2px; font-weight: 500; }
+.c-classic .cs { font-size: 10px; color: #993C1D; margin-top: 4px; }
+.c-chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 12px 6px; }
+.c-chips .chip { font-size: 11px; padding: 5px 10px; border-radius: 999px; background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); color: var(--color-text-secondary); }
+.c-input { position: absolute; bottom: 0; left: 0; right: 0; background: var(--color-background-primary); border-top: 0.5px solid var(--color-border-tertiary); padding: 10px 12px; display: flex; align-items: center; gap: 8px; }
+.c-input .ibox { flex: 1; height: 32px; background: var(--color-background-secondary); border-radius: 16px; display: flex; align-items: center; padding: 0 12px; font-size: 11px; color: var(--color-text-tertiary); }
+.c-input i { font-size: 20px; color: var(--color-text-secondary); }
+.c-input .send { width: 32px; height: 32px; border-radius: 50%; background: #993C1D; color: #FAECE7; display: flex; align-items: center; justify-content: center; }
+.c-input .send i { color: #FAECE7; font-size: 16px; }
+.c-typing { align-self: flex-start; background: var(--color-background-secondary); padding: 7px 12px; border-radius: 16px; font-size: 11px; color: var(--color-text-tertiary); display: flex; align-items: center; gap: 5px; }
+.c-typing .d { width: 4px; height: 4px; border-radius: 50%; background: var(--color-text-tertiary); }
+</style>
+</head>
+<body>
+<div class="gz-stage">
+  <div>
+    <div class="gz-phone" style="height: 560px; background: #2C2C2A;">
+      <div class="v-screen">
+        <div class="v-bg"></div>
+        <div class="v-status"><span>9:41</span><span style="display: flex; gap: 4px;"><i class="ti ti-wifi"></i><i class="ti ti-battery-3"></i></span></div>
+        <div class="v-top"><span class="on">推荐</span><span>关注</span><span>话题</span></div>
+        <div class="v-quote">
+          <div class="body">学而时习之<br/>不亦说乎</div>
+          <div class="en">Isn't it a joy to learn,<br/>and to apply what you've learned?</div>
+          <div class="src">论语 · 学而 · 子曰君解读</div>
+        </div>
+        <div class="v-actions">
+          <div class="a heart"><i class="ti ti-heart"></i><span>1.2k</span></div>
+          <div class="a"><i class="ti ti-message"></i><span>89</span></div>
+          <div class="a"><i class="ti ti-share-3"></i><span>分享</span></div>
+          <div class="a"><i class="ti ti-photo"></i><span>壁纸</span></div>
+          <div class="a"><i class="ti ti-bookmark"></i><span>收藏</span></div>
+        </div>
+        <div class="v-bottom-info">
+          <div class="who"><span class="av">曰</span>子曰君 · 学而篇</div>
+          <div class="tags">#每日金句 #治愈系古文 #i人友好</div>
+        </div>
+        <div class="v-tabbar">
+          <div class="item"><i class="ti ti-home"></i>首页</div>
+          <div class="item active"><i class="ti ti-player-play"></i>刷刷</div>
+          <div class="item"><i class="ti ti-book-2"></i>读经</div>
+          <div class="item"><i class="ti ti-message-circle"></i>对话</div>
+          <div class="item"><i class="ti ti-user"></i>我</div>
+        </div>
+      </div>
+    </div>
+    <div class="gz-phone-label">01 · 经典短视频流</div>
+  </div>
+  <div>
+    <div class="gz-phone" style="height: 560px;">
+      <div class="gz-status"><span>9:41</span><span style="display: flex; gap: 4px;"><i class="ti ti-wifi"></i><i class="ti ti-battery-3"></i></span></div>
+      <div class="c-header">
+        <div class="av">曰</div>
+        <div class="who">
+          <div class="n">子曰君<span class="dot"></span></div>
+          <div class="s">经典派 · 在线 · 温和而严谨</div>
+        </div>
+        <i class="ti ti-arrows-shuffle swap"></i>
+      </div>
+      <div class="c-chat">
+        <div class="c-msg user">最近老是 emo，怎么办😮‍💨</div>
+        <div class="c-msg ai-soft">嗯，听到你不舒服了。先抱抱～</div>
+        <div class="c-msg ai">先别急着"解决"情绪。孔子有句话特别戳：</div>
+        <div class="c-classic">
+          <div class="ct">不怨天，不尤人</div>
+          <div class="cs">论语 · 宪问</div>
+        </div>
+        <div class="c-msg ai">不是让你压抑，是把"向外抱怨"的劲收回来一点，留点能量给自己。</div>
+        <div class="c-typing"><span class="d"></span><span class="d"></span><span class="d"></span>子曰君正在想…</div>
+      </div>
+      <div class="c-chips">
+        <div class="chip">展开聊聊</div>
+        <div class="chip">换个角度</div>
+        <div class="chip">求出处</div>
+      </div>
+      <div class="c-input">
+        <i class="ti ti-microphone"></i>
+        <div class="ibox">说点什么…</div>
+        <i class="ti ti-mood-smile"></i>
+        <div class="send"><i class="ti ti-arrow-up"></i></div>
+      </div>
+    </div>
+    <div class="gz-phone-label">02 · AI 对话（子曰君人格）</div>
+  </div>
+</div>
+</body>
+</html>

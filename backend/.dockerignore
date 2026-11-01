@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+*.pyc
+kongzi.db
+chroma/
+.env
+.env.*
+docker-compose*.yml
+README.md

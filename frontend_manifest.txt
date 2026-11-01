@@ -1,0 +1,182 @@
+前端压缩包文件清单（共 117 个文件；已排除 node_modules / .next / *.log）
+
+[frontend]
+   .dockerignore
+   .eslintrc.json
+   .gitignore
+   Dockerfile
+   README.md
+   next-env.d.ts
+   next.config.mjs
+   package-lock.json
+   package.json
+   postcss.config.mjs
+   tailwind.config.ts
+   tsconfig.json
+
+[frontend/public/hanzi-data]
+   中.json
+   义.json
+   习.json
+   仁.json
+   信.json
+   勇.json
+   友.json
+   君.json
+   命.json
+   和.json
+   圣.json
+   天.json
+   孝.json
+   学.json
+   德.json
+   心.json
+   忠.json
+   思.json
+   性.json
+   恕.json
+   悌.json
+   敬.json
+   智.json
+   省.json
+   知.json
+   礼.json
+   行.json
+   诚.json
+   道.json
+   问.json
+
+[frontend/src/app/admin/cases]
+   page.tsx
+
+[frontend/src/app/admin/institutions]
+   page.tsx
+
+[frontend/src/app/cases/[id]]
+   page.tsx
+
+[frontend/src/app/cases]
+   page.tsx
+
+[frontend/src/app/chat]
+   page.tsx
+
+[frontend/src/app/co-create]
+   page.tsx
+
+[frontend/src/app/developers]
+   page.tsx
+
+[frontend/src/app]
+   favicon.ico
+   globals.css
+   layout.tsx
+   page.tsx
+
+[frontend/src/app/feed]
+   page.tsx
+
+[frontend/src/app/fonts]
+   GeistMonoVF.woff
+   GeistVF.woff
+
+[frontend/src/app/graph]
+   page.tsx
+
+[frontend/src/app/journey/li]
+   Li3DGame.tsx
+   liHostAudio.ts
+   liHostData.ts
+   liHostLogic.ts
+   liHostPlayer.tsx
+   liHostVisuals.tsx
+   page.tsx
+
+[frontend/src/app/journey/math]
+   MathGame.tsx
+   mathAudio.ts
+   mathEngine.ts
+   mathScene.tsx
+   page.tsx
+
+[frontend/src/app/journey]
+   page.tsx
+
+[frontend/src/app/journey/she]
+   SheGame.tsx
+   page.tsx
+   sheAimInset.tsx
+   sheAudio.ts
+   sheEngine.ts
+   sheScene.tsx
+
+[frontend/src/app/journey/shu/assemble]
+   page.tsx
+
+[frontend/src/app/journey/shu/brush3d]
+   Brush3DGame.tsx
+   brushAudio.ts
+   brushEngine.ts
+   brushScene.tsx
+   page.tsx
+
+[frontend/src/app/journey/shu]
+   page.tsx
+
+[frontend/src/app/journey/shu/write]
+   page.tsx
+
+[frontend/src/app/journey/yu]
+   YuGame.tsx
+   page.tsx
+   yuAudio.ts
+   yuEngine.ts
+   yuScene.tsx
+
+[frontend/src/app/journey/yue]
+   YueGame.tsx
+   page.tsx
+   yueAudio.ts
+   yueEngine.ts
+   yueScene.tsx
+
+[frontend/src/app/kiosk]
+   layout.tsx
+   page.tsx
+
+[frontend/src/app/login]
+   page.tsx
+
+[frontend/src/app/me]
+   page.tsx
+
+[frontend/src/app/plugins]
+   page.tsx
+
+[frontend/src/app/reach]
+   page.tsx
+
+[frontend/src/app/read]
+   page.tsx
+
+[frontend/src/components]
+   LangSwitcher.tsx
+   Nav.tsx
+   ScrollTopButton.tsx
+   ThemeToggle.tsx
+   Toast.tsx
+   Tracker.tsx
+   UserMenu.tsx
+
+[frontend/src/lib]
+   api.ts
+   apiBase.ts
+   auth.ts
+   i18n.ts
+   metaText.ts
+   track.ts
+   types.ts
+   ui.ts
+
+[frontend/src/lib/gameDict]
+   common.ts
