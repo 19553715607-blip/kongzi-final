@@ -1,11 +1,11 @@
 /**
- * 礼 · 第三人称行走操控（WASD / 方向键 + 跟随镜头，参考 Summer Afternoon）
+ * 礼 · 庭院行走操控（WASD / 方向键 + 正面固定镜头）
  */
 
 import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useRef, type MutableRefObject } from "react";
 import * as THREE from "three";
-import { LowPolyPerson, PAL, WORLD } from "./liHostVisuals";
+import { RiteFigure, PAL, WORLD } from "./liHostVisuals";
 import * as sfx from "./liHostAudio";
 
 export const PLAYER_START = new THREE.Vector3(0, 0, 1.2);
@@ -104,36 +104,19 @@ export function PlayerAvatar({
 
   return (
     <group ref={group} position={PLAYER_START.toArray()}>
-      <LowPolyPerson robeColor={PAL.hostRobe} hat="host" bowTilt={bowTilt} walkRef={walkRef} />
+      <RiteFigure robeColor={PAL.hostRobe} hat="host" bowTilt={bowTilt} walkRef={walkRef} />
     </group>
   );
 }
 
-/** Summer Afternoon 式跟随镜头：后上方平滑追随 */
-export function FollowCamera({
-  target,
-  active,
-  bowTilt,
-}: {
-  target: MutableRefObject<THREE.Vector3>;
-  active: boolean;
-  bowTilt: number;
-}) {
+/** 正面固定镜头：人物居中，主殿入口与重檐完整留在人物身后。 */
+export function FixedRiteCamera() {
   const { camera } = useThree();
-  const look = useRef(new THREE.Vector3());
-  const ideal = useRef(new THREE.Vector3());
-
-  useFrame(() => {
-    if (!active) return;
-    const t = target.current;
-    const dist = 4.2 - bowTilt * 0.8;
-    const height = 2.35 + bowTilt * 0.3;
-    ideal.current.set(t.x, t.y + height, t.z + dist);
-    camera.position.lerp(ideal.current, 0.09);
-    look.current.set(t.x, t.y + 1.05 - bowTilt * 0.4, t.z - 1.8);
-    camera.lookAt(look.current);
-  });
-
+  useEffect(() => {
+    camera.position.set(0, 4.8, 10.5);
+    camera.lookAt(0, 1.8, -4.5);
+    camera.updateProjectionMatrix();
+  }, [camera]);
   return null;
 }
 
