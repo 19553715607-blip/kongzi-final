@@ -72,3 +72,4 @@ htmlcov/
 # 运行时数据(TTS 音频缓存 / 用户上传头像)
 backend/audio_cache/
 backend/uploads/
+*.bak-*

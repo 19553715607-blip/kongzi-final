@@ -10,7 +10,7 @@ export const META_TITLE: Record<string, string> = {
   en: "Kongzi · Confucian Semantic Platform",
   fr: "Kongzi · Plateforme sémantique confucéenne",
   es: "Kongzi · Plataforma semántica confuciana",
-  ar: "كونغ تسي · منصة المعنى الكونفوشيوسي",
+  ar: "كونغ تسي · المنصة الدلالية للفكر الكونفوشيوسي",
 };
 
 export const META_DESCRIPTION: Record<string, string> = {
@@ -18,7 +18,7 @@ export const META_DESCRIPTION: Record<string, string> = {
   en: "A multi-terminal, multilingual, multi-agent semantic platform for the Confucian classics",
   fr: "Une plateforme sémantique multi-terminal, multilingue et multi-agents pour les classiques confucéens",
   es: "Una plataforma semántica multiterminal, multilingüe y multiagente para los clásicos confucianos",
-  ar: "منصة دلالية متعددة الأجهزة واللغات والعملاء للنصوص الكونفوشيوسية",
+  ar: "منصة دلالية متعددة الأجهزة واللغات، مدعومة بوكلاء أذكياء متعددين، للنصوص الكونفوشيوسية الكلاسيكية",
 };
 
 export const META_KEYWORDS: Record<string, string> = {
@@ -26,6 +26,6 @@ export const META_KEYWORDS: Record<string, string> = {
   en: "Kongzi, Confucius, Confucianism, Analects, Four Books, Chinese characters, philology, classics, multilingual",
   fr: "Kongzi, Confucius, confucéisme, Analectes, classiques chinois, caractères chinois, philologie, multilingue",
   es: "Kongzi, Confucio, confucianismo, Analectas, clásicos chinos, caracteres chinos, filología, multilingüe",
-  ar: "كونغ تسي, كونفوشيوس, الكونفوشيوسية, المختارات, كلاسيكيات صينية, حروف صينية, متعدد اللغات",
+  ar: "كونغ تسي, كونفوشيوس, الكونفوشيوسية, مقولات كونفوشيوس, كلاسيكيات صينية, حروف صينية, متعدد اللغات",
 };
 // i18n-scan-ignore-end
