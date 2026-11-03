@@ -52,7 +52,7 @@ export const SHU: Record<string, E> = {
     es: "← Seis artes",
     ar: "→ الفنون الستة",
   },
-  "游戏 · 1": { en: "Game · 1", fr: "Jeu · 1", es: "Juego · 1", ar: "لعبة · ١" },
+  "游戏 · 1": { en: "Game · 1", fr: "Jeu · 1", es: "Juego · 1", ar: "لعبة · 1" },
   "拼字游戏 →": {
     en: "Assemble a character →",
     fr: "Assembler un caractère →",
@@ -71,7 +71,7 @@ export const SHU: Record<string, E> = {
     es: "Comprende la estructura de los caracteres. Correcto: Caligrafía +3–9.",
     ar: "افهم كيف تُبنى الحروف. الإجابة الصحيحة: الخط +3–9.",
   },
-  "游戏 · 2": { en: "Game · 2", fr: "Jeu · 2", es: "Juego · 2", ar: "لعبة · ٢" },
+  "游戏 · 2": { en: "Game · 2", fr: "Jeu · 2", es: "Juego · 2", ar: "لعبة · 2" },
   "描红写字 →": {
     en: "Trace and write →",
     fr: "Repasser et écrire →",
@@ -90,7 +90,7 @@ export const SHU: Record<string, E> = {
     es: "Siente el gesto de «escribir». Al escribirlo: Caligrafía +2.",
     ar: "استشعر فعل «الكتابة». عند الكتابة: الخط +2.",
   },
-  "游戏 · 3": { en: "Game · 3", fr: "Jeu · 3", es: "Juego · 3", ar: "لعبة · ٣" },
+  "游戏 · 3": { en: "Game · 3", fr: "Jeu · 3", es: "Juego · 3", ar: "لعبة · 3" },
   "竹简挥毫 →": {
     en: "Brush on bamboo slips →",
     fr: "Le pinceau sur les bambous →",

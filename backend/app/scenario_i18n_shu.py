@@ -56,7 +56,7 @@ SHU_CARD_I18N: dict[str, dict] = {
             "en": "\"Ren\" is written with \"person\" and \"two\"; in bronze script it looks like two people standing side by side. The ancients held that one living alone has no occasion for ren: only when people deal with one another does that heart of mutual care count as ren. Mencius said, \"Ren is the human heart\" — ren is not an external rule but the innate virtue of the human heart.",
             "fr": "« Ren » s'écrit avec « homme » et « deux » ; en écriture sur bronze, il figure deux personnes côte à côte. Les anciens tenaient qu'un homme vivant seul n'a pas matière à ren : c'est seulement dans les rapports entre personnes que ce cœur de sollicitude mutuelle est ren. Mencius a dit : « Ren, c'est le cœur de l'homme » — ren n'est pas une règle extérieure, mais la vertu innée du cœur humain.",
             "es": "«Ren» se escribe con «persona» y «dos»; en escritura de bronce figura dos personas lado a lado. Los antiguos sostenían que quien vive solo no tiene ocasión de ren: solo en el trato entre personas ese corazón de mutuo cuidado es ren. Mencio dijo: «Ren es el corazón del hombre» — ren no es una norma externa, sino la virtud innata del corazón humano.",
-            "ar": "«رِن» تُكتب بـ«إنسان» و«اثنان»، وفي كتابة البرونز تمثّل شخصين يقفان جنبًا إلى جنب. ورأى القدماء أن المنفرد وحده لا محلّ له من رِن؛ فحين يتعامل الناس فيما بينهم يصير ذلك القلب المتعاهد رِن. قال منسيوس: «رِن قلب الإنسان» — فهي ليست قاعدة خارجية بل فضيلة القلب الإنساني الفطرية.",
+            "ar": "«رِن» تُكتب بـ«إنسان» و«اثنان»، وفي كتابة البرونز تمثّل شخصين يقفان جنبًا إلى جنب. ورأى القدماء أن المنفرد وحده لا محلّ له من رِن؛ فحين يتعامل الناس فيما بينهم يصير ذلك القلب المتعاهد رِن. قال مينسيوس: «رِن قلب الإنسان» — فهي ليست قاعدة خارجية بل فضيلة القلب الإنساني الفطرية.",
         },
         "options": {
             "A": {"text": {
@@ -102,7 +102,7 @@ SHU_CARD_I18N: dict[str, dict] = {
             "en": "The traditional form of \"yi\" joins \"sheep\" and \"I\": the sheep was a sacrificial animal of good omen, \"I\" a weapon — together, \"I take up arms to guard the auspicious rite\". By extension it means acting fittingly, in accord with the right way. Mencius said, \"Yi is the straight road for man\".",
             "fr": "La forme traditionnelle de « yi » réunit « mouton » et « moi » : le mouton était une victime sacrificielle de bon augure, « moi » une arme — ensemble : « je prends les armes pour garder le rite propice ». Par extension, agir avec justesse, selon la voie droite. Mencius a dit : « Yi est le droit chemin de l'homme ».",
             "es": "La forma tradicional de «yi» une «oveja» y «yo»: la oveja era víctima propiciatoria de buen augurio, «yo» un arma; juntas: «tomo las armas para guardar el rito propicio». Por extensión, obrar con rectitud, conforme al camino recto. Mencio dijo: «Yi es el camino recto del hombre».",
-            "ar": "الشكل التقليدي لـ«يي» يجمع «الخروف» و«أنا»: فالخروف قربان مبارك، و«أنا» سلاح؛ ومعًا: «أحمل السلاح حمايةً للطقس الميمون». ثم اتسع المعنى إلى العمل بما يليق وفق الطريق المستقيم. قال منسيوس: «يي طريق الإنسان المستقيم».",
+            "ar": "الشكل التقليدي لـ«يي» يجمع «الخروف» و«أنا»: فالخروف قربان مبارك، و«أنا» سلاح؛ ومعًا: «أحمل السلاح حمايةً للطقس الميمون». ثم اتسع المعنى إلى العمل بما يليق وفق الطريق المستقيم. قال مينسيوس: «يي طريق الإنسان المستقيم».",
         },
         "options": {
             "A": {"text": {
@@ -1206,7 +1206,7 @@ SHU_CARD_I18N: dict[str, dict] = {
             "en": "\"Xing\" is \"heart\" with \"birth\": \"what the human heart has from birth\". From this the Confucians developed the debate between Mencius's \"nature is good\" and Xunzi's \"nature is evil\". The Doctrine of the Mean: \"What Heaven decrees is called nature; to follow nature is called the Way; to cultivate the Way is called teaching\" — xing is the innate given.",
             "fr": "« Xing » est « cœur » avec « naissance » : « ce que le cœur humain a dès la naissance ». De là le débat confucéen entre la « nature bonne » de Mencius et la « nature mauvaise » de Xunzi. La Doctrine du Milieu : « Ce que le Ciel décrète est la nature ; suivre sa nature est la Voie ; cultiver la Voie est l'enseignement » — xing est le donné inné.",
             "es": "«Xing» es «corazón» con «nacimiento»: «lo que el corazón humano tiene desde el nacimiento». De ahí el debate confuciano entre la «naturaleza buena» de Mencio y la «naturaleza mala» de Xunzi. La Doctrina del Medio: «Lo que el Cielo decreta es la naturaleza; seguir la naturaleza es la Vía; cultivar la Vía es la enseñanza»: xing es el don innato.",
-            "ar": "«شينغ» هي «القلب» مع «الميلاد»: «ما للقلب الإنساني منذ الولادة». ومن هنا نشأ الخلاف الكونفوشي بين «الطبيعة صالحة» عند منسيوس و«الطبيعة شريرة» عند شيون تسي. وفي مذهب الوسط: «ما يقضيه السماء هو الطبيعة، واتباع الطبيعة هو الطريق، وتهذيب الطريق هو التعليم» — فشينغ هي المعطى الفطري.",
+            "ar": "«شينغ» هي «القلب» مع «الميلاد»: «ما للقلب الإنساني منذ الولادة». ومن هنا نشأ الخلاف الكونفوشي بين «الطبيعة صالحة» عند مينسيوس و«الطبيعة شريرة» عند شيون تسي. وفي مذهب الوسط: «ما يقضيه السماء هو الطبيعة، واتباع الطبيعة هو الطريق، وتهذيب الطريق هو التعليم» — فشينغ هي المعطى الفطري.",
         },
         "options": {
             "A": {"text": {

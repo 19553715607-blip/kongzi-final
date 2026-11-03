@@ -73,3 +73,4 @@ htmlcov/
 backend/audio_cache/
 backend/uploads/
 *.bak-*
+*.bak2-*
