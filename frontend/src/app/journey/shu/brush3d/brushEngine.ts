@@ -219,22 +219,46 @@ export function redrawView(st: BrushEngineState) {
   const ctx = st.view.getContext("2d")!;
   const S = CANVAS_SIZE;
   ctx.setTransform(1, 0, 0, 1, 0, 0);
-  // 宣纸底
-  ctx.fillStyle = "#f6f0dd";
+  // 竹简底：竖排竹片 + 编绳（缝隙深底 → 竹片 → 竹纹 → 片缘圆竹光影 → 竹节 → 编绳）
+  const slips = 10;
+  const sw = S / slips;
+  ctx.fillStyle = "#4a3a22";
   ctx.fillRect(0, 0, S, S);
-  // 纸纹（淡斑点）
-  ctx.fillStyle = "rgba(180,160,110,0.05)";
-  for (let i = 0; i < 120; i++) {
-    const x = (i * 733) % S;
-    const y = (i * 397) % S;
-    ctx.fillRect(x, y, 3 + (i % 5), 2 + (i % 3));
+  for (let i = 0; i < slips; i++) {
+    const x = i * sw;
+    const b = 196 + ((i * 37) % 26) - 13;
+    ctx.fillStyle = "rgb(" + (b + 8) + "," + (b - 20) + "," + Math.max(92, b - 76) + ")";
+    ctx.fillRect(x + 2, 0, sw - 4, S);
+    ctx.strokeStyle = "rgba(120,95,45,0.22)";
+    ctx.lineWidth = 1.6;
+    for (let g = 0; g < 5; g++) {
+      const gx = x + 5 + ((g * 53 + i * 31) % (sw - 10));
+      ctx.beginPath();
+      ctx.moveTo(gx, 0);
+      ctx.lineTo(gx + (g % 2 ? 3 : -3), S);
+      ctx.stroke();
+    }
+    const grad = ctx.createLinearGradient(x, 0, x + sw, 0);
+    grad.addColorStop(0, "rgba(56,42,18,0.42)");
+    grad.addColorStop(0.16, "rgba(56,42,18,0)");
+    grad.addColorStop(0.84, "rgba(56,42,18,0)");
+    grad.addColorStop(1, "rgba(56,42,18,0.42)");
+    ctx.fillStyle = grad;
+    ctx.fillRect(x + 2, 0, sw - 4, S);
+    ctx.fillStyle = "rgba(92,68,30,0.5)";
+    ctx.fillRect(x + 2, 10, sw - 4, 5);
+    ctx.fillRect(x + 2, S - 15, sw - 4, 5);
   }
-  // 边框
-  ctx.strokeStyle = "rgba(150,50,40,0.55)";
-  ctx.lineWidth = 6;
-  ctx.strokeRect(30, 30, S - 60, S - 60);
-  // 米字格
-  ctx.strokeStyle = "rgba(150,50,40,0.28)";
+  for (const cy of [S * 0.15, S * 0.5, S * 0.85]) {
+    ctx.fillStyle = "#4a3520";
+    ctx.fillRect(0, cy - 7, S, 14);
+    ctx.fillStyle = "rgba(22,16,9,0.55)";
+    for (let i = 0; i < slips; i++) ctx.fillRect(i * sw + sw / 2 - 2.5, cy - 7, 5, 14);
+    ctx.fillStyle = "rgba(255,236,190,0.10)";
+    ctx.fillRect(0, cy - 7, S, 3);
+  }
+  // 米字格（竹上刻痕风）
+  ctx.strokeStyle = "rgba(74,50,22,0.42)";
   ctx.lineWidth = 3;
   ctx.setLineDash([14, 12]);
   ctx.beginPath();

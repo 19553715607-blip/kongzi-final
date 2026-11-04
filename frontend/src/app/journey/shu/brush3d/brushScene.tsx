@@ -176,7 +176,7 @@ function InkStone() {
     <group position={[2.6, DESK_Y + 0.02, -0.7]}>
       <mesh position={[0, 0.09, 0]}>
         <cylinderGeometry args={[0.58, 0.64, 0.18, 20]} />
-        <meshStandardMaterial color="#3a3a40" roughness={0.6} />
+        <meshStandardMaterial color="#33333a" roughness={0.28} metalness={0.06} />
       </mesh>
       {/* 墨池（镜面反光） */}
       <mesh position={[0, 0.185, 0]} rotation={[-Math.PI / 2, 0, 0]}>
@@ -194,12 +194,12 @@ function BrushRest() {
       {[-0.28, 0, 0.28].map((x, i) => (
         <mesh key={i} position={[x, 0.16, 0]}>
           <coneGeometry args={[0.16, 0.32 + (i === 1 ? 0.1 : 0), 8]} />
-          <InkMat color="#7a8a96" />
+          <meshStandardMaterial color="#7a8a96" roughness={0.26} metalness={0.04} />
         </mesh>
       ))}
       <mesh position={[0, 0.03, 0]}>
         <boxGeometry args={[0.9, 0.06, 0.3]} />
-        <InkMat color="#5a6a76" />
+        <meshStandardMaterial color="#5a6a76" roughness={0.32} metalness={0.04} />
       </mesh>
     </group>
   );
@@ -212,7 +212,7 @@ function PaperWeights() {
       {[-1, 1].map((s) => (
         <mesh key={s} position={[s * (PAPER.w / 2 + 0.12), PAPER.y + 0.05, PAPER.cz]}>
           <boxGeometry args={[0.16, 0.09, 2.8]} />
-          <meshStandardMaterial color="#4a4440" metalness={0.3} roughness={0.5} />
+          <meshStandardMaterial color="#6a5a3c" metalness={0.75} roughness={0.32} />
         </mesh>
       ))}
     </>
@@ -380,8 +380,8 @@ function Brush({ g }: { g: BrushRefs }) {
     <group ref={grp} position={[1.6, PAPER.y + 1.6, 0.4]} rotation={[0.5, 0, 0.12]}>
       {/* 竹杆 */}
       <mesh position={[0, 0.62, 0]}>
-        <cylinderGeometry args={[0.045, 0.05, 1.25, 10]} />
-        <InkMat color="#b08d57" />
+        <cylinderGeometry args={[0.045, 0.05, 1.25, 12]} />
+        <meshStandardMaterial color="#b08d57" roughness={0.38} metalness={0.04} />
       </mesh>
       {/* 杆顶挂绳 */}
       <mesh position={[0, 1.28, 0]}>
@@ -396,7 +396,7 @@ function Brush({ g }: { g: BrushRefs }) {
       {/* 笔头（锥形墨尖，按压压扁） */}
       <mesh ref={tip} position={[0, -0.2, 0]}>
         <coneGeometry args={[0.062, 0.26, 10]} />
-        <InkMat color="#2a2118" />
+        <meshStandardMaterial color="#2a2118" roughness={0.26} />
       </mesh>
       <mesh position={[0, -0.31, 0]}>
         <sphereGeometry args={[0.03, 8, 6]} />
