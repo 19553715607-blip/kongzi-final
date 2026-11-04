@@ -32,7 +32,7 @@ import { Reveal, CountUp, Pressable } from "@/lib/motion";
 import { TactileButton } from "@/components/museum";
 import {
   dist2d,
-  FixedRiteCamera,
+  FollowRiteCamera,
   PLAYER_START,
   PlayerAvatar,
   useMovementKeys,
@@ -498,7 +498,7 @@ export default function Li3DGame({
               bowTilt={bowTilt}
               onMove={onPlayerMove}
             />
-            <FixedRiteCamera />
+            <FollowRiteCamera playerPos={playerPos} />
           </Suspense>
         </Canvas>
 

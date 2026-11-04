@@ -1,5 +1,5 @@
 /**
- * 礼 · 庭院行走操控（WASD / 方向键 + 正面固定镜头）
+ * 礼 · 庭院行走操控（WASD / 方向键 + 过门跟随镜头）
  */
 
 import { useFrame, useThree } from "@react-three/fiber";
@@ -109,14 +109,19 @@ export function PlayerAvatar({
   );
 }
 
-/** 正面固定镜头：人物居中，主殿入口与重檐完整留在人物身后。 */
-export function FixedRiteCamera() {
+/** 跟随镜头：随人物过门推进，高机位俯瞰构图保持（主殿始终在前方视野内）。 */
+export function FollowRiteCamera({ playerPos }: { playerPos: MutableRefObject<THREE.Vector3> }) {
   const { camera } = useThree();
-  useEffect(() => {
-    camera.position.set(0, 4.8, 10.5);
-    camera.lookAt(0, 1.8, -4.5);
-    camera.updateProjectionMatrix();
-  }, [camera]);
+  const look = useRef(new THREE.Vector3(0, 1.8, -4.5));
+  const ideal = useRef(new THREE.Vector3(0, 4.8, 10.5));
+  useFrame(() => {
+    const p = playerPos.current;
+    // 横向半跟随（避免左右步态带得镜头晃），纵向全跟随（过门即推进）
+    ideal.current.set(p.x * 0.55, 4.35, p.z + 8.6);
+    camera.position.lerp(ideal.current, 0.06);
+    look.current.lerp(new THREE.Vector3(p.x * 0.75, 1.5, p.z - 3.4), 0.08);
+    camera.lookAt(look.current);
+  });
   return null;
 }
 
