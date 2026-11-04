@@ -632,6 +632,10 @@ function AIChariot({ g, tr, idx }: { g: YuRefs; tr: YuTraffic; idx: number }) {
           const off = child.userData.leg % 2 === 0 ? 0 : Math.PI;
           child.rotation.x = Math.sin(phase + off) * 0.5;
         }
+        if (child.userData.knee != null) {
+          const koff = child.userData.knee % 2 === 0 ? 0 : Math.PI;
+          child.rotation.x = -Math.max(0, Math.sin(phase + koff - 0.85)) * 0.45;
+        }
       });
     }
     // 相揖回礼（稍迟 0.4s，先受礼再答礼）
@@ -728,6 +732,10 @@ function Chariot({ g }: { g: YuRefs }) {
         if (child.userData.leg != null) {
           const off = child.userData.leg % 2 === 0 ? 0 : Math.PI;
           child.rotation.x = Math.sin(phase + off) * 0.5 * Math.min(1, speed / 4);
+        }
+        if (child.userData.knee != null) {
+          const koff = child.userData.knee % 2 === 0 ? 0 : Math.PI;
+          child.rotation.x = -Math.max(0, Math.sin(phase + koff - 0.85)) * 0.45 * Math.min(1, speed / 4);
         }
       });
     });
@@ -829,6 +837,8 @@ function HorseModel({ coat, mane }: { coat: string; mane: string }) {
     scene.traverse((o) => {
       const m = /^leg_([0-3])$/.exec(o.name);
       if (m) o.userData.leg = Number(m[1]);
+      const k = /^knee_([0-3])$/.exec(o.name);
+      if (k) o.userData.knee = Number(k[1]);
     });
     return scene;
   }, [scene]);
