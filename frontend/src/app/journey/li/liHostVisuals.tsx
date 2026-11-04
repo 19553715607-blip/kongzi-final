@@ -820,7 +820,7 @@ function CourtyardGround() {
 
 // 【渲染优化】GLB 已减面并内嵌 PBR 贴图，不加载 FBX 或远程解码器。
 function ImportedPavilion() {
-  const { scene } = useGLTF("/models/li/e554ccfa-pavilion.glb", false, false);
+  const { scene } = useGLTF("/models/li/e554ccfa-pavilion.glb", false, true);
   const pavilion = useMemo(() => {
     const copy = scene.clone(true);
     copy.traverse((object) => {
@@ -858,7 +858,7 @@ function ImportedAncientTree({ variant, position, height, facing }: {
   height: number;
   facing: number;
 }) {
-  const { scene } = useGLTF(`/models/li/ancient-tree-${variant}.glb`, false, false);
+  const { scene } = useGLTF(`/models/li/ancient-tree-${variant}.glb`, false, true);
   const tree = useMemo(() => {
     const copy = scene.clone(true);
     copy.traverse((object) => {

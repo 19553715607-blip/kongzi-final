@@ -74,3 +74,6 @@ backend/audio_cache/
 backend/uploads/
 *.bak-*
 *.bak2-*
+
+# ─── 3D 源文件档案(本地留档, 不进 git; 外部备份: D:/d/designkongzi-assets-archive) ───
+assets/models/
