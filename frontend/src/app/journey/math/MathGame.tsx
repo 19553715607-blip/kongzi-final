@@ -286,6 +286,9 @@ export default function MathGame() {
                 <div className="mt-1 text-xs leading-relaxed opacity-85">{gt(current.setting, lang)}</div>
                 <div className="mt-1 text-[11px] opacity-70">{gt(current.hint, lang)}</div>
                 {current.principle && <div className="mt-1.5 text-[11px] text-sky-200">{gt("法曰", lang)}{gt(current.principle, lang)}</div>}
+                <div className="mt-2 rounded-lg bg-white/10 px-3 py-1.5 text-[11px]">
+                  {gt("目标", lang)}：{gt("把", lang)} <b className="text-[#f0d9a0]">{current.total} {current.unit}</b> {gt("按各项指标比例分入各村", lang)} — {gt("分完封仓验收", lang)}
+                </div>
               </div>
             </Reveal>
           )}
@@ -347,12 +350,13 @@ export default function MathGame() {
             </div>
           )}
 
-          {/* 桌面键位提示 */}
+          {/* 桌面键位提示 + 三步引导 */}
           {phase === "playing" && (
             <div className="pointer-events-none absolute right-3 top-3 hidden rounded-full bg-black/45 px-3 py-1 text-[10px] text-white backdrop-blur sm:block">
               {gt("←→ 选村 · ↑ 出粮 · ↓ 回粮 · Enter 验收", lang)}
             </div>
           )}
+          {phase === "playing" && <StepTutorial g={g} />}
         </section>
       )}
 
@@ -416,10 +420,12 @@ function RemainingGauge({ g }: { g: MathRefs }) {
   );
 }
 
-// ── 每村已分小条（rAF 驱动） ──
+// ── 每村已分小条（rAF 驱动；含权重 attrs 与当前村高亮） ──
 function VillageMeters({ g, scenario }: { g: MathRefs; scenario: MathScenarioBrief }) {
+  const [lang] = useLang();
   const barRefs = useRef<(HTMLDivElement | null)[]>([]);
   const txtRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  const rowRefs = useRef<(HTMLDivElement | null)[]>([]);
   useEffect(() => {
     let raf = 0;
     const loop = () => {
@@ -435,6 +441,8 @@ function VillageMeters({ g, scenario }: { g: MathRefs; scenario: MathScenarioBri
           }
           const txt = txtRefs.current[i];
           if (txt) txt.textContent = `${Math.round(v)} ${scenario.unit} · ${Math.round(pct)}%`;
+          const row = rowRefs.current[i];
+          if (row) row.style.background = st.selected === i ? "rgba(217,165,33,0.14)" : "transparent";
         });
       }
       raf = requestAnimationFrame(loop);
@@ -443,21 +451,62 @@ function VillageMeters({ g, scenario }: { g: MathRefs; scenario: MathScenarioBri
     return () => cancelAnimationFrame(raf);
   }, [g, scenario]);
   return (
-    <div className="pointer-events-none absolute left-3 top-3 w-[190px] space-y-1.5 rounded-2xl bg-black/45 p-3 backdrop-blur">
+    <div className="pointer-events-none absolute left-3 top-3 w-[210px] space-y-1 rounded-2xl bg-black/45 p-3 backdrop-blur">
+      <div className="text-[10px] tracking-widest text-white/55">{gt("按题分粮 · 金框为当前村", lang)}</div>
       {scenario.items.map((it, i) => (
-        <div key={it.name}>
-          <div className="flex justify-between text-[10px] text-white/80">
+        <div key={it.name} ref={(el) => { rowRefs.current[i] = el; }} className="rounded-lg px-1.5 py-0.5 transition-colors">
+          <div className="flex justify-between text-[10px] text-white/85">
             <span className="font-medium">{it.name_display ?? it.name}</span>
             <span ref={(el) => { txtRefs.current[i] = el; }} className="text-white/60" />
           </div>
+          <div className="text-[9px] leading-tight text-white/50">{it.attrs}</div>
           <div className="mt-0.5 h-1.5 overflow-hidden rounded-full bg-white/20">
             <div ref={(el) => { barRefs.current[i] = el; }} className="h-full rounded-full" style={{ width: "0%" }} />
           </div>
         </div>
       ))}
+      <div className="border-t border-white/15 pt-1 text-[9px] leading-tight text-white/45">
+        {gt("总", lang)} {scenario.total} {scenario.unit} · {gt("按各项指标比例分入各村", lang)}
+      </div>
     </div>
   );
 }
+
+// ── 三步引导（首次游玩：做完一步勾一步，全勾后隐去） ──
+function StepTutorial({ g }: { g: MathRefs }) {
+  const [lang] = useLang();
+  const [done, setDone] = useState({ sel: false, pour: false, full: false });
+  const allDone = done.sel && done.pour && done.full;
+  useEffect(() => {
+    const id = setInterval(() => {
+      const st = g.engine;
+      if (!st) return;
+      const poured = allocatedSum(st) > 0.5;
+      const full = remaining(st) <= Math.max(0.5, st.scenario.total * 0.002);
+      setDone((s) => {
+        const n = { sel: s.sel || poured || st.selected !== 0, pour: s.pour || poured, full: s.full || full };
+        return n.sel === s.sel && n.pour === s.pour && n.full === s.full ? s : n;
+      });
+    }, 400);
+    return () => clearInterval(id);
+  }, [g]);
+  if (allDone) return null;
+  const Step = ({ n, ok, text }: { n: string; ok: boolean; text: string }) => (
+    <div className={`flex items-center gap-1.5 text-[11px] ${ok ? "text-[#d9a521] line-through opacity-70" : "text-white/90"}`}>
+      <span className={`flex h-4 w-4 items-center justify-center rounded-full text-[9px] ${ok ? "bg-[#d9a521] text-black" : "bg-white/25"}`}>{ok ? "✓" : n}</span>
+      {text}
+    </div>
+  );
+  return (
+    <div className="pointer-events-none absolute right-3 top-11 w-[190px] space-y-1 rounded-2xl bg-black/45 p-3 backdrop-blur animate-fadein">
+      <div className="text-[10px] tracking-widest text-white/55">{gt("怎么玩", lang)}</div>
+      <Step n="1" ok={done.sel} text={gt("←→ 或 ◀▶ 选村", lang)} />
+      <Step n="2" ok={done.pour} text={gt("↑ 按住出粮 · ↓ 回粮", lang)} />
+      <Step n="3" ok={done.full} text={gt("粮分完 → 封仓验收", lang)} />
+    </div>
+  );
+}
+
 
 // ── 结算卡 ──
 function ResultCard({ result, onRetry, onBack }: { result: MathSolveResp; onRetry: () => void; onBack: () => void }) {
