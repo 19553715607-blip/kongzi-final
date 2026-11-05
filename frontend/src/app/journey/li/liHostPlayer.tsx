@@ -5,10 +5,37 @@
 import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useRef, type MutableRefObject } from "react";
 import * as THREE from "three";
-import { RiteFigure, PAL, WORLD } from "./liHostVisuals";
+import { RiteFigure, PAL, WORLD, LI_COLLIDERS } from "./liHostVisuals";
 import * as sfx from "./liHostAudio";
 
 export const PLAYER_START = new THREE.Vector3(0, 0, 1.2);
+
+const PLAYER_R = 0.26;
+
+/** 实体碰撞：圆推离 + 盒最小轴推出（与 WORLD 边界钳制配合）。 */
+function resolveColliders(px: number, pz: number): [number, number] {
+  for (const c of LI_COLLIDERS.circles) {
+    const dx = px - c.x;
+    const dz = pz - c.z;
+    const d = Math.hypot(dx, dz);
+    const min = c.r + PLAYER_R;
+    if (d < min && d > 1e-4) {
+      px = c.x + (dx / d) * min;
+      pz = c.z + (dz / d) * min;
+    }
+  }
+  for (const b of LI_COLLIDERS.boxes) {
+    const dx = px - b.x;
+    const dz = pz - b.z;
+    const ox = b.hx + PLAYER_R - Math.abs(dx);
+    const oz = b.hz + PLAYER_R - Math.abs(dz);
+    if (ox > 0 && oz > 0) {
+      if (ox < oz) px = b.x + Math.sign(dx || 1) * (b.hx + PLAYER_R);
+      else pz = b.z + Math.sign(dz || 1) * (b.hz + PLAYER_R);
+    }
+  }
+  return [px, pz];
+}
 
 export interface MoveInput {
   x: number;
@@ -83,10 +110,11 @@ export function PlayerAvatar({
     walkRef.current = moving.current ? 1 : 0;
 
     if (moving.current) {
-      group.current.position.x += ix * speed * dt;
-      group.current.position.z += iz * speed * dt;
-      group.current.position.x = THREE.MathUtils.clamp(group.current.position.x, WORLD.minX, WORLD.maxX);
-      group.current.position.z = THREE.MathUtils.clamp(group.current.position.z, WORLD.minZ, WORLD.maxZ);
+      const nx = group.current.position.x + ix * speed * dt;
+      const nz = group.current.position.z + iz * speed * dt;
+      const [cx, cz] = resolveColliders(nx, nz);
+      group.current.position.x = THREE.MathUtils.clamp(cx, WORLD.minX, WORLD.maxX);
+      group.current.position.z = THREE.MathUtils.clamp(cz, WORLD.minZ, WORLD.maxZ);
       const targetYaw = Math.atan2(ix, iz);
       group.current.rotation.y = THREE.MathUtils.lerp(group.current.rotation.y, targetYaw, 0.14);
       // 石板脚步：每行进 0.62 个世界单位一步

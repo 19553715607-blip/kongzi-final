@@ -72,6 +72,26 @@ export function seatWorldPos(idx: number): THREE.Vector3 {
   return new THREE.Vector3(Math.sin(a) * 1.3, 0, -4.5 + Math.cos(a) * 1.15);
 }
 
+/** 实体碰撞体（与摆件视觉对位）：圆=柱/灯/门柱，盒=亭后墙。 */
+export const LI_COLLIDERS: {
+  circles: { x: number; z: number; r: number }[];
+  boxes: { x: number; z: number; hx: number; hz: number }[];
+} = {
+  circles: [
+    { x: 1.35, z: 3.1, r: 0.3 },     // 门楼柱
+    { x: -1.35, z: 3.1, r: 0.3 },
+    { x: 2.4, z: -0.9, r: 0.24 },    // 石灯笼
+    { x: -2.4, z: -0.9, r: 0.24 },
+    { x: 2.3, z: -3.35, r: 0.36 },   // 亭前柱
+    { x: -2.3, z: -3.35, r: 0.36 },
+    { x: 1.5, z: -5.45, r: 0.3 },    // 亭内柱
+    { x: -1.5, z: -5.45, r: 0.3 },
+  ],
+  boxes: [
+    { x: 0, z: -7.0, hx: 2.7, hz: 0.35 }, // 亭后墙
+  ],
+};
+
 // ── CanvasTexture 文字（匾额 / 宾客名签，沿用乐场景写法） ──
 
 function makePlaqueTexture(title: string): THREE.CanvasTexture {
