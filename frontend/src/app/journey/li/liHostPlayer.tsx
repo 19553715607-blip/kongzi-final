@@ -109,17 +109,21 @@ export function PlayerAvatar({
   );
 }
 
-/** 跟随镜头：随人物过门推进，高机位俯瞰构图保持（主殿始终在前方视野内）。 */
+/** 跟随镜头：随人物过门推进；近亭自动降高缩距钻入檐下（瓦顶不挡视线）。 */
 export function FollowRiteCamera({ playerPos }: { playerPos: MutableRefObject<THREE.Vector3> }) {
   const { camera } = useThree();
   const look = useRef(new THREE.Vector3(0, 1.8, -4.5));
   const ideal = useRef(new THREE.Vector3(0, 4.8, 10.5));
   useFrame(() => {
     const p = playerPos.current;
-    // 横向半跟随（避免左右步态带得镜头晃），纵向全跟随（过门即推进）
-    ideal.current.set(p.x * 0.55, 4.35, p.z + 8.6);
+    // 深度系数：1=门外/门内前段（高机位远观），0=亭前（低机位檐下近观）
+    const depth = THREE.MathUtils.clamp((p.z + 4.5) / 5.7, 0, 1);
+    const h = 2.2 + 2.55 * depth;
+    const back = 5.2 + 3.8 * depth;
+    const side = 2.2 * (1 - depth); // 近亭侧前方斜视角（避开正对名签与檐柱）
+    ideal.current.set(p.x * 0.55 + side, h, p.z + back);
     camera.position.lerp(ideal.current, 0.06);
-    look.current.lerp(new THREE.Vector3(p.x * 0.75, 1.5, p.z - 3.4), 0.08);
+    look.current.lerp(new THREE.Vector3(p.x * 0.75 + side * 0.35, 1.35 + 0.25 * depth, p.z - 0.6 - 2.4 * depth), 0.08);
     camera.lookAt(look.current);
   });
   return null;
