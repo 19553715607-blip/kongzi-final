@@ -197,7 +197,7 @@ function Fields({ length }: { length: number }) {
       {strips.map((s, i) => (
         <mesh key={i} rotation={[-Math.PI / 2, 0, 0]} position={[s.x, 0.02, s.z]}>
           <planeGeometry args={[s.w, s.d]} />
-          <InkMat color={s.c} />
+          <InkMat color={s.c} grain="grass" repeat={[8, 3]} />
         </mesh>
       ))}
     </>
@@ -651,7 +651,7 @@ function AIChariot({ g, tr, idx }: { g: YuRefs; tr: YuTraffic; idx: number }) {
       {/* 辕 */}
       <mesh position={[0, 0.86, -1.6]} rotation={[Math.PI / 2, 0, 0]}>
         <cylinderGeometry args={[0.05, 0.06, 2.4, 8]} />
-        <InkMat color="#5a3b1d" />
+        <InkMat color="#5a3b1d" grain="wood" repeat={[2, 2]} />
       </mesh>
       {/* 舆（与玩家朱厢相别） */}
       <mesh position={[0, 0.98, 0.2]}>
@@ -661,7 +661,7 @@ function AIChariot({ g, tr, idx }: { g: YuRefs; tr: YuTraffic; idx: number }) {
       {/* 盖 */}
       <mesh position={[0, 1.9, 0.22]}>
         <cylinderGeometry args={[0.035, 0.035, 1.25, 8]} />
-        <InkMat color="#5a3b1d" />
+        <InkMat color="#5a3b1d" grain="wood" repeat={[2, 2]} />
       </mesh>
       <mesh position={[0, 2.58, 0.22]}>
         <coneGeometry args={[1.05, 0.46, 12]} />
@@ -753,11 +753,11 @@ function Chariot({ g }: { g: YuRefs }) {
       {/* 辕 + 轭 */}
       <mesh position={[0, 0.86, -1.7]} rotation={[Math.PI / 2, 0, 0]}>
         <cylinderGeometry args={[0.05, 0.06, 2.8, 8]} />
-        <InkMat color="#5a3b1d" />
+        <InkMat color="#5a3b1d" grain="wood" repeat={[2, 2]} />
       </mesh>
       <mesh position={[0, 1.05, -2.6]} rotation={[0, 0, Math.PI / 2]}>
         <cylinderGeometry args={[0.045, 0.045, 1.7, 8]} />
-        <InkMat color="#6b4a26" />
+        <InkMat color="#6b4a26" grain="wood" repeat={[2, 1]} />
       </mesh>
       {/* 鸾铃（轭两端） */}
       {[-0.85, 0.85].map((x) => (
@@ -771,30 +771,30 @@ function Chariot({ g }: { g: YuRefs }) {
         {/* 厢体 */}
         <mesh position={[0, 0.98, 0.2]}>
           <boxGeometry args={[1.7, 0.5, 1.5]} />
-          <InkMat color="#8c2f24" />
+          <InkMat color="#8c2f24" grain="lacquer" repeat={[3, 1]} />
         </mesh>
         {/* 栏杆 */}
         {[-0.8, 0.8].map((x) => (
           <mesh key={x} position={[x, 1.45, 0.2]}>
             <boxGeometry args={[0.06, 0.45, 1.5]} />
-            <InkMat color="#5a3b1d" />
+            <InkMat color="#5a3b1d" grain="wood" repeat={[2, 2]} />
           </mesh>
         ))}
         <mesh position={[0, 1.45, 0.92]}>
           <boxGeometry args={[1.7, 0.45, 0.06]} />
-          <InkMat color="#5a3b1d" />
+          <InkMat color="#5a3b1d" grain="wood" repeat={[2, 2]} />
         </mesh>
         {/* 轼（前横木） */}
         <mesh position={[0, 1.32, -0.5]} rotation={[0, 0, Math.PI / 2]}>
           <cylinderGeometry args={[0.035, 0.035, 1.6, 8]} />
-          <InkMat color="#6b4a26" />
+          <InkMat color="#6b4a26" grain="wood" repeat={[2, 1]} />
         </mesh>
         {/* 御者（按礼时拱手一揖） */}
         <Driver ref={driverRef} coat="#6b2420" />
         {/* 华盖杆 + 盖 */}
         <mesh position={[0, 1.9, 0.25]}>
           <cylinderGeometry args={[0.035, 0.035, 1.3, 8]} />
-          <InkMat color="#5a3b1d" />
+          <InkMat color="#5a3b1d" grain="wood" repeat={[2, 2]} />
         </mesh>
         <mesh position={[0, 2.62, 0.25]}>
           <coneGeometry args={[1.15, 0.5, 12]} />
@@ -854,13 +854,13 @@ const SpokedWheel = forwardRef<THREE.Group, { x: number; z: number }>(
         {/* 轮圈（绕 x 轴旋转 → 圈在 yz 平面） */}
         <mesh rotation={[0, Math.PI / 2, 0]}>
           <torusGeometry args={[0.62, 0.055, 10, 28]} />
-          <InkMat color="#4a3520" />
+          <InkMat color="#4a3520" grain="wood" repeat={[3, 2]} />
         </mesh>
         {/* 辐条 */}
         {spokes.map((a, i) => (
           <mesh key={i} rotation={[a, 0, 0]}>
             <cylinderGeometry args={[0.028, 0.028, 1.2, 6]} />
-            <InkMat color="#6b4a26" />
+            <InkMat color="#6b4a26" grain="wood" repeat={[2, 1]} />
           </mesh>
         ))}
         {/* 毂 */}

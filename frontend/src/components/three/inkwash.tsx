@@ -53,19 +53,134 @@ export function toonGradient(): THREE.DataTexture {
   return tex;
 }
 
-/** 受光主体材质:宣纸分档着色 */
+// ── 程序化材质纹理(去塑料感:木纹/漆器/灰浆/竹纹/布纹/草皮) ──
+export type GrainKind = "wood" | "lacquer" | "plaster" | "bamboo" | "cloth" | "grass";
+const _grainBase: Partial<Record<GrainKind, HTMLCanvasElement>> = {};
+
+function grainCanvas(kind: GrainKind): HTMLCanvasElement {
+  const hit = _grainBase[kind];
+  if (hit) return hit;
+  const size = 256;
+  const c = document.createElement("canvas");
+  c.width = c.height = size;
+  const ctx = c.getContext("2d")!;
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, size, size);
+  const line = (x1: number, y1: number, x2: number, y2: number, w: number, a: string) => {
+    ctx.strokeStyle = a;
+    ctx.lineWidth = w;
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+  };
+  if (kind === "wood") {
+    for (let i = 0; i < 46; i++) {
+      const x = Math.random() * size;
+      const wob = 6 + Math.random() * 10;
+      line(x, 0, x + (Math.random() < 0.5 ? wob : -wob), size, 1 + Math.random() * 2.2,
+        `rgba(96,64,30,${0.08 + Math.random() * 0.16})`);
+    }
+    for (let i = 0; i < 5; i++) {
+      ctx.fillStyle = `rgba(90,58,26,${0.10 + Math.random() * 0.08})`;
+      ctx.beginPath();
+      ctx.ellipse(Math.random() * size, Math.random() * size, 3 + Math.random() * 5, 8 + Math.random() * 10, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  } else if (kind === "lacquer") {
+    for (let i = 0; i < 26; i++) {
+      line(Math.random() * size, 0, Math.random() * size, size, 1 + Math.random() * 2,
+        `rgba(70,40,16,${0.05 + Math.random() * 0.07})`);
+    }
+    for (let i = 0; i < 7; i++) {
+      ctx.fillStyle = `rgba(255,214,140,${0.04 + Math.random() * 0.05})`;
+      ctx.beginPath();
+      ctx.ellipse(Math.random() * size, Math.random() * size, 22 + Math.random() * 34, 10 + Math.random() * 18, Math.random() * Math.PI, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  } else if (kind === "plaster") {
+    for (let i = 0; i < 900; i++) {
+      ctx.fillStyle = `rgba(118,108,92,${0.05 + Math.random() * 0.06})`;
+      ctx.fillRect(Math.random() * size, Math.random() * size, 1 + Math.random() * 2, 1 + Math.random() * 2);
+    }
+    for (let i = 0; i < 8; i++) {
+      ctx.fillStyle = `rgba(206,200,186,${0.06 + Math.random() * 0.06})`;
+      ctx.beginPath();
+      ctx.ellipse(Math.random() * size, Math.random() * size, 18 + Math.random() * 30, 14 + Math.random() * 22, Math.random() * Math.PI, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  } else if (kind === "bamboo") {
+    for (let i = 0; i < 70; i++) {
+      const x = (i / 70) * size + Math.random() * 2;
+      line(x, 0, x + (Math.random() * 4 - 2), size, 1, `rgba(108,88,40,${0.10 + Math.random() * 0.12})`);
+    }
+    for (const y of [size * 0.3, size * 0.72]) {
+      ctx.fillStyle = "rgba(104,80,38,0.24)";
+      ctx.fillRect(0, y, size, 6);
+      ctx.fillStyle = "rgba(255,240,200,0.18)";
+      ctx.fillRect(0, y + 6, size, 2);
+    }
+  } else if (kind === "cloth") {
+    for (let y = 0; y < size; y += 4) line(0, y, size, y, 1, "rgba(96,86,64,0.12)");
+    for (let x = 0; x < size; x += 4) line(x, 0, x, size, 1, "rgba(96,86,64,0.09)");
+    for (let i = 0; i < 6; i++) {
+      ctx.fillStyle = `rgba(210,196,160,${0.05 + Math.random() * 0.05})`;
+      ctx.beginPath();
+      ctx.ellipse(Math.random() * size, Math.random() * size, 20 + Math.random() * 30, 16 + Math.random() * 24, Math.random() * Math.PI, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  } else {
+    // grass
+    for (let i = 0; i < 420; i++) {
+      const x = Math.random() * size;
+      const y = Math.random() * size;
+      const h = 4 + Math.random() * 9;
+      line(x, y, x + (Math.random() * 4 - 2), y - h, 1.2,
+        Math.random() < 0.5 ? `rgba(88,118,58,${0.14 + Math.random() * 0.12})` : `rgba(168,196,116,${0.12 + Math.random() * 0.10})`);
+    }
+    for (let i = 0; i < 6; i++) {
+      ctx.fillStyle = `rgba(140,158,96,${0.08 + Math.random() * 0.06})`;
+      ctx.beginPath();
+      ctx.ellipse(Math.random() * size, Math.random() * size, 24 + Math.random() * 36, 14 + Math.random() * 20, Math.random() * Math.PI, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+  _grainBase[kind] = c;
+  return c;
+}
+
+export function grainTexture(kind: GrainKind, rx: number, ry: number): THREE.CanvasTexture {
+  const tex = new THREE.CanvasTexture(grainCanvas(kind));
+  tex.wrapS = THREE.RepeatWrapping;
+  tex.wrapT = THREE.RepeatWrapping;
+  tex.repeat.set(rx, ry);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 4;
+  return tex;
+}
+
+/** 受光主体材质:宣纸分档着色 + 可选程序化纹理(去塑料感) */
 export function InkMat({
   color,
   opacity,
+  grain,
+  repeat = [1, 1],
 }: {
   color?: string;
   opacity?: number;
+  grain?: GrainKind;
+  repeat?: [number, number];
 }) {
   const grad = toonGradient();
+  const map = useMemo(
+    () => (grain ? grainTexture(grain, repeat[0], repeat[1]) : null),
+    [grain, repeat[0], repeat[1]],
+  );
   return (
     <meshToonMaterial
       color={color}
       gradientMap={grad}
+      map={map ?? undefined}
       transparent={opacity != null && opacity < 1}
       opacity={opacity ?? 1}
     />

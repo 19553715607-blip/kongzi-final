@@ -9,6 +9,7 @@
 
 import { useFrame } from "@react-three/fiber";
 import { useGLTF } from "@react-three/drei";
+import { grainTexture } from "@/components/three/inkwash";
 import { softenCourtyardShadows, useCourtyardSurface, useCourtyardTexture } from "./liHostTextures";
 import { CourtyardColorGrade, InkMountainMaterial } from "./liHostRendering";
 import { Suspense, useEffect, useMemo, useRef, type MutableRefObject } from "react";
@@ -685,7 +686,7 @@ function Walls() {
         <group key={x} position={[x, 0, -2.9]}>
           <mesh position={[0, 0.88, 0]}>
             <boxGeometry args={[0.26, 1.76, 12.2]} />
-            <meshStandardMaterial color="#d1cec2" />
+            <meshStandardMaterial color="#d1cec2" map={grainTexture("plaster", 4, 2)} roughness={0.92} />
           </mesh>
           {cap(0.44, 12.3)}
         </group>
@@ -694,7 +695,7 @@ function Walls() {
       <group position={[0, 0, -9.0]}>
         <mesh position={[0, 0.88, 0]}>
           <boxGeometry args={[13.3, 1.76, 0.26]} />
-          <meshStandardMaterial color="#d1cec2" />
+          <meshStandardMaterial color="#d1cec2" map={grainTexture("plaster", 4, 2)} roughness={0.92} />
         </mesh>
         {cap(13.4, 0.44)}
       </group>
@@ -703,7 +704,7 @@ function Walls() {
         <group key={x} position={[x, 0, 3.1]}>
           <mesh position={[0, 0.88, 0]}>
             <boxGeometry args={[5.4, 1.76, 0.26]} />
-            <meshStandardMaterial color="#d1cec2" />
+            <meshStandardMaterial color="#d1cec2" map={grainTexture("plaster", 4, 2)} roughness={0.92} />
           </mesh>
           {cap(5.5, 0.44)}
         </group>

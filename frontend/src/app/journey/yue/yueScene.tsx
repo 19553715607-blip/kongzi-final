@@ -224,7 +224,7 @@ function Lanterns() {
         <group key={x} position={[x, 0.3, RACK_Z + 0.6]}>
           <mesh position={[0, 1.1, 0]}>
             <cylinderGeometry args={[0.05, 0.07, 2.2, 8]} />
-            <InkMat color={WOOD} />
+            <InkMat color={WOOD} grain="wood" repeat={[2, 1]} />
           </mesh>
           <mesh position={[0, 2.35, 0]}>
             <boxGeometry args={[0.42, 0.52, 0.42]} />
@@ -232,7 +232,7 @@ function Lanterns() {
           </mesh>
           <mesh position={[0, 2.68, 0]}>
             <coneGeometry args={[0.36, 0.22, 4]} />
-            <InkMat color={LACQUER} />
+            <InkMat color={LACQUER} grain="lacquer" repeat={[2, 2]} />
           </mesh>
         </group>
       ))}
@@ -249,11 +249,11 @@ function BellRack({ g }: { g: YueRefs }) {
         <group key={x} position={[x, 0, RACK_Z]}>
           <mesh position={[0, 1.9, 0]}>
             <cylinderGeometry args={[0.13, 0.17, 3.8, 10]} />
-            <InkMat color={LACQUER} />
+            <InkMat color={LACQUER} grain="lacquer" repeat={[2, 2]} />
           </mesh>
           <mesh position={[0, 0.12, 0]}>
             <boxGeometry args={[0.6, 0.24, 0.6]} />
-            <InkMat color={WOOD} />
+            <InkMat color={WOOD} grain="wood" repeat={[2, 1]} />
           </mesh>
           <mesh position={[0, 3.86, 0]}>
             <sphereGeometry args={[0.14, 10, 8]} />
@@ -264,7 +264,7 @@ function BellRack({ g }: { g: YueRefs }) {
       {/* 横梁（髹漆彩绘：朱梁金缘） */}
       <mesh position={[0, BEAM_Y, RACK_Z]}>
         <boxGeometry args={[7.4, 0.22, 0.26]} />
-        <InkMat color={LACQUER} />
+        <InkMat color={LACQUER} grain="lacquer" repeat={[2, 2]} />
       </mesh>
       <mesh position={[0, BEAM_Y + 0.13, RACK_Z]}>
         <boxGeometry args={[7.4, 0.05, 0.28]} />
@@ -313,7 +313,7 @@ function Bell({ g, note, idx }: { g: YueRefs; note: YueNote; idx: number }) {
       {/* 挂索 */}
       <mesh position={[0, (BEAM_Y - center.y) / 2 + 0.05, 0]}>
         <cylinderGeometry args={[0.03, 0.03, BEAM_Y - center.y - 0.1, 6]} />
-        <InkMat color={WOOD} />
+        <InkMat color={WOOD} grain="wood" repeat={[2, 1]} />
       </mesh>
       <group ref={grp} onPointerDown={(e) => { e.stopPropagation(); g.onStrike.current(note); }}>
         {/* 甬柄 */}

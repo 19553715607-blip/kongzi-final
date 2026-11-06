@@ -112,7 +112,7 @@ function Fields() {
       {strips.map((s, i) => (
         <mesh key={i} rotation={[-Math.PI / 2, 0, 0]} position={[s.x, 0.02, s.z]}>
           <planeGeometry args={[s.w, s.d]} />
-          <InkMat color={s.c} />
+          <InkMat color={s.c} grain="grass" repeat={[8, 3]} />
         </mesh>
       ))}
     </>
@@ -133,14 +133,14 @@ function BambooScreen() {
       {slats.map((s, i) => (
         <mesh key={i} position={[s.x, 3.1, 0]}>
           <boxGeometry args={[0.4, 6.2, 0.06]} />
-          <InkMat color={s.c} />
+          <InkMat color={s.c} grain="bamboo" repeat={[1, 3]} />
         </mesh>
       ))}
       {/* 帘上横梁 */}
       {[5.4, 3.4].map((y) => (
         <mesh key={y} position={[0, y, 0.06]}>
           <boxGeometry args={[17.4, 0.09, 0.04]} />
-          <InkMat color={WOOD_DARK} />
+          <InkMat color={WOOD_DARK} grain="wood" repeat={[2, 1]} />
         </mesh>
       ))}
     </group>
@@ -153,17 +153,17 @@ function Desk() {
     <group position={[0, 0, -1.2]}>
       <mesh position={[0, DESK_Y - 0.16, 0]}>
         <boxGeometry args={[7.6, 0.32, 4.8]} />
-        <InkMat color={WOOD} />
+        <InkMat color={WOOD} grain="wood" repeat={[3, 2]} />
       </mesh>
       {/* 案沿 */}
       <mesh position={[0, DESK_Y + 0.005, 0]}>
         <boxGeometry args={[7.7, 0.03, 4.9]} />
-        <InkMat color={WOOD_DARK} />
+        <InkMat color={WOOD_DARK} grain="wood" repeat={[2, 1]} />
       </mesh>
       {[[-3.4, -2.0], [3.4, -2.0], [-3.4, 2.0], [3.4, 2.0]].map(([x, z], i) => (
         <mesh key={i} position={[x, DESK_Y / 2 - 0.16, z]}>
           <boxGeometry args={[0.3, DESK_Y - 0.3, 0.3]} />
-          <InkMat color={WOOD_DARK} />
+          <InkMat color={WOOD_DARK} grain="wood" repeat={[2, 1]} />
         </mesh>
       ))}
     </group>
@@ -239,7 +239,7 @@ function Candle() {
     <group position={[3.2, DESK_Y + 0.02, -2.6]}>
       <mesh position={[0, 0.5, 0]}>
         <cylinderGeometry args={[0.035, 0.05, 1.0, 8]} />
-        <InkMat color={WOOD_DARK} />
+        <InkMat color={WOOD_DARK} grain="wood" repeat={[2, 1]} />
       </mesh>
       <mesh position={[0, 1.02, 0]}>
         <cylinderGeometry args={[0.22, 0.14, 0.1, 12]} />
@@ -386,7 +386,7 @@ function Brush({ g }: { g: BrushRefs }) {
       {/* 杆顶挂绳 */}
       <mesh position={[0, 1.28, 0]}>
         <cylinderGeometry args={[0.015, 0.015, 0.1, 6]} />
-        <InkMat color={WOOD_DARK} />
+        <InkMat color={WOOD_DARK} grain="wood" repeat={[2, 1]} />
       </mesh>
       {/* 笔斗 */}
       <mesh position={[0, -0.03, 0]}>

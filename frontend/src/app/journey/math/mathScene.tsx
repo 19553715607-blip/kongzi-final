@@ -271,7 +271,7 @@ function Fields() {
       {strips.map((s, i) => (
         <mesh key={i} rotation={[-Math.PI / 2, 0, 0]} position={[s.x, 0.02, s.z]}>
           <planeGeometry args={[s.w, s.d]} />
-          <InkMat color={s.c} />
+          <InkMat color={s.c} grain="grass" repeat={[8, 3]} />
         </mesh>
       ))}
     </>
@@ -306,7 +306,7 @@ function Granary({ g }: { g: MathRefs }) {
       {[0.55, 1.35].map((y) => (
         <mesh key={y} position={[0, y, 0]}>
           <torusGeometry args={[1.83, 0.05, 8, 32]} />
-          <InkMat color={WOOD} />
+          <InkMat color={WOOD} grain="wood" repeat={[2, 2]} />
         </mesh>
       ))}
       {/* 粮堆锥体（随剩余量缩放） */}
@@ -318,7 +318,7 @@ function Granary({ g }: { g: MathRefs }) {
       {[[-1.5, -1.5], [1.5, -1.5], [-1.5, 1.5], [1.5, 1.5]].map(([x, z], i) => (
         <mesh key={i} position={[x, 2.3, z]}>
           <cylinderGeometry args={[0.07, 0.09, 2.2, 8]} />
-          <InkMat color={WOOD} />
+          <InkMat color={WOOD} grain="wood" repeat={[2, 2]} />
         </mesh>
       ))}
       <mesh position={[0, 4.05, 0]}>
@@ -332,7 +332,7 @@ function Granary({ g }: { g: MathRefs }) {
       {/* 仓口斜槽 */}
       <mesh position={[0, 1.95, 1.65]} rotation={[0.6, 0, 0]}>
         <boxGeometry args={[0.5, 0.14, 1.1]} />
-        <InkMat color={WOOD} />
+        <InkMat color={WOOD} grain="wood" repeat={[2, 2]} />
       </mesh>
       {/* 仓前粮袋装饰 */}
       {[[-2.6, 1.2], [-3.1, 0.5], [2.7, 1.0]].map(([x, z], i) => (
@@ -405,7 +405,7 @@ function Village({ g, scenario, idx }: { g: MathRefs; scenario: MathScenarioBrie
       <group position={[v.x, 0, v.z]} rotation={[0, -v.angle, 0]}>
         <mesh position={[0, 0.55, 0]}>
           <boxGeometry args={[1.5, 1.1, 1.3]} />
-          <InkMat color="#d8c8a2" />
+          <InkMat color="#d8c8a2" grain="plaster" repeat={[2, 1]} />
         </mesh>
         <mesh position={[0, 1.5, 0]} rotation={[0, Math.PI / 4, 0]}>
           <coneGeometry args={[1.35, 0.95, 4]} />
@@ -429,7 +429,7 @@ function Village({ g, scenario, idx }: { g: MathRefs; scenario: MathScenarioBrie
         {/* 底 */}
         <mesh position={[0, 0.05, 0]}>
           <boxGeometry args={[1.25, 0.1, 1.25]} />
-          <InkMat color={WOOD} />
+          <InkMat color={WOOD} grain="wood" repeat={[2, 2]} />
         </mesh>
         {/* 四壁 */}
         {[
@@ -457,7 +457,7 @@ function Village({ g, scenario, idx }: { g: MathRefs; scenario: MathScenarioBrie
         <group ref={flagRef} position={[0.85, 0, 0.85]} visible={false}>
           <mesh position={[0, 0.9, 0]}>
             <cylinderGeometry args={[0.03, 0.04, 1.8, 6]} />
-            <InkMat color={WOOD} />
+            <InkMat color={WOOD} grain="wood" repeat={[2, 2]} />
           </mesh>
           <mesh position={[0.32, 1.5, 0]}>
             <boxGeometry args={[0.6, 0.36, 0.03]} />
