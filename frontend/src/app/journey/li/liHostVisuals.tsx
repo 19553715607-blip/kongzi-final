@@ -63,6 +63,12 @@ export function guestWorldPos(
     const a = SEAT_ANGLES[seatIdx] ?? 0;
     return new THREE.Vector3(Math.sin(a) * 1.3, 0, -4.5 + Math.cos(a) * 1.15);
   }
+  if (total === 4) {
+    // 四人迎宾时，两端站在亭子较宽的中段，给斜向栏杆和衣袖留出空间。
+    const outer = index === 0 || index === 3;
+    const x = outer ? 1.5 : 0.75;
+    return new THREE.Vector3(index < 2 ? -x : x, 0, outer ? -4.5 : -5.8);
+  }
   const spread = (index - (total - 1) / 2) * 1.5;
   return new THREE.Vector3(spread, 0, -6.2);
 }

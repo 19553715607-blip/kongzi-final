@@ -2,7 +2,7 @@
 
 /** 射 · 观德 3D — React Three Fiber 场景
  *
- * 第一人称射圃：宣纸色天光 + 淡墨远山 + 松柏 + 风向旗 + 飘叶，
+ * 第一人称射圃：宣纸色天光 + 淡墨远山 + 古树 + 风向旗 + 飘叶，
  * 木架靶布五环（靶面单位 → 世界坐标 R_WORLD=0.75m，距离 30m），
  * 拉弓时弦后引、相机 FOV 收窄；箭矢沿贝塞尔飞行带拖尾，中靶插箭留痕。
  *
@@ -10,7 +10,8 @@
  */
 
 import { useFrame, useThree } from "@react-three/fiber";
-import { useMemo, useRef, type MutableRefObject } from "react";
+import { Clone, useGLTF } from "@react-three/drei";
+import { Suspense, useMemo, useRef, type MutableRefObject } from "react";
 import * as THREE from "three";
 import { aimAt, type Impact } from "./sheEngine";
 import { InkWorld, InkMat } from "@/components/three/inkwash";
@@ -179,11 +180,6 @@ export function ArcheryScene({
         fogRange={[22, 85]}
         groundSize={[220, 140]}
         groundPosition={[0, 0, -20]}
-        pines={[
-          { x: -5.5, z: -14, s: 1.2 }, { x: 6.5, z: -18, s: 1.5 },
-          { x: -8, z: -24, s: 1.8 }, { x: 9, z: -27, s: 1.3 },
-          { x: -4, z: -33, s: 1.6 }, { x: 5, z: -35, s: 2.0 },
-        ]}
         clouds={[
           { x: -16, y: 13, z: -50, s: 3.2 }, { x: 4, y: 16, z: -55, s: 4 },
           { x: 18, y: 12, z: -48, s: 2.6 },
@@ -191,6 +187,9 @@ export function ArcheryScene({
         sun={{ focus: [0, 1.5, -16], size: 34, offset: [12, 18, 7] }}
       >
         <RangePath />
+        <Suspense fallback={null}>
+          <RangeTrees />
+        </Suspense>
       </InkWorld>
       <TargetStand g={g} />
       <WindFlag g={g} />
@@ -204,9 +203,36 @@ export function ArcheryScene({
   );
 }
 
+const RANGE_TREES = [
+  { x: -5.5, z: -14, s: 1.2 }, { x: 6.5, z: -18, s: 1.5 },
+  { x: -8, z: -24, s: 1.8 }, { x: 9, z: -27, s: 1.3 },
+  { x: -4, z: -33, s: 1.6 }, { x: 5, z: -35, s: 2.0 },
+];
+
+function RangeTrees() {
+  const models = useGLTF(["/models/li/ancient-tree-left.glb", "/models/li/ancient-tree-right.glb"], false, true);
+  const trees = useMemo(() => models.map(({ scene }) => {
+    const bounds = new THREE.Box3().setFromObject(scene, true);
+    const center = bounds.getCenter(new THREE.Vector3());
+    // 【渲染优化】沿用旧树 3.55 的基准高度。
+    return { scene, scale: 3.55 / (bounds.max.y - bounds.min.y), offset: new THREE.Vector3(-center.x, -bounds.min.y, -center.z) };
+  }), [models]);
+
+  return RANGE_TREES.map(({ x, z, s }, i) => {
+    const tree = trees[x < 0 ? 0 : 1];
+    return (
+      // 【渲染优化】两款模型的外扩根系位于基准高度的底部 0.55，按实例比例埋到主干处。
+      <group key={x} position={[x, -0.55 * s, z]} scale={s * tree.scale} rotation={[0, (i * 1.7) % Math.PI, 0]} dispose={null}>
+        {/* 【渲染优化】共享 GLB 材质，阴影沿用树叶的透明裁切，保留枝叶间的透光。 */}
+        <Clone object={tree.scene} position={tree.offset} castShadow receiveShadow />
+      </group>
+    );
+  });
+}
+
 function RangePath() {
   return (
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.012, -15]}>
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.012, -15]} receiveShadow>
       <planeGeometry args={[2.4, 32]} />
       <InkMat color="#d8ceaf" />
     </mesh>
