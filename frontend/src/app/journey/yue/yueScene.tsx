@@ -296,9 +296,9 @@ function bellSkin(note: YueNote): THREE.CanvasTexture {
   c.height = H;
   const ctx = c.getContext("2d")!;
   const g = ctx.createLinearGradient(0, 0, 0, H);
-  g.addColorStop(0, "#b39455");
-  g.addColorStop(0.55, "#a8905a");
-  g.addColorStop(1, "#8a7448");
+  g.addColorStop(0, "#7d6c44");
+  g.addColorStop(0.55, "#6e5f3c");
+  g.addColorStop(1, "#57492f");
   ctx.fillStyle = g;
   ctx.fillRect(0, 0, W, H);
   // 铜绿斑（淡）
@@ -387,29 +387,29 @@ function Bell({ g, note, idx }: { g: YueRefs; note: YueNote; idx: number }) {
         {/* 甬柄 */}
         <mesh position={[0, (1.05 * s) / 2 + 0.1, 0]}>
           <cylinderGeometry args={[0.07 * s, 0.09 * s, 0.24, 8]} />
-          <meshStandardMaterial color={BRONZE_DARK} metalness={0.82} roughness={0.42} />
+          <meshStandardMaterial color={BRONZE_DARK} metalness={0.78} roughness={0.46} envMapIntensity={0.42} />
         </mesh>
         {/* 钟体（合瓦扁形：上大下小锥台 + 压扁） */}
         <mesh scale={[1, 1, 0.62]}>
           <cylinderGeometry args={[0.3 * s, 0.46 * s, 1.05 * s, 18]} />
-          <meshStandardMaterial map={skin} metalness={0.82} roughness={0.34} />
+          <meshStandardMaterial map={skin} metalness={0.78} roughness={0.42} envMapIntensity={0.42} />
         </mesh>
         {/* 钟口沿（水平环） */}
         <mesh position={[0, -(1.05 * s) / 2, 0]} rotation={[Math.PI / 2, 0, 0]} scale={[1, 0.62, 1]}>
           <torusGeometry args={[0.46 * s, 0.035 * s, 8, 18]} />
-          <meshStandardMaterial color={BRONZE_DARK} metalness={0.82} roughness={0.42} />
+          <meshStandardMaterial color={BRONZE_DARK} metalness={0.78} roughness={0.46} envMapIntensity={0.42} />
         </mesh>
         {/* 乳钉 */}
         {studs.map((p, i) => (
           <mesh key={i} position={[p.x, p.y, p.z]} scale={[1, 1, 1.4]}>
             <sphereGeometry args={[0.038 * s, 8, 6]} />
-            <meshStandardMaterial color={BRONZE_DARK} metalness={0.82} roughness={0.42} />
+            <meshStandardMaterial color={BRONZE_DARK} metalness={0.78} roughness={0.46} envMapIntensity={0.42} />
           </mesh>
         ))}
         {/* 腰箍 */}
         <mesh scale={[1, 1, 0.62]}>
           <cylinderGeometry args={[0.385 * s, 0.39 * s, 0.07 * s, 18]} />
-          <meshStandardMaterial color={BRONZE_DARK} metalness={0.82} roughness={0.42} />
+          <meshStandardMaterial color={BRONZE_DARK} metalness={0.78} roughness={0.46} envMapIntensity={0.42} />
         </mesh>
       </group>
       {/* 名牌（梁上） */}
