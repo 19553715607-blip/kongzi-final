@@ -289,68 +289,10 @@ const INSCRIPTION: Record<YueNote, [string, string]> = {
 
 /** 钟体贴图：青铜底 + 铜绿斑 + 错金铭文（两面各一组竖排） */
 /** 青铜斑驳斑块: dark 锈暗 / patina 铜绿 / wear 磨亮, 同源坐标喂三张贴图保持对齐 */
-type BronzeBlob = { x: number; y: number; rx: number; ry: number; rot: number; kind: "dark" | "patina" | "wear" };
-
-function bronzeBlobs(W: number, H: number): BronzeBlob[] {
-  const arr: BronzeBlob[] = [];
-  for (let i = 0; i < 34; i++) arr.push({ x: Math.random() * W, y: Math.random() * H, rx: 30 + Math.random() * 90, ry: 20 + Math.random() * 60, rot: Math.random() * Math.PI, kind: "dark" });
-  for (let i = 0; i < 28; i++) arr.push({ x: Math.random() * W, y: H * 0.3 + Math.random() * H * 0.7, rx: 16 + Math.random() * 55, ry: 10 + Math.random() * 36, rot: Math.random() * Math.PI, kind: "patina" });
-  for (let i = 0; i < 24; i++) arr.push({ x: Math.random() * W, y: Math.random() * H, rx: 24 + Math.random() * 70, ry: 12 + Math.random() * 40, rot: Math.random() * Math.PI, kind: "wear" });
-  return arr;
-}
-
-/** 椭圆软边斑(径向渐变), 外圈自然融入底色 */
-function paintBlob(ctx: CanvasRenderingContext2D, b: BronzeBlob, fill: string) {
-  ctx.save();
-  ctx.translate(b.x, b.y);
-  ctx.rotate(b.rot);
-  ctx.scale(1, b.ry / b.rx);
-  const g = ctx.createRadialGradient(0, 0, 0, 0, 0, b.rx);
-  g.addColorStop(0, fill);
-  g.addColorStop(1, "rgba(0,0,0,0)");
-  ctx.fillStyle = g;
-  ctx.beginPath();
-  ctx.arc(0, 0, b.rx, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.restore();
-}
-
-/** 暗铜小件(甬/沿/钉/箍)共享粗糙·金属度噪声: 打破均匀反射, 否则塑料感 */
-let darkBronzeMaps: { rough: THREE.CanvasTexture; metal: THREE.CanvasTexture } | null = null;
-function getDarkBronzeMaps() {
-  if (darkBronzeMaps) return darkBronzeMaps;
-  const W = 256;
-  const H = 128;
-  const mk = () => {
-    const cv = document.createElement("canvas");
-    cv.width = W;
-    cv.height = H;
-    return cv.getContext("2d")!;
-  };
-  const cr = mk();
-  const cm = mk();
-  cr.fillStyle = "#9a"; // 0.60 基准粗糙
-  cr.fillRect(0, 0, W, H);
-  cm.fillStyle = "#da"; // 0.85 基准金属度
-  cm.fillRect(0, 0, W, H);
-  for (const b of bronzeBlobs(W, H)) {
-    if (b.kind === "patina") {
-      paintBlob(cr, b, "rgba(184,184,184,1)");
-      paintBlob(cm, b, "rgba(118,118,118,1)");
-    } else {
-      paintBlob(cr, b, "rgba(70,70,70,1)");   // 磨亮处反射集中
-      paintBlob(cm, b, "rgba(250,250,250,1)");
-    }
-  }
-  darkBronzeMaps = { rough: new THREE.CanvasTexture(cr.canvas), metal: new THREE.CanvasTexture(cm.canvas) };
-  return darkBronzeMaps;
-}
-
-/** 钟体贴图三件套：青铜底+斑驳(锈暗/铜绿/磨亮)同步进颜色/粗糙/金属度, 反射有对比才有金属感 */
-function bellSkin(note: YueNote): { map: THREE.CanvasTexture; roughnessMap: THREE.CanvasTexture; metalnessMap: THREE.CanvasTexture } {
+/** 钟体贴图：抛光青铜(馆展级) — 铸层软带+竖向拭痕+错金铭文带，干净温润不脏不塑料 */
+function bellSkin(note: YueNote): { map: THREE.CanvasTexture; roughnessMap: THREE.CanvasTexture } {
   const W = 1024;
   const H = 512;
-  const blobs = bronzeBlobs(W, H);
   const mk = () => {
     const cv = document.createElement("canvas");
     cv.width = W;
@@ -359,46 +301,52 @@ function bellSkin(note: YueNote): { map: THREE.CanvasTexture; roughnessMap: THRE
   };
   const ca = mk(); // 颜色
   const cr = mk(); // 粗糙度
-  const cm = mk(); // 金属度
+  // 底色：温润青铜纵向渐变
   const g = ca.createLinearGradient(0, 0, 0, H);
-  g.addColorStop(0, "#7d6c44");
-  g.addColorStop(0.55, "#6e5f3c");
-  g.addColorStop(1, "#57492f");
+  g.addColorStop(0, "#8a7448");
+  g.addColorStop(0.55, "#7b6740");
+  g.addColorStop(1, "#63512f");
   ca.fillStyle = g;
   ca.fillRect(0, 0, W, H);
-  cr.fillStyle = "#8e"; // 0.56 基准粗糙
+  // 铸层带：4 条超宽软横带，极低对比，给大面层次而非噪点
+  for (let i = 0; i < 4; i++) {
+    const y = H * (0.1 + i * 0.22) + Math.random() * 18;
+    const h = H * (0.1 + Math.random() * 0.08);
+    const bg = ca.createLinearGradient(0, y, 0, y + h);
+    bg.addColorStop(0, "rgba(0,0,0,0)");
+    bg.addColorStop(0.5, i % 2 === 0 ? "rgba(52,40,20,0.07)" : "rgba(214,178,110,0.06)");
+    bg.addColorStop(1, "rgba(0,0,0,0)");
+    ca.fillStyle = bg;
+    ca.fillRect(0, y, W, h);
+  }
+  // 竖向拭痕：跟随钟形的抛光痕迹(细长条, 极低透明度)
+  for (let i = 0; i < 42; i++) {
+    const x = Math.random() * W;
+    const w = 2 + Math.random() * 4;
+    const h = 60 + Math.random() * 240;
+    const y = Math.random() * (H - h);
+    ca.fillStyle = Math.random() < 0.5 ? "rgba(196,160,96,0.05)" : "rgba(58,44,22,0.05)";
+    ca.fillRect(x, y, w, h);
+  }
+  // 粗糙度：抛光基准 + 少量大块柔变(反射缓变, 无颗粒)
+  cr.fillStyle = "#5e"; // 0.37 抛光基准
   cr.fillRect(0, 0, W, H);
-  cm.fillStyle = "#e2"; // 0.89 基准金属度
-  cm.fillRect(0, 0, W, H);
-  for (const b of blobs) {
-    if (b.kind === "dark") {
-      paintBlob(ca, b, `rgba(38,30,16,${(0.16 + Math.random() * 0.18).toFixed(3)})`);
-      paintBlob(cr, b, "rgba(158,158,158,1)");
-      paintBlob(cm, b, "rgba(196,196,196,1)");
-    } else if (b.kind === "patina") {
-      paintBlob(ca, b, `rgba(96,124,102,${(0.1 + Math.random() * 0.12).toFixed(3)})`);
-      paintBlob(cr, b, "rgba(184,184,184,1)"); // 铜绿最糙
-      paintBlob(cm, b, "rgba(118,118,118,1)"); // 且近非金属
-    } else {
-      paintBlob(ca, b, `rgba(188,150,88,${(0.14 + Math.random() * 0.14).toFixed(3)})`);
-      paintBlob(cr, b, "rgba(64,64,64,1)");    // 磨亮抛光
-      paintBlob(cm, b, "rgba(255,255,255,1)"); // 全金属
-    }
-  }
-  // 细碎颗粒: 近看打破平滑
-  for (let i = 0; i < 900; i++) {
-    ca.fillStyle = Math.random() < 0.5 ? "rgba(30,24,12,0.10)" : "rgba(200,168,104,0.08)";
-    ca.fillRect(Math.random() * W, Math.random() * H, 1 + Math.random() * 2, 1 + Math.random() * 2);
-  }
-  // 横向磨痕
-  ca.strokeStyle = "rgba(60,48,24,0.10)";
-  for (let i = 0; i < 22; i++) {
+  for (let i = 0; i < 6; i++) {
+    const x = Math.random() * W;
     const y = Math.random() * H;
-    ca.lineWidth = 1 + Math.random() * 2;
-    ca.beginPath();
-    ca.moveTo(0, y);
-    ca.lineTo(W, y + Math.random() * 6 - 3);
-    ca.stroke();
+    const r = 90 + Math.random() * 140;
+    const v = Math.random() < 0.5 ? 86 : 52; // 局部更哑/更亮
+    cr.save();
+    cr.translate(x, y);
+    cr.scale(1, 0.6);
+    const rg = cr.createRadialGradient(0, 0, 0, 0, 0, r);
+    rg.addColorStop(0, `rgba(${v},${v},${v},0.5)`);
+    rg.addColorStop(1, "rgba(0,0,0,0)");
+    cr.fillStyle = rg;
+    cr.beginPath();
+    cr.arc(0, 0, r, 0, Math.PI * 2);
+    cr.fill();
+    cr.restore();
   }
   // 铭文带：深色带内错金竖排（两面相隔半周），金线镶边
   const lines = INSCRIPTION[note];
@@ -425,8 +373,7 @@ function bellSkin(note: YueNote): { map: THREE.CanvasTexture; roughnessMap: THRE
   map.colorSpace = THREE.SRGBColorSpace;
   map.anisotropy = 8;
   const roughnessMap = new THREE.CanvasTexture(cr.canvas);
-  const metalnessMap = new THREE.CanvasTexture(cm.canvas);
-  return { map, roughnessMap, metalnessMap };
+  return { map, roughnessMap };
 }
 
 function Bell({ g, note, idx }: { g: YueRefs; note: YueNote; idx: number }) {
@@ -435,7 +382,6 @@ function Bell({ g, note, idx }: { g: YueRefs; note: YueNote; idx: number }) {
   const grp = useRef<THREE.Group>(null);
   const center = bellCenter(idx);
   const skin = useMemo(() => bellSkin(note), [note]);
-  const dark = useMemo(getDarkBronzeMaps, []);
 
   // 乳钉纹（两圈六钉）
   const studs = useMemo(() => {
@@ -472,29 +418,29 @@ function Bell({ g, note, idx }: { g: YueRefs; note: YueNote; idx: number }) {
         {/* 甬柄 */}
         <mesh position={[0, (1.05 * s) / 2 + 0.1, 0]}>
           <cylinderGeometry args={[0.07 * s, 0.09 * s, 0.24, 8]} />
-          <meshStandardMaterial color={BRONZE_DARK} roughnessMap={dark.rough} metalnessMap={dark.metal} metalness={1} roughness={1} envMapIntensity={0.9} />
+          <meshStandardMaterial color={BRONZE_DARK} metalness={0.8} roughness={0.42} envMapIntensity={0.7} />
         </mesh>
         {/* 钟体（合瓦扁形：上大下小锥台 + 压扁） */}
         <mesh scale={[1, 1, 0.62]}>
           <cylinderGeometry args={[0.3 * s, 0.46 * s, 1.05 * s, 18]} />
-          <meshStandardMaterial map={skin.map} roughnessMap={skin.roughnessMap} metalnessMap={skin.metalnessMap} metalness={1} roughness={1} envMapIntensity={0.9} />
+          <meshStandardMaterial map={skin.map} roughnessMap={skin.roughnessMap} metalness={0.88} roughness={1} envMapIntensity={0.75} />
         </mesh>
         {/* 钟口沿（水平环） */}
         <mesh position={[0, -(1.05 * s) / 2, 0]} rotation={[Math.PI / 2, 0, 0]} scale={[1, 0.62, 1]}>
           <torusGeometry args={[0.46 * s, 0.035 * s, 8, 18]} />
-          <meshStandardMaterial color={BRONZE_DARK} roughnessMap={dark.rough} metalnessMap={dark.metal} metalness={1} roughness={1} envMapIntensity={0.9} />
+          <meshStandardMaterial color={BRONZE_DARK} metalness={0.8} roughness={0.42} envMapIntensity={0.7} />
         </mesh>
         {/* 乳钉 */}
         {studs.map((p, i) => (
           <mesh key={i} position={[p.x, p.y, p.z]} scale={[1, 1, 1.4]}>
             <sphereGeometry args={[0.038 * s, 8, 6]} />
-            <meshStandardMaterial color={BRONZE_DARK} roughnessMap={dark.rough} metalnessMap={dark.metal} metalness={1} roughness={1} envMapIntensity={0.9} />
+            <meshStandardMaterial color={BRONZE_DARK} metalness={0.8} roughness={0.42} envMapIntensity={0.7} />
           </mesh>
         ))}
         {/* 腰箍 */}
         <mesh scale={[1, 1, 0.62]}>
           <cylinderGeometry args={[0.385 * s, 0.39 * s, 0.07 * s, 18]} />
-          <meshStandardMaterial color={BRONZE_DARK} roughnessMap={dark.rough} metalnessMap={dark.metal} metalness={1} roughness={1} envMapIntensity={0.9} />
+          <meshStandardMaterial color={BRONZE_DARK} metalness={0.8} roughness={0.42} envMapIntensity={0.7} />
         </mesh>
       </group>
       {/* 名牌（梁上） */}
