@@ -55,6 +55,7 @@ export function createYueRefs(): YueRefs {
 const GOLD = "#d9a521";
 const BRONZE = "#a8905a";
 const BRONZE_DARK = "#8a7448";
+const BRONZE_DEEP = "#5f4d2e"; // 甬/钉/箍等深铜强调件
 const LACQUER = "#6b2420"; // 髹漆朱
 const WOOD = "#5a3b1d";
 const SHENG_COLOR = "#2f8f7b"; // 相生 · 青
@@ -289,6 +290,24 @@ const INSCRIPTION: Record<YueNote, [string, string]> = {
 
 /** 钟体贴图：青铜底 + 铜绿斑 + 错金铭文（两面各一组竖排） */
 /** 青铜斑驳斑块: dark 锈暗 / patina 铜绿 / wear 磨亮, 同源坐标喂三张贴图保持对齐 */
+/** 编钟车削轮廓（合瓦钟形剪影）: 口沿外撇→鼓腹→收腰→圆肩→平顶, r/y 单位乘 s */
+function bellProfile(s: number): THREE.Vector2[] {
+  const p = (r: number, y: number) => new THREE.Vector2(r * s, y * s);
+  return [
+    p(0.47, 0.0),   // 口沿外撇
+    p(0.455, 0.02),
+    p(0.435, 0.1),
+    p(0.45, 0.32),  // 鼓腹
+    p(0.425, 0.52),
+    p(0.415, 0.62), // 收腰
+    p(0.4, 0.75),   // 圆肩
+    p(0.34, 0.9),
+    p(0.28, 0.97),
+    p(0.1, 0.99),
+    p(0.0, 0.99),   // 顶面收拢
+  ];
+}
+
 /** 钟体贴图：抛光青铜(馆展级) — 铸层软带+竖向拭痕+错金铭文带，干净温润不脏不塑料 */
 function bellSkin(note: YueNote): { map: THREE.CanvasTexture; roughnessMap: THREE.CanvasTexture } {
   const W = 1024;
@@ -303,9 +322,9 @@ function bellSkin(note: YueNote): { map: THREE.CanvasTexture; roughnessMap: THRE
   const cr = mk(); // 粗糙度
   // 底色：温润青铜纵向渐变
   const g = ca.createLinearGradient(0, 0, 0, H);
-  g.addColorStop(0, "#8a7448");
-  g.addColorStop(0.55, "#7b6740");
-  g.addColorStop(1, "#63512f");
+  g.addColorStop(0, "#a8875a");
+  g.addColorStop(0.55, "#96794e");
+  g.addColorStop(1, "#7d6540");
   ca.fillStyle = g;
   ca.fillRect(0, 0, W, H);
   // 铸层带：4 条超宽软横带，极低对比，给大面层次而非噪点
@@ -329,7 +348,7 @@ function bellSkin(note: YueNote): { map: THREE.CanvasTexture; roughnessMap: THRE
     ca.fillRect(x, y, w, h);
   }
   // 粗糙度：抛光基准 + 少量大块柔变(反射缓变, 无颗粒)
-  cr.fillStyle = "#5e"; // 0.37 抛光基准
+  cr.fillStyle = "#52"; // 0.32 抛光基准
   cr.fillRect(0, 0, W, H);
   for (let i = 0; i < 6; i++) {
     const x = Math.random() * W;
@@ -386,13 +405,13 @@ function Bell({ g, note, idx }: { g: YueRefs; note: YueNote; idx: number }) {
   // 乳钉纹（两圈六钉）
   const studs = useMemo(() => {
     const arr: { x: number; y: number; z: number }[] = [];
-    for (const ry of [-0.18, 0.14]) {
+    for (const [ry, rr] of [[-0.18, 0.458], [0.14, 0.425]] as const) {
       for (let k = 0; k < 6; k++) {
         const a = (k / 6) * Math.PI * 2;
         arr.push({
-          x: Math.cos(a) * 0.4 * s,
+          x: Math.cos(a) * rr * s,
           y: ry * s,
-          z: Math.sin(a) * 0.25 * s,
+          z: Math.sin(a) * rr * s * 0.62,
         });
       }
     }
@@ -415,32 +434,36 @@ function Bell({ g, note, idx }: { g: YueRefs; note: YueNote; idx: number }) {
         <InkMat color={WOOD} grain="wood" repeat={[2, 1]} />
       </mesh>
       <group ref={grp} onPointerDown={(e) => { e.stopPropagation(); g.onStrike.current(note); }}>
-        {/* 甬柄 */}
-        <mesh position={[0, (1.05 * s) / 2 + 0.1, 0]}>
-          <cylinderGeometry args={[0.07 * s, 0.09 * s, 0.24, 8]} />
-          <meshStandardMaterial color={BRONZE_DARK} metalness={0.8} roughness={0.42} envMapIntensity={0.7} />
+        {/* 甬柄 + 衡顶 */}
+        <mesh position={[0, 0.6 * s, 0]}>
+          <cylinderGeometry args={[0.065 * s, 0.085 * s, 0.22 * s, 8]} />
+          <meshStandardMaterial color={BRONZE_DEEP} metalness={0.82} roughness={0.42} envMapIntensity={0.7} />
         </mesh>
-        {/* 钟体（合瓦扁形：上大下小锥台 + 压扁） */}
-        <mesh scale={[1, 1, 0.62]}>
-          <cylinderGeometry args={[0.3 * s, 0.46 * s, 1.05 * s, 18]} />
-          <meshStandardMaterial map={skin.map} roughnessMap={skin.roughnessMap} metalness={0.88} roughness={1} envMapIntensity={0.75} />
+        <mesh position={[0, 0.73 * s, 0]}>
+          <sphereGeometry args={[0.05 * s, 10, 8]} />
+          <meshStandardMaterial color={BRONZE_DEEP} metalness={0.82} roughness={0.42} envMapIntensity={0.7} />
         </mesh>
-        {/* 钟口沿（水平环） */}
-        <mesh position={[0, -(1.05 * s) / 2, 0]} rotation={[Math.PI / 2, 0, 0]} scale={[1, 0.62, 1]}>
-          <torusGeometry args={[0.46 * s, 0.035 * s, 8, 18]} />
-          <meshStandardMaterial color={BRONZE_DARK} metalness={0.8} roughness={0.42} envMapIntensity={0.7} />
+        {/* 钟体（车削轮廓: 口沿外撇·鼓腹·圆肩, z 压扁成合瓦形） */}
+        <mesh position={[0, -0.495 * s, 0]} scale={[1, 1, 0.62]}>
+          <latheGeometry args={[bellProfile(s), 24]} />
+          <meshStandardMaterial map={skin.map} roughnessMap={skin.roughnessMap} metalness={0.85} roughness={1} envMapIntensity={0.8} side={THREE.DoubleSide} />
         </mesh>
-        {/* 乳钉 */}
+        {/* 口沿加厚环 */}
+        <mesh position={[0, -0.48 * s, 0]} rotation={[Math.PI / 2, 0, 0]} scale={[1, 0.62, 1]}>
+          <torusGeometry args={[0.455 * s, 0.022 * s, 8, 24]} />
+          <meshStandardMaterial color={BRONZE_DEEP} metalness={0.82} roughness={0.42} envMapIntensity={0.7} />
+        </mesh>
+        {/* 乳钉（两圈六钉, 贴合钟面弧度） */}
         {studs.map((p, i) => (
           <mesh key={i} position={[p.x, p.y, p.z]} scale={[1, 1, 1.4]}>
-            <sphereGeometry args={[0.038 * s, 8, 6]} />
-            <meshStandardMaterial color={BRONZE_DARK} metalness={0.8} roughness={0.42} envMapIntensity={0.7} />
+            <sphereGeometry args={[0.034 * s, 8, 6]} />
+            <meshStandardMaterial color={BRONZE_DEEP} metalness={0.82} roughness={0.45} envMapIntensity={0.65} />
           </mesh>
         ))}
-        {/* 腰箍 */}
-        <mesh scale={[1, 1, 0.62]}>
-          <cylinderGeometry args={[0.385 * s, 0.39 * s, 0.07 * s, 18]} />
-          <meshStandardMaterial color={BRONZE_DARK} metalness={0.8} roughness={0.42} envMapIntensity={0.7} />
+        {/* 腰箍（圆肩下缘装饰环） */}
+        <mesh position={[0, 0.3 * s, 0]} rotation={[Math.PI / 2, 0, 0]} scale={[1, 0.62, 1]}>
+          <torusGeometry args={[0.388 * s, 0.02 * s, 8, 24]} />
+          <meshStandardMaterial color={BRONZE_DEEP} metalness={0.82} roughness={0.42} envMapIntensity={0.7} />
         </mesh>
       </group>
       {/* 名牌（梁上） */}
