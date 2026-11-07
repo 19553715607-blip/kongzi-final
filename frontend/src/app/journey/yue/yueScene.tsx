@@ -55,8 +55,9 @@ export function createYueRefs(): YueRefs {
 const GOLD = "#d9a521";
 const BRONZE = "#a8905a";
 const BRONZE_DARK = "#8a7448";
-const BRONZE_DEEP = "#5f4d2e"; // 甬/钉/箍等深铜强调件
+const BRONZE_DEEP = "#454c36"; // 甬/钉/箍等深绿铜强调件
 const LACQUER = "#6b2420"; // 髹漆朱
+const RACK_LACQUER = "#352a1e"; // 簨簴黑褐漆(曾侯乙式木架)
 const WOOD = "#5a3b1d";
 const SHENG_COLOR = "#2f8f7b"; // 相生 · 青
 const REVERSE_COLOR = "#8a3530"; // 逆跳 · 暗红
@@ -250,7 +251,7 @@ function BellRack({ g }: { g: YueRefs }) {
         <group key={x} position={[x, 0, RACK_Z]}>
           <mesh position={[0, 1.9, 0]}>
             <cylinderGeometry args={[0.13, 0.17, 3.8, 10]} />
-            <InkMat color={LACQUER} grain="lacquer" repeat={[2, 2]} />
+            <InkMat color={RACK_LACQUER} grain="wood" repeat={[2, 2]} />
           </mesh>
           <mesh position={[0, 0.12, 0]}>
             <boxGeometry args={[0.6, 0.24, 0.6]} />
@@ -265,7 +266,7 @@ function BellRack({ g }: { g: YueRefs }) {
       {/* 横梁（髹漆彩绘：朱梁金缘） */}
       <mesh position={[0, BEAM_Y, RACK_Z]}>
         <boxGeometry args={[7.4, 0.22, 0.26]} />
-        <InkMat color={LACQUER} grain="lacquer" repeat={[2, 2]} />
+        <InkMat color={RACK_LACQUER} grain="wood" repeat={[2, 2]} />
       </mesh>
       <mesh position={[0, BEAM_Y + 0.13, RACK_Z]}>
         <boxGeometry args={[7.4, 0.05, 0.28]} />
@@ -338,9 +339,9 @@ function bellSkin(note: YueNote): { map: THREE.CanvasTexture; roughnessMap: THRE
   const cr = mk(); // 粗糙度
   // 底色：温润青铜纵向渐变
   const g = ca.createLinearGradient(0, 0, 0, H);
-  g.addColorStop(0, "#a8875a");
-  g.addColorStop(0.55, "#96794e");
-  g.addColorStop(1, "#7d6540");
+  g.addColorStop(0, "#8f9a78");
+  g.addColorStop(0.55, "#7d8866");
+  g.addColorStop(1, "#636b4e");
   ca.fillStyle = g;
   ca.fillRect(0, 0, W, H);
   // 铸层带：4 条超宽软横带，极低对比，给大面层次而非噪点
@@ -349,7 +350,7 @@ function bellSkin(note: YueNote): { map: THREE.CanvasTexture; roughnessMap: THRE
     const h = H * (0.1 + Math.random() * 0.08);
     const bg = ca.createLinearGradient(0, y, 0, y + h);
     bg.addColorStop(0, "rgba(0,0,0,0)");
-    bg.addColorStop(0.5, i % 2 === 0 ? "rgba(52,40,20,0.07)" : "rgba(214,178,110,0.06)");
+    bg.addColorStop(0.5, i % 2 === 0 ? "rgba(36,44,28,0.08)" : "rgba(198,206,158,0.06)");
     bg.addColorStop(1, "rgba(0,0,0,0)");
     ca.fillStyle = bg;
     ca.fillRect(0, y, W, h);
@@ -360,7 +361,7 @@ function bellSkin(note: YueNote): { map: THREE.CanvasTexture; roughnessMap: THRE
     const w = 2 + Math.random() * 4;
     const h = 60 + Math.random() * 240;
     const y = Math.random() * (H - h);
-    ca.fillStyle = Math.random() < 0.5 ? "rgba(196,160,96,0.05)" : "rgba(58,44,22,0.05)";
+    ca.fillStyle = Math.random() < 0.5 ? "rgba(206,212,164,0.05)" : "rgba(44,52,32,0.05)";
     ca.fillRect(x, y, w, h);
   }
   // 粗糙度：抛光基准 + 少量大块柔变(反射缓变, 无颗粒)
@@ -390,7 +391,7 @@ function bellSkin(note: YueNote): { map: THREE.CanvasTexture; roughnessMap: THRE
   ca.textAlign = "center";
   ca.textBaseline = "middle";
   for (const face of [{ cx: W * 0.25, col: lines[0] }, { cx: W * 0.75, col: lines[1] }]) {
-    ca.fillStyle = "rgba(46,40,22,0.72)";
+    ca.fillStyle = "rgba(30,34,22,0.75)";
     ca.fillRect(face.cx - 78, bandY, 156, bandH);
     ca.fillStyle = "#caa245";
     ca.fillRect(face.cx - 78, bandY, 156, 3);
