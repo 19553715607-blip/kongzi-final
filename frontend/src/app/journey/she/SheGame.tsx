@@ -400,7 +400,7 @@ export default function SheGame() {
 
       {/* 射场（3D） */}
       <section
-        className="relative select-none overflow-hidden rounded-2xl border border-line"
+        className="relative select-none overflow-hidden rounded-none border border-line"
         style={{ height: "min(64vh, 560px)", minHeight: 380, touchAction: "none" }}
         onPointerDown={(e) => {
           // 仅在「就绪可拉弓」时接管指针；卡片/按钮阶段不拦截，

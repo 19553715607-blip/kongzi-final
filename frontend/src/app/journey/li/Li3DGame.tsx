@@ -459,7 +459,7 @@ export default function Li3DGame({
       </div>
 
       <section
-        className="relative isolate overflow-hidden rounded-[1.35rem] border border-[#9a7940]/40 bg-[#e9dfc7] select-none shadow-[0_24px_70px_-32px_rgba(39,30,18,0.7)] ring-1 ring-white/60"
+        className="relative isolate overflow-hidden rounded-none border border-[#9a7940]/40 bg-[#e9dfc7] select-none shadow-[0_24px_70px_-32px_rgba(39,30,18,0.7)] ring-1 ring-white/60"
         style={{ height: "min(76vh, 650px)", minHeight: 440, touchAction: "none", background: `linear-gradient(180deg, ${PAL.skyTop}, ${PAL.skyBot})` }}
       >
         <Canvas

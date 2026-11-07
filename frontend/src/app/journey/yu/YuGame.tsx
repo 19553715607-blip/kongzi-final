@@ -261,7 +261,7 @@ export default function YuGame() {
 
       {/* 驾驶舱 */}
       {(phase === "playing" || phase === "submitting" || phase === "scored") && current && (
-        <section className="relative select-none overflow-hidden rounded-2xl border border-line" style={{ height: "min(64vh, 560px)", minHeight: 340 }}>
+        <section className="relative select-none overflow-hidden rounded-none border border-line" style={{ height: "min(64vh, 560px)", minHeight: 340 }}>
           <Canvas
             key={`${current.id}-${runId}`}
             shadows

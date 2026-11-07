@@ -278,7 +278,7 @@ export default function Brush3DGame() {
 
       {/* 书案 */}
       {(phase === "writing" || phase === "submitting" || phase === "scored") && current && (
-        <section className="relative select-none overflow-hidden rounded-2xl border border-line" style={{ height: "min(66vh, 580px)", minHeight: 360 }}>
+        <section className="relative select-none overflow-hidden rounded-none border border-line" style={{ height: "min(66vh, 580px)", minHeight: 360 }}>
           <Canvas
           shadows
             key={`${current.id}-${runId}`}
