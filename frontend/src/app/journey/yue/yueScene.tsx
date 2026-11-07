@@ -257,7 +257,7 @@ function BellRack({ g }: { g: YueRefs }) {
           </mesh>
           <mesh position={[0, 3.86, 0]}>
             <sphereGeometry args={[0.14, 10, 8]} />
-            <meshStandardMaterial color={GOLD} metalness={0.6} roughness={0.35} />
+            <meshStandardMaterial color={GOLD} grain="lacquer" />
           </mesh>
         </group>
       ))}
@@ -268,7 +268,7 @@ function BellRack({ g }: { g: YueRefs }) {
       </mesh>
       <mesh position={[0, BEAM_Y + 0.13, RACK_Z]}>
         <boxGeometry args={[7.4, 0.05, 0.28]} />
-        <meshStandardMaterial color={GOLD} metalness={0.5} roughness={0.4} />
+        <meshStandardMaterial color={GOLD} grain="lacquer" />
       </mesh>
       {/* 五口钟 */}
       {NOTES.map((note, i) => (
@@ -319,29 +319,29 @@ function Bell({ g, note, idx }: { g: YueRefs; note: YueNote; idx: number }) {
         {/* 甬柄 */}
         <mesh position={[0, (1.05 * s) / 2 + 0.1, 0]}>
           <cylinderGeometry args={[0.07 * s, 0.09 * s, 0.24, 8]} />
-          <meshStandardMaterial color={BRONZE_DARK} metalness={0.85} roughness={0.4} />
+          <meshStandardMaterial color={BRONZE_DARK} grain="bamboo" />
         </mesh>
         {/* 钟体（合瓦扁形：上大下小锥台 + 压扁） */}
         <mesh scale={[1, 1, 0.62]}>
           <cylinderGeometry args={[0.3 * s, 0.46 * s, 1.05 * s, 18]} />
-          <meshStandardMaterial color={BRONZE} metalness={0.88} roughness={0.34} />
+          <meshStandardMaterial color={BRONZE} grain="bamboo" />
         </mesh>
         {/* 钟口沿（水平环） */}
         <mesh position={[0, -(1.05 * s) / 2, 0]} rotation={[Math.PI / 2, 0, 0]} scale={[1, 0.62, 1]}>
           <torusGeometry args={[0.46 * s, 0.035 * s, 8, 18]} />
-          <meshStandardMaterial color={BRONZE_DARK} metalness={0.85} roughness={0.4} />
+          <meshStandardMaterial color={BRONZE_DARK} grain="bamboo" />
         </mesh>
         {/* 乳钉 */}
         {studs.map((p, i) => (
           <mesh key={i} position={[p.x, p.y, p.z]} scale={[1, 1, 1.4]}>
             <sphereGeometry args={[0.038 * s, 8, 6]} />
-            <meshStandardMaterial color={BRONZE_DARK} metalness={0.85} roughness={0.4} />
+            <meshStandardMaterial color={BRONZE_DARK} grain="bamboo" />
           </mesh>
         ))}
         {/* 腰箍 */}
         <mesh scale={[1, 1, 0.62]}>
           <cylinderGeometry args={[0.385 * s, 0.39 * s, 0.07 * s, 18]} />
-          <meshStandardMaterial color={BRONZE_DARK} metalness={0.85} roughness={0.38} />
+          <meshStandardMaterial color={BRONZE_DARK} grain="bamboo" />
         </mesh>
       </group>
       {/* 名牌（梁上） */}
