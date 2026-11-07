@@ -78,7 +78,7 @@ const NOTE_NAME: Record<YueNote, string> = { gong: "宫", shang: "商", jue: "�
 
 function bellCenter(idx: number): THREE.Vector3 {
   const s = BELL_SCALE[idx];
-  return new THREE.Vector3(BELL_X[idx], BEAM_Y - 0.34 - (1.05 * s) / 2, RACK_Z);
+  return new THREE.Vector3(BELL_X[idx], BEAM_Y - 0.5 - (1.4 * s) / 2, RACK_Z);
 }
 
 // ── 文字标签（CanvasTexture sprite，沿用数场景写法） ──
@@ -290,22 +290,38 @@ const INSCRIPTION: Record<YueNote, [string, string]> = {
 
 /** 钟体贴图：青铜底 + 铜绿斑 + 错金铭文（两面各一组竖排） */
 /** 青铜斑驳斑块: dark 锈暗 / patina 铜绿 / wear 磨亮, 同源坐标喂三张贴图保持对齐 */
-/** 编钟车削轮廓（合瓦钟形剪影）: 口沿外撇→鼓腹→收腰→圆肩→平顶, r/y 单位乘 s */
+/** 编钟车削轮廓（甬钟制式）: 近直壁上收、瘦高 h:w≈1.67、铣角最宽, 总高 1.4s */
 function bellProfile(s: number): THREE.Vector2[] {
   const p = (r: number, y: number) => new THREE.Vector2(r * s, y * s);
   return [
-    p(0.47, 0.0),   // 口沿外撇
-    p(0.455, 0.02),
-    p(0.435, 0.1),
-    p(0.45, 0.32),  // 鼓腹
-    p(0.425, 0.52),
-    p(0.415, 0.62), // 收腰
-    p(0.4, 0.75),   // 圆肩
-    p(0.34, 0.9),
-    p(0.28, 0.97),
-    p(0.1, 0.99),
-    p(0.0, 0.99),   // 顶面收拢
+    p(0.42, 0.0),    // 铣角（口沿最宽）
+    p(0.418, 0.04),
+    p(0.40, 0.2),    // 近直壁微收
+    p(0.375, 0.55),
+    p(0.35, 0.9),
+    p(0.325, 1.15),
+    p(0.3, 1.32),    // 肩
+    p(0.27, 1.38),
+    p(0.1, 1.4),
+    p(0.0, 1.4),     // 平顶收拢
   ];
+}
+
+/** 曲于口: 口沿前後中央上弧、两侧铣角最低（合瓦钟标志）— 对车削底缘做顶点位移 */
+function bellGeometry(s: number): THREE.LatheGeometry {
+  const geo = new THREE.LatheGeometry(bellProfile(s), 28);
+  const pos = geo.attributes.position as THREE.BufferAttribute;
+  for (let i = 0; i < pos.count; i++) {
+    const y = pos.getY(i);
+    const yn = y / (1.4 * s);
+    if (yn > 0.13) continue;
+    const th = Math.atan2(pos.getZ(i), pos.getX(i));
+    const lift = 0.09 * s * Math.sin(th) * Math.sin(th) * Math.pow(1 - yn / 0.13, 2);
+    pos.setY(i, y + lift);
+  }
+  pos.needsUpdate = true;
+  geo.computeVertexNormals();
+  return geo;
 }
 
 /** 钟体贴图：抛光青铜(馆展级) — 铸层软带+竖向拭痕+错金铭文带，干净温润不脏不塑料 */
@@ -367,10 +383,10 @@ function bellSkin(note: YueNote): { map: THREE.CanvasTexture; roughnessMap: THRE
     cr.fill();
     cr.restore();
   }
-  // 铭文带：深色带内错金竖排（两面相隔半周），金线镶边
+  // 铭文带：鼓部深色带内错金双列竖排（右起, 传统钟铭行款）, 金线镶边
   const lines = INSCRIPTION[note];
-  const bandY = H * 0.26;
-  const bandH = H * 0.42;
+  const bandY = H * 0.5;
+  const bandH = H * 0.3;
   ca.textAlign = "center";
   ca.textBaseline = "middle";
   for (const face of [{ cx: W * 0.25, col: lines[0] }, { cx: W * 0.75, col: lines[1] }]) {
@@ -379,14 +395,18 @@ function bellSkin(note: YueNote): { map: THREE.CanvasTexture; roughnessMap: THRE
     ca.fillStyle = "#caa245";
     ca.fillRect(face.cx - 78, bandY, 156, 3);
     ca.fillRect(face.cx - 78, bandY + bandH - 3, 156, 3);
-    ca.font = `${68}px "Kaiti SC", "STKaiti", "KaiTi", serif`;
-    for (let i = 0; i < face.col.length; i++) {
-      const y = bandY + 52 + i * (68 + 8);
-      ca.fillStyle = "rgba(30,22,8,0.9)";
-      ca.fillText(face.col[i], face.cx + 3, y + 3);
-      ca.fillStyle = "#f6d06a";
-      ca.fillText(face.col[i], face.cx, y);
-    }
+    ca.font = `${60}px "Kaiti SC", "STKaiti", "KaiTi", serif`;
+    const cols = [face.col.slice(0, 2).split(""), face.col.slice(2).split("")]; // 右列前两字, 左列余字
+    cols.forEach((chars, ci) => {
+      const x = face.cx + (ci === 0 ? 34 : -34);
+      chars.forEach((ch, ri) => {
+        const y = bandY + bandH / 2 - 34 + ri * 72;
+        ca.fillStyle = "rgba(30,22,8,0.9)";
+        ca.fillText(ch, x + 3, y + 3);
+        ca.fillStyle = "#f6d06a";
+        ca.fillText(ch, x, y);
+      });
+    });
   }
   const map = new THREE.CanvasTexture(ca.canvas);
   map.colorSpace = THREE.SRGBColorSpace;
@@ -402,21 +422,24 @@ function Bell({ g, note, idx }: { g: YueRefs; note: YueNote; idx: number }) {
   const center = bellCenter(idx);
   const skin = useMemo(() => bellSkin(note), [note]);
 
-  // 乳钉纹（两圈六钉）
+  // 乳钉纹（三圈九钉, 曾侯乙枚区制式, 贴合近直壁弧度）
   const studs = useMemo(() => {
     const arr: { x: number; y: number; z: number }[] = [];
-    for (const [ry, rr] of [[-0.18, 0.458], [0.14, 0.425]] as const) {
-      for (let k = 0; k < 6; k++) {
-        const a = (k / 6) * Math.PI * 2;
+    const rows: [number, number][] = [[0.72, 0.375], [0.92, 0.36], [1.12, 0.341]]; // [y_unit, 轨道半径]
+    for (const [yu, rr] of rows) {
+      for (let k = 0; k < 9; k++) {
+        const a = (k / 9) * Math.PI * 2;
         arr.push({
           x: Math.cos(a) * rr * s,
-          y: ry * s,
+          y: (yu - 0.7) * s,
           z: Math.sin(a) * rr * s * 0.62,
         });
       }
     }
     return arr;
   }, [s]);
+  const geo = useMemo(() => bellGeometry(s), [s]);
+  const ropeH = BEAM_Y - 0.11 - (center.y + 0.8 * s); // 挂索: 梁底→甬上旋环
 
   useFrame(() => {
     const el = grp.current;
@@ -428,48 +451,46 @@ function Bell({ g, note, idx }: { g: YueRefs; note: YueNote; idx: number }) {
 
   return (
     <group position={[center.x, center.y, center.z]}>
-      {/* 挂索 */}
-      <mesh position={[0, (BEAM_Y - center.y) / 2 + 0.05, 0]}>
-        <cylinderGeometry args={[0.03, 0.03, BEAM_Y - center.y - 0.1, 6]} />
+      {/* 挂索（梁底→甬上旋环） */}
+      <mesh position={[0, BEAM_Y - 0.11 - center.y - ropeH / 2, 0]}>
+        <cylinderGeometry args={[0.03, 0.03, ropeH, 6]} />
         <InkMat color={WOOD} grain="wood" repeat={[2, 1]} />
       </mesh>
       <group ref={grp} onPointerDown={(e) => { e.stopPropagation(); g.onStrike.current(note); }}>
-        {/* 甬柄 + 衡顶 */}
-        <mesh position={[0, 0.6 * s, 0]}>
-          <cylinderGeometry args={[0.065 * s, 0.085 * s, 0.22 * s, 8]} />
+        {/* 甬柄（带旋环）+ 衡顶 */}
+        <mesh position={[0, 0.85 * s, 0]}>
+          <cylinderGeometry args={[0.052 * s, 0.065 * s, 0.3 * s, 10]} />
           <meshStandardMaterial color={BRONZE_DEEP} metalness={0.82} roughness={0.42} envMapIntensity={0.7} />
         </mesh>
-        <mesh position={[0, 0.73 * s, 0]}>
-          <sphereGeometry args={[0.05 * s, 10, 8]} />
+        <mesh position={[0, 0.8 * s, 0]} rotation={[Math.PI / 2, 0, 0]}>
+          <torusGeometry args={[0.075 * s, 0.018 * s, 8, 16]} />
           <meshStandardMaterial color={BRONZE_DEEP} metalness={0.82} roughness={0.42} envMapIntensity={0.7} />
         </mesh>
-        {/* 钟体（车削轮廓: 口沿外撇·鼓腹·圆肩, z 压扁成合瓦形） */}
-        <mesh position={[0, -0.495 * s, 0]} scale={[1, 1, 0.62]}>
-          <latheGeometry args={[bellProfile(s), 24]} />
+        <mesh position={[0, 1.02 * s, 0]}>
+          <sphereGeometry args={[0.045 * s, 10, 8]} />
+          <meshStandardMaterial color={BRONZE_DEEP} metalness={0.82} roughness={0.42} envMapIntensity={0.7} />
+        </mesh>
+        {/* 钟体（甬钟制式: 近直壁瘦高+曲于口, z 压扁成合瓦形） */}
+        <mesh position={[0, -0.7 * s, 0]} scale={[1, 1, 0.62]} geometry={geo}>
           <meshStandardMaterial map={skin.map} roughnessMap={skin.roughnessMap} metalness={0.85} roughness={1} envMapIntensity={0.8} side={THREE.DoubleSide} />
         </mesh>
-        {/* 口沿加厚环 */}
-        <mesh position={[0, -0.48 * s, 0]} rotation={[Math.PI / 2, 0, 0]} scale={[1, 0.62, 1]}>
-          <torusGeometry args={[0.455 * s, 0.022 * s, 8, 24]} />
-          <meshStandardMaterial color={BRONZE_DEEP} metalness={0.82} roughness={0.42} envMapIntensity={0.7} />
-        </mesh>
-        {/* 乳钉（两圈六钉, 贴合钟面弧度） */}
+        {/* 乳钉（三圈九钉） */}
         {studs.map((p, i) => (
-          <mesh key={i} position={[p.x, p.y, p.z]} scale={[1, 1, 1.4]}>
-            <sphereGeometry args={[0.034 * s, 8, 6]} />
+          <mesh key={i} position={[p.x, p.y, p.z]} scale={[1, 1, 1.2]}>
+            <sphereGeometry args={[0.026 * s, 8, 6]} />
             <meshStandardMaterial color={BRONZE_DEEP} metalness={0.82} roughness={0.45} envMapIntensity={0.65} />
           </mesh>
         ))}
-        {/* 腰箍（圆肩下缘装饰环） */}
-        <mesh position={[0, 0.3 * s, 0]} rotation={[Math.PI / 2, 0, 0]} scale={[1, 0.62, 1]}>
-          <torusGeometry args={[0.388 * s, 0.02 * s, 8, 24]} />
+        {/* 肩箍（圆肩上缘装饰环） */}
+        <mesh position={[0, 0.52 * s, 0]} rotation={[Math.PI / 2, 0, 0]} scale={[1, 0.62, 1]}>
+          <torusGeometry args={[0.322 * s, 0.012 * s, 8, 24]} />
           <meshStandardMaterial color={BRONZE_DEEP} metalness={0.82} roughness={0.42} envMapIntensity={0.7} />
         </mesh>
       </group>
-      {/* 名牌（梁上） */}
+      {/* 名牌（钟顶上方） */}
       <Label
         lines={[{ text: tr(NOTE_NAME[note]), size: 150, color: "#2b2925", bold: true }]}
-        position={[0, BEAM_Y - center.y + 0.58, 0]}
+        position={[0, 0.7 * s + 0.16, 0]}
         width={1.0}
       />
     </group>
