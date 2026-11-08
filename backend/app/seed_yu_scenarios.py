@@ -16,7 +16,7 @@ YU_PASSAGES = [
         "chapter_id": "diguan-baoshi",
         "chapter_title": "地官·保氏",
         "ref_label": "周礼·地官·保氏",
-        "original_text": "乃教之六艺：一曰五礼，二曰六乐，三曰五射，四曰五驭，五曰六书，六曰九数。五驭：鸣和鸾，逐水曲，过君表，舞交衢，逐禽左。",
+        "original_text": "乃教之六艺：一曰五礼，二曰六乐，三曰五射，四曰五驭，五曰六书，六曰九数。",
         "pinyin": "nǎi jiào zhī liù yì... wǔ yù: míng hé luán, zhú shuǐ qū, guò jūn biǎo, wǔ jiāo qú, zhú qín zuǒ.",
         "concepts": ["yu", "li"],
         "i18n": {

@@ -1514,11 +1514,11 @@ const DICT: Dict = {
     zh: "新展", en: "Now on view", fr: "À l'affiche", es: "En exhibición", ar: "جديد الآن",
   },
   "home.announce.text": {
-    zh: "常设专题展：《论语》十卷 · 从西汉竹书到数字化校勘本",
-    en: "Permanent exhibition: The Analects in ten books — from Han bamboo slips to the digital critical edition",
-    fr: "Exposition permanente : les Analectes en dix livres — des rouleaux de bambou des Han à l'édition critique numérique",
-    es: "Exposición permanente: Las Analectas en diez libros — desde las tiras de bambú Han hasta la edición crítica digital",
-    ar: "معرض دائم: «مقولات كونفوشيوس» في عشرة كتب — من شرائح الخيزران في عهد أسرة الهان إلى الطبعة النقدية الرقمية",
+    zh: "常设专题展：《论语》二十篇 · 从西汉竹书到数字化校勘本",
+    en: "Permanent exhibition: The Analects in twenty chapters — from Han bamboo slips to the digital critical edition",
+    fr: "Exposition permanente : les Analectes en vingt chapitres — des rouleaux de bambou des Han à l'édition critique numérique",
+    es: "Exposición permanente: Las Analectas en veinte capítulos — desde las tiras de bambú Han hasta la edición crítica digital",
+    ar: "معرض دائم: «مقولات كونفوشيوس» في عشرين فصلاً — من شرائح الخيزران في عهد أسرة الهان إلى الطبعة النقدية الرقمية",
   },
   "home.curator.kicker": {
     zh: "馆藏 · 专题", en: "Collection · Curated", fr: "Collection · Dossier", es: "Colección · Dossier", ar: "مقتنيات · موضوع",
