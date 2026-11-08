@@ -23,11 +23,16 @@ export default function CasesPage() {
   const [err, setErr] = useState("");
 
   useEffect(() => {
-    getTopics(lang).then(setTopics).catch((e) => setErr(isAuthError(e) ? t("common.loginRequired", lang) : t("cases.noBackend", lang)));
-    getCaseStats().then(setStats).catch(() => {});
+    let dead = false; // 语言切换时作废旧请求, 防慢响应覆盖新语言
+    getTopics(lang)
+      .then((v) => { if (!dead) setTopics(v); })
+      .catch((e) => { if (!dead) setErr(isAuthError(e) ? t("common.loginRequired", lang) : t("cases.noBackend", lang)); });
+    getCaseStats().then((v) => { if (!dead) setStats(v); }).catch(() => {});
+    return () => { dead = true; };
   }, [lang]);
 
   useEffect(() => {
+    let dead = false; // 语言切换竞态守卫: 旧响应到达时不再覆盖新语言数据
     setLoading(true);
     getCases({
       topic_id: topicId || undefined,
@@ -38,10 +43,15 @@ export default function CasesPage() {
       lang, // 后端按语种取行,缺行时回落中文并本地化问题标题
     })
       .then((d) => {
-        setItems(d.items);
-        setTotal(d.total);
+        if (!dead) {
+          setItems(d.items);
+          setTotal(d.total);
+        }
       })
-      .finally(() => setLoading(false));
+      .finally(() => {
+        if (!dead) setLoading(false);
+      });
+    return () => { dead = true; };
   }, [topicId, q, page, lang]);
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));

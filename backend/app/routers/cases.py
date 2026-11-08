@@ -5,13 +5,14 @@ import re
 from datetime import datetime
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from pydantic import BaseModel
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from ..db import get_db
 from ..models import DialogCase, Topic, User
+from ..questions_i18n import ANGLE_LABEL_BY_ZH
 from ..services.auth import get_current_user
 
 router = APIRouter(prefix="/api/v1", tags=["cases"])
@@ -24,18 +25,32 @@ def _slugify(text: str) -> str:
     return sl or "case"
 
 
-def _brief(c: DialogCase, lang: str = "zh", topic_en: str = "") -> dict:
+def _brief(c: DialogCase, lang: str = "zh", topic_en: str = "", topic_i18n: dict | None = None) -> dict:
     # 非中文时用预置四语问题译文展示(无译文回落中文原文)
     q = c.question
+    title = c.title
+    tags = list(c.tags or [])
     if lang not in ("zh", "all"):
-        q = (c.question_i18n or {}).get(lang) or c.question
+        qi = (c.question_i18n or {}).get(lang)
+        if qi:
+            q = qi
+            # 标题同构本地化: 议题名 · 语境标签 · 问题(拉丁语放宽截断)
+            tname = (topic_i18n or {}).get(lang) or topic_en or c.topic_id
+            angle_zh = tags[1] if len(tags) > 1 else ""
+            angle = (ANGLE_LABEL_BY_ZH.get(angle_zh) or {}).get(lang) or angle_zh
+            trunc = qi if len(qi) <= 60 else qi[:57] + "…"
+            title = f"{tname} · {angle} · {trunc}"
+        if len(tags) > 1:
+            tags = [tags[0]] + [
+                (ANGLE_LABEL_BY_ZH.get(tg) or {}).get(lang) or tg for tg in tags[1:]
+            ]
     return {
         "id": c.id,
         # 分享友好 URL:/cases/{id}-{topic-en-slug};旧纯数字链接仍兼容(前端按前导数字解析)
         "slug": f"{c.id}-{_slugify(topic_en or c.topic_id)}",
         "topic_id": c.topic_id,
         "lang": c.lang,
-        "title": c.title,
+        "title": title,
         "question": q,
         "status": c.status,
         "quality": c.quality,
@@ -43,7 +58,7 @@ def _brief(c: DialogCase, lang: str = "zh", topic_en: str = "") -> dict:
         "reviewer": c.reviewer,
         "reviewed_at": c.reviewed_at.isoformat() if c.reviewed_at else None,
         "review_note": c.review_note,
-        "tags": list(c.tags or []),
+        "tags": tags,
         "civ_count": len(c.cross_civ_views or []),
     }
 
@@ -74,6 +89,7 @@ def _full(c: DialogCase, lang: str = "zh", topic_en: str = "") -> dict:
 
 @router.get("/cases")
 def list_cases(
+    response: Response,
     topic_id: Optional[str] = Query(None),
     lang: str = Query("zh"),
     status: str = Query("published"),  # 默认仅显示已发布
@@ -83,9 +99,10 @@ def list_cases(
     page_size: int = Query(20, ge=1, le=100),
     db: Session = Depends(get_db),
 ) -> dict:
-    topic_en_map = {
-        t.id: (t.name_i18n or {}).get("en", "") for t in db.execute(select(Topic)).scalars()
+    topic_map = {
+        t.id: (t.name_i18n or {}) for t in db.execute(select(Topic)).scalars()
     }
+    topic_en_map = {tid: m.get("en", "") for tid, m in topic_map.items()}
     stmt = select(DialogCase).where(DialogCase.lang == lang)
     # 语种行缺失时回落中文行(标题按 question_i18n 本地化),保证任何语言都有内容
     if lang not in ("zh", "all"):
@@ -130,11 +147,12 @@ def list_cases(
         .all()
     )
 
+    response.headers["Cache-Control"] = "no-store"
     return {
         "total": total,
         "page": page,
         "page_size": page_size,
-        "items": [_brief(c, lang, topic_en_map.get(c.topic_id, "")) for c in rows],
+        "items": [_brief(c, lang, topic_en_map.get(c.topic_id, ""), topic_map.get(c.topic_id, {})) for c in rows],
     }
 
 

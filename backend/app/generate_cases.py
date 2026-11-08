@@ -21,6 +21,7 @@ from sqlalchemy.orm import Session, selectinload
 from .db import SessionLocal, init_db
 from .models import CrossCivView, DialogCase, Passage, Topic
 from .seed import seed_if_empty
+from .questions_i18n import QUESTIONS_I18N, ANGLE_TEMPLATES_I18N
 
 # ── 25 个高质量问题 / 议题 ────────────────────────────────────────────────────
 QUESTIONS = {
@@ -382,11 +383,20 @@ def _compose_case(
             f"[{sec['practice']} · {a_name}]\n{a_instr}"
         )
 
+    # 五语问题(语境模板 × 问题译文); 缺译回落中文
+    qi = (QUESTIONS_I18N.get(topic.id) or {}).get(question) or {}
+    qmap = dict(zip(("en", "fr", "es", "ar"), qi)) if isinstance(qi, tuple) else qi
+    tpl = ANGLE_TEMPLATES_I18N[angle_idx]
+    question_i18n = {
+        lg: tpl[lg].format(q=qmap[lg])
+        for lg in ("en", "fr", "es", "ar") if lg in qmap
+    }
     return {
         "topic_id": topic.id,
         "lang": "zh",
         "title": f"{topic.name_zh} · {angle_name} · {question[:18]}",
         "question": full_q,
+        "question_i18n": question_i18n,
         "confucian_answer": answer,
         "answer_i18n": answer_i18n,
         "cross_civ_views": civ_summary,
