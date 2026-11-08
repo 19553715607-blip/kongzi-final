@@ -16,7 +16,7 @@ from typing import Any, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from pydantic import BaseModel, Field
 from sqlalchemy import func, select
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 
 from ..db import get_db
 from ..models import (
@@ -265,6 +265,11 @@ def _passage_out(p: Passage) -> dict:
         "original_text": p.original_text, "pinyin": p.pinyin,
         "sort_order": p.sort_order, "concepts": list(p.concepts or []),
         "meta": dict(p.meta or {}), "is_published": bool(p.is_published),
+        # 随行五语译文(有则展示当前语言预览, 编辑台可见全部)
+        "translations": [
+            {"lang": t.lang, "text": t.text, "translator": t.translator}
+            for t in (p.translations or [])
+        ],
     }
 
 
@@ -456,7 +461,7 @@ def list_passages(
     db: Session = Depends(get_db),
     _: User = Depends(require_admin),
 ) -> dict:
-    stmt = select(Passage)
+    stmt = select(Passage).options(selectinload(Passage.translations))
     if chapter_id:
         stmt = stmt.where(Passage.chapter_id == chapter_id)
     total = db.scalar(select(func.count()).select_from(stmt.subquery())) or 0

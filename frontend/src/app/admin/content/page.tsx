@@ -414,6 +414,16 @@ export default function AdminContentPage() {
                       {tab === "passages" && (
                         <span className="ms-1 text-[10px] text-faint">{t("admin.content.selectPassage", lang)}</span>
                       )}
+                      {tab === "passages" && (() => {
+                        // 当前界面语言的译文预览(有译文才显示; 原典始终以原文为准)
+                        const tr = ((it.translations as { lang: string; text: string }[] | undefined) ?? []).find((x) => x.lang === lang);
+                        return tr ? (
+                          <div className="mt-0.5 line-clamp-1 text-[11px] text-muted">
+                            <span className="badge badge-accent me-1 !py-0 !text-[9px]">{tr.lang}</span>
+                            {tr.text}
+                          </div>
+                        ) : null;
+                      })()}
                     </td>
                     <td className="px-3 py-2">
                       {it.is_published ? (
@@ -455,7 +465,7 @@ export default function AdminContentPage() {
               {translations.map((tr) => (
                 <div key={tr.id} className="mb-1.5 rounded-lg border border-line bg-surface p-2">
                   <div className="flex items-center justify-between">
-                    <span className="badge badge-accent">{tr.lang}</span>
+                    <span className={`badge ${tr.lang === lang ? "badge-accent" : "badge-gold"}`}>{tr.lang === lang ? `${tr.lang} ✓` : tr.lang}</span>
                     <div className="flex gap-1">
                       <button className="text-[11px] text-muted hover:text-fg" onClick={() => setTransForm(tr)}>{t("admin.common.edit", lang)}</button>
                       <button className="text-[11px] text-accent" onClick={async () => {
