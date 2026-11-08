@@ -179,8 +179,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   // 面包屑：由路径段推导，逐级可点击回退
   const crumbs = useMemo(() => {
     const parts = pathname.split("/").filter(Boolean); // ["admin","users"]
+    // 根路径时品牌名即标题, 面包屑留空避免与顶栏品牌文本重复
+    if (parts.length <= 1) return [];
     const out: { href: string; label: string; here: boolean }[] = [
-      { href: "/admin", label: t("admin.nav.title", lang), here: parts.length <= 1 },
+      { href: "/admin", label: t("admin.nav.title", lang), here: false },
     ];
     let acc = "";
     parts.forEach((seg, i) => {
@@ -230,7 +232,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           {/* 顶栏 */}
           <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-line bg-bg/90 px-4 backdrop-blur">
             <span className="seal flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-base">孔</span>
-            <span className="hidden font-serif text-sm font-medium text-fg sm:block">
+            <span className="hidden min-w-0 truncate font-serif text-sm font-medium text-fg sm:block">
               {t("admin.nav.title", lang)}
             </span>
 
@@ -269,7 +271,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <select
                 value={lang}
                 onChange={(e) => setLangState(e.target.value as Lang)}
-                className="rounded-md border border-line bg-surface px-2 py-1 text-xs text-muted"
+                className="max-w-[110px] shrink-0 rounded-md border border-line bg-surface px-2 py-1 text-xs text-muted"
                 aria-label="language"
               >
                 {LANGS.map((l) => (
@@ -280,9 +282,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               </select>
               <Link
                 href="/"
-                className="rounded-full border border-line px-3 py-1 text-xs text-muted hover:bg-surface-2"
+                className="shrink-0 rounded-full border border-line px-3 py-1 text-xs text-muted hover:bg-surface-2"
               >
-                {t("admin.nav.back", lang)}
+                <span className="sm:hidden">←</span>
+                <span className="hidden sm:inline">{t("admin.nav.back", lang)}</span>
               </Link>
             </div>
           </header>

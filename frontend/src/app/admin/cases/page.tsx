@@ -284,7 +284,7 @@ export default function AdminCasesPage() {
                   setPage(1);
                 }}
                 className={`pressable rounded-full px-2.5 py-1 text-xs ${
-                  topicId === tp.id ? "text-white" : "border border-line text-muted"
+                  topicId === tp.id ? "text-on-accent" : "border border-line text-muted"
                 }`}
                 style={topicId === tp.id ? { background: tp.color } : undefined}
               >

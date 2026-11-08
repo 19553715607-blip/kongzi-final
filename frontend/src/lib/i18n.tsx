@@ -2041,6 +2041,7 @@ const DICT: Dict = {
 
   // 机构管理
   "admin.inst.new": { zh: "新建机构", en: "New institution", fr: "Nouvelle institution", es: "Nueva institución", ar: "مؤسسة جديدة" },
+  "admin.inst.empty": { zh: "暂无机构，点击右上角新建", en: "No institutions yet — create one from the top-right", fr: "Aucune institution — créez-en une en haut à droite", es: "Aún no hay instituciones: cree una desde la parte superior derecha", ar: "لا توجد مؤسسات بعد — أنشئ واحدة من أعلى اليمين" },
   "admin.inst.edit": { zh: "编辑机构", en: "Edit institution", fr: "Modifier l'institution", es: "Editar institución", ar: "تعديل المؤسسة" },
   "admin.inst.delete": { zh: "删除机构", en: "Delete institution", fr: "Supprimer l'institution", es: "Eliminar institución", ar: "حذف المؤسسة" },
   "admin.inst.confirmDelete": { zh: "确定删除机构 {name} 及其所有 Key？", en: "Delete institution {name} and all its keys?", fr: "Supprimer l'institution {name} et toutes ses clés ?", es: "¿Eliminar la institución {name} y todas sus claves?", ar: "هل تريد حذف المؤسسة {name} وكل مفاتيحها؟" },

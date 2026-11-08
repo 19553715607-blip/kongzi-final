@@ -503,11 +503,12 @@ button.retry-btn:hover { filter: brightness(1.06); }
   flex: 0 0 auto; width: 232px;
   border-inline-end: 1px solid var(--line);
   background: color-mix(in srgb, var(--surface) 60%, transparent);
-  display: flex; flex-direction: column;
+  display: none; flex-direction: column; /* 移动端隐藏, 快捷导航条顶上 */
   transition: width 0.22s cubic-bezier(0.22, 1, 0.36, 1);
   overflow: hidden;
 }
 .admin-aside.sb-collapsed { width: 64px; }
+@media (min-width: 768px) { .admin-aside { display: flex; } }
 .sb-scroll { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 10px 8px; display: flex; flex-direction: column; gap: 14px; }
 .sb-group-label {
   font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
@@ -549,7 +550,8 @@ button.retry-btn:hover { filter: brightness(1.06); }
 .sb-collapsed .sb-collapse-btn .sb-text { display: none; }
 
 /* ── 面包屑 ── */
-.crumb { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--faint); min-width: 0; }
+.crumb { display: none; align-items: center; gap: 6px; font-size: 12px; color: var(--faint); min-width: 0; }
+@media (min-width: 768px) { .crumb { display: flex; } }
 .crumb a { color: var(--muted); text-decoration: none; border-radius: 4px; padding: 1px 4px; }
 .crumb a:hover { color: var(--accent); background: var(--surface-2); }
 .crumb .crumb-sep { color: var(--line); }
