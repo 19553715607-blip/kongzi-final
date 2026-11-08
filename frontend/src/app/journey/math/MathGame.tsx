@@ -238,7 +238,7 @@ export default function MathGame() {
                       {gt(s.kind_label, lang)}
                     </span>
                     <span className="flex gap-1">
-                      {s.done_today && <span className="rounded-full bg-amber-50 px-2 py-0.5 text-[10px] text-amber-700">{gt("今日已校 ✓", lang)}</span>}
+                      {s.done_today && <span className="rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] text-amber-700 dark:bg-amber-400/15 dark:text-amber-300">{gt("今日已校 ✓", lang)}</span>}
                       {best > 0 && <span className="rounded-full bg-surface-2 px-2 py-0.5 text-[10px] text-muted">{gt("最佳", lang)} {best}</span>}
                     </span>
                   </div>

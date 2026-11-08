@@ -411,7 +411,7 @@ export default function ShuWritePage() {
             <p className="mt-2 text-sm leading-relaxed text-muted">{result.card.story}</p>
           </div>
           {result.new_unlocked_refs.length > 0 && (
-            <div className="mt-3 rounded-lg border border-gold bg-amber-50 p-3">
+            <div className="mt-3 rounded-lg border border-gold bg-amber-50 p-3 dark:bg-amber-400/10">
               <div className="mb-1 text-[10px] tracking-widest text-amber-700">
                 {gt("新解锁经典", lang)}
               </div>

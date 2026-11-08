@@ -303,7 +303,7 @@ function CardItem({
             className={`rounded-lg p-3 text-sm ${
               result.correct
                 ? "bg-emerald-50 text-emerald-900 border border-emerald-200"
-                : "bg-amber-50 text-amber-900 border border-amber-200"
+                : "bg-amber-50 text-amber-900 border border-amber-200 dark:bg-amber-400/15 dark:text-amber-200 dark:border-amber-500/40"
             }`}
           >
             {result.correct
@@ -331,7 +331,7 @@ function CardItem({
 
           {/* 解锁经典 */}
           {result.new_unlocked_refs.length > 0 && (
-            <div className="rounded-lg border border-gold bg-amber-50 p-3">
+            <div className="rounded-lg border border-gold bg-amber-50 p-3 dark:bg-amber-400/10">
               <div className="mb-1 text-[10px] tracking-widest text-amber-700">{gt("🎖 新解锁经典", lang)}</div>
               {result.new_unlocked_refs.map((r) => (
                 <div key={r.ref_id} className="mt-1 border-s-2 border-amber-500 ps-2 text-sm text-amber-900">

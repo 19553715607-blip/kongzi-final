@@ -453,7 +453,7 @@ function LeaderRow({ row }: { row: { rank: number; name: string; total: number; 
             return (
               <span
                 key={k}
-                className="rounded bg-white/70 px-1 py-0.5"
+                className="rounded bg-white/70 px-1 py-0.5 dark:bg-white/10"
                 style={{ opacity: v > 0 ? 1 : 0.4 }}
               >
                 {lbl} {v}

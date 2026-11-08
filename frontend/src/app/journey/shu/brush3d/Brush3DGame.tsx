@@ -252,7 +252,7 @@ export default function Brush3DGame() {
                     {c.category_label}
                   </span>
                   <span className="flex gap-1">
-                    {c.answered && <span className="rounded-full bg-amber-50 px-2 py-0.5 text-[10px] text-amber-700">{gt("练过", lang)}</span>}
+                    {c.answered && <span className="rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] text-amber-700 dark:bg-amber-400/15 dark:text-amber-300">{gt("练过", lang)}</span>}
                     <span className="rounded-full bg-surface-2 px-2 py-0.5 text-[10px] text-muted">{"★".repeat(c.difficulty)}</span>
                   </span>
                 </div>

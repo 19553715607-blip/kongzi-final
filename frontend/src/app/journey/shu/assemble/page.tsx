@@ -237,7 +237,7 @@ export default function ShuAssemblePage() {
                     ? "border-emerald-500 bg-emerald-50 text-emerald-900"
                     : result && !result.correct
                     ? "border-rose-500 bg-rose-50 text-rose-900"
-                    : "border-accent bg-accent-soft text-accent-ink hover:bg-amber-50"
+                    : "border-accent bg-accent-soft text-accent-ink hover:bg-amber-50 dark:hover:bg-amber-400/10"
                   : "border-dashed border-line bg-surface-2/40 text-faint"
               }`}
             >
@@ -306,7 +306,7 @@ export default function ShuAssemblePage() {
           className={`rounded-2xl border p-5 ${
             result.correct
               ? "border-emerald-300 bg-emerald-50"
-              : "border-amber-300 bg-amber-50"
+              : "border-amber-300 bg-amber-50 dark:border-amber-500/40 dark:bg-amber-400/10"
           }`}
         >
           <div
@@ -325,7 +325,7 @@ export default function ShuAssemblePage() {
                 )}
           </div>
 
-          <div className="rounded-lg bg-white/70 p-3">
+          <div className="rounded-lg bg-white/70 p-3 dark:bg-white/10">
             <div className="text-[10px] text-muted">
               {result.card.method_label} · {gt("本义", lang)}
             </div>
@@ -334,7 +334,7 @@ export default function ShuAssemblePage() {
           </div>
 
           {result.new_unlocked_refs.length > 0 && (
-            <div className="mt-3 rounded-lg border border-gold bg-amber-50 p-3">
+            <div className="mt-3 rounded-lg border border-gold bg-amber-50 p-3 dark:bg-amber-400/10">
               <div className="mb-1 text-[10px] tracking-widest text-amber-700">
                 {t("jrn.newUnlock", lang)}
               </div>

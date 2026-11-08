@@ -242,7 +242,7 @@ export default function YuGame() {
                   {tr(s.title)}
                 </span>
                 <span className="flex gap-1">
-                  {s.done_today && <span className="rounded-full bg-amber-50 px-2 py-0.5 text-[10px] text-amber-700">{tr("今日已评")}</span>}
+                  {s.done_today && <span className="rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] text-amber-700 dark:bg-amber-400/15 dark:text-amber-300">{tr("今日已评")}</span>}
                   {s.answered && !s.done_today && <span className="rounded-full bg-surface-2 px-2 py-0.5 text-[10px] text-muted">{tr("已驭过")}</span>}
                 </span>
               </div>
