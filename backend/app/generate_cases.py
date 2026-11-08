@@ -399,11 +399,11 @@ def _compose_case(
 
 
 def generate(db: Session, reset: bool = False) -> dict:
-    published_keys: set[tuple[str, str]] = set()
+    prior_status: dict[tuple[str, str], tuple[str, str | None, str | None]] = {}
     if reset:
-        published_keys = {
-            (c.topic_id, c.title)
-            for c in db.execute(select(DialogCase).where(DialogCase.status == "published")).scalars()
+        prior_status = {
+            (c.topic_id, c.title): (c.status, c.reviewer, c.review_note)
+            for c in db.execute(select(DialogCase)).scalars()
         }
         db.execute(delete(DialogCase))
         db.commit()
@@ -439,16 +439,15 @@ def generate(db: Session, reset: bool = False) -> dict:
                 total += 1
         counts[t.id] = per_topic
     db.commit()
-    if reset and published_keys:
-        republished = 0
+    if reset and prior_status:
+        restored = 0
         for c in db.execute(select(DialogCase)).scalars():
-            if (c.topic_id, c.title) in published_keys:
-                c.status = "published"
-                c.reviewer = "editorial-seed"
-                c.review_note = "初始发布批次"
-                republished += 1
+            prior = prior_status.get((c.topic_id, c.title))
+            if prior:
+                c.status, c.reviewer, c.review_note = prior
+                restored += 1
         db.commit()
-        print(f"[generate_cases] republished {republished}")
+        print(f"[generate_cases] status restored for {restored}")
     return {"total_added": total, "per_topic": counts}
 
 
