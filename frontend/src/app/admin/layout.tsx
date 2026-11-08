@@ -268,18 +268,21 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 </svg>
                 <span className="cmd-kbd">⌘K</span>
               </button>
-              <select
-                value={lang}
-                onChange={(e) => setLangState(e.target.value as Lang)}
-                className="max-w-[110px] shrink-0 rounded-md border border-line bg-surface px-2 py-1 text-xs text-muted"
-                aria-label="language"
-              >
+              {/* 语言 pill 组: 与站点导航一致, 比原生下拉更直观 */}
+              <div className="flex shrink-0 items-center gap-0.5 rounded-full border border-line bg-surface p-0.5" role="group" aria-label="language">
                 {LANGS.map((l) => (
-                  <option key={l.code} value={l.code}>
-                    {l.native}
-                  </option>
+                  <button
+                    key={l.code}
+                    onClick={() => setLangState(l.code)}
+                    className={`rounded-full px-1.5 py-0.5 text-[10px] transition ${
+                      lang === l.code ? "bg-accent text-on-accent" : "text-muted hover:text-fg"
+                    }`}
+                    aria-pressed={lang === l.code}
+                  >
+                    {l.code === "zh" ? "中" : l.label}
+                  </button>
                 ))}
-              </select>
+              </div>
               <Link
                 href="/"
                 className="shrink-0 rounded-full border border-line px-3 py-1 text-xs text-muted hover:bg-surface-2"
