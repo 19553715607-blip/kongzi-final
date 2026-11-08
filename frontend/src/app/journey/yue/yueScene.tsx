@@ -423,7 +423,7 @@ function bellSkin(note: YueNote): { map: THREE.CanvasTexture; roughnessMap: THRE
     ca.fillRect(x, y, w, h);
   }
   // 粗糙度：抛光基准 + 少量大块柔变(反射缓变, 无颗粒)
-  cr.fillStyle = "#96"; // 0.59 哑光基准
+  cr.fillStyle = "#b4"; // 0.71 哑光基准
   cr.fillRect(0, 0, W, H);
   for (let i = 0; i < 6; i++) {
     const x = rnd() * W;
@@ -484,8 +484,8 @@ function Bell({ g, note, idx }: { g: YueRefs; note: YueNote; idx: number }) {
   const ropeH = BEAM_Y - 0.11 - (center.y + 0.8 * s); // 挂索: 梁底→甬上旋环
   // Blender 建模 GLB(合瓦形+曲于口+甬旋衡+枚+篆带), 材质按名覆写
   const { scene: bellGlb } = useGLTF("/models/sixarts/bianzhong.glb", false, true);
-  const bodyMat = useMemo(() => new THREE.MeshStandardMaterial({ map: skin.map, roughnessMap: skin.roughnessMap, metalness: 0.9, roughness: 1, envMapIntensity: 0.5, side: THREE.DoubleSide }), [skin]);
-  const deepMat = useMemo(() => new THREE.MeshStandardMaterial({ color: BRONZE_DEEP, metalness: 0.88, roughness: 0.58, envMapIntensity: 0.5 }), []);
+  const bodyMat = useMemo(() => new THREE.MeshStandardMaterial({ map: skin.map, roughnessMap: skin.roughnessMap, metalness: 0.25, roughness: 1, envMapIntensity: 0.25, side: THREE.DoubleSide }), [skin]);
+  const deepMat = useMemo(() => new THREE.MeshStandardMaterial({ color: BRONZE_DEEP, metalness: 0.3, roughness: 0.75, envMapIntensity: 0.25 }), []);
   const model = useMemo(() => {
     const c = bellGlb.clone(true);
     c.traverse((o) => {
