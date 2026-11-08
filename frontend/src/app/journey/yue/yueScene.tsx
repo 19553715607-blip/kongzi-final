@@ -12,8 +12,9 @@
  */
 
 import { useFrame, useThree } from "@react-three/fiber";
-import { useMemo, useRef, type MutableRefObject } from "react";
+import { Suspense, useMemo, useRef, type MutableRefObject } from "react";
 import * as THREE from "three";
+import { useGLTF } from "@react-three/drei";
 import { InkWorld, InkMat, AutoCastShadow } from "@/components/three/inkwash";
 import type { YueNote } from "@/lib/types";
 import { useGT } from "@/lib/gameDict";
@@ -369,40 +370,6 @@ function rackWoodTexture(rot = false): THREE.CanvasTexture {
   return tex;
 }
 
-/** 编钟车削轮廓（甬钟制式）: 近直壁上收、瘦高 h:w≈1.67、铣角最宽, 总高 1.4s */
-function bellProfile(s: number): THREE.Vector2[] {
-  const p = (r: number, y: number) => new THREE.Vector2(r * s, y * s);
-  return [
-    p(0.42, 0.0),    // 铣角（口沿最宽）
-    p(0.418, 0.04),
-    p(0.40, 0.2),    // 近直壁微收
-    p(0.375, 0.55),
-    p(0.35, 0.9),
-    p(0.325, 1.15),
-    p(0.3, 1.32),    // 肩
-    p(0.27, 1.38),
-    p(0.1, 1.4),
-    p(0.0, 1.4),     // 平顶收拢
-  ];
-}
-
-/** 曲于口: 口沿前後中央上弧、两侧铣角最低（合瓦钟标志）— 对车削底缘做顶点位移 */
-function bellGeometry(s: number): THREE.LatheGeometry {
-  const geo = new THREE.LatheGeometry(bellProfile(s), 28);
-  const pos = geo.attributes.position as THREE.BufferAttribute;
-  for (let i = 0; i < pos.count; i++) {
-    const y = pos.getY(i);
-    const yn = y / (1.4 * s);
-    if (yn > 0.13) continue;
-    const th = Math.atan2(pos.getZ(i), pos.getX(i));
-    const lift = 0.09 * s * Math.sin(th) * Math.sin(th) * Math.pow(1 - yn / 0.13, 2);
-    pos.setY(i, y + lift);
-  }
-  pos.needsUpdate = true;
-  geo.computeVertexNormals();
-  return geo;
-}
-
 /** 固定种子伪随机(mulberry32): 五口钟共用同源斑驳, 质感统一 */
 function bellRng(seed = 7) {
   let a = seed >>> 0;
@@ -514,24 +481,23 @@ function Bell({ g, note, idx }: { g: YueRefs; note: YueNote; idx: number }) {
   const center = bellCenter(idx);
   const skin = useMemo(() => bellSkin(note), [note]);
 
-  // 乳钉纹（三圈九钉, 曾侯乙枚区制式, 贴合近直壁弧度）
-  const studs = useMemo(() => {
-    const arr: { x: number; y: number; z: number }[] = [];
-    const rows: [number, number][] = [[0.72, 0.375], [0.92, 0.36], [1.12, 0.341]]; // [y_unit, 轨道半径]
-    for (const [yu, rr] of rows) {
-      for (let k = 0; k < 9; k++) {
-        const a = (k / 9) * Math.PI * 2;
-        arr.push({
-          x: Math.cos(a) * rr * s,
-          y: (yu - 0.7) * s,
-          z: Math.sin(a) * rr * s * 0.62,
-        });
-      }
-    }
-    return arr;
-  }, [s]);
-  const geo = useMemo(() => bellGeometry(s), [s]);
   const ropeH = BEAM_Y - 0.11 - (center.y + 0.8 * s); // 挂索: 梁底→甬上旋环
+  // Blender 建模 GLB(合瓦形+曲于口+甬旋衡+枚+篆带), 材质按名覆写
+  const { scene: bellGlb } = useGLTF("/models/sixarts/bianzhong.glb", false, true);
+  const bodyMat = useMemo(() => new THREE.MeshStandardMaterial({ map: skin.map, roughnessMap: skin.roughnessMap, metalness: 0.85, roughness: 1, envMapIntensity: 0.8, side: THREE.DoubleSide }), [skin]);
+  const deepMat = useMemo(() => new THREE.MeshStandardMaterial({ color: BRONZE_DEEP, metalness: 0.82, roughness: 0.45, envMapIntensity: 0.65 }), []);
+  const model = useMemo(() => {
+    const c = bellGlb.clone(true);
+    c.traverse((o) => {
+      const m = o as THREE.Mesh;
+      if (!m.isMesh) return;
+      const src = m.material as THREE.MeshStandardMaterial;
+      m.material = src.name === "bronze_body" ? bodyMat : deepMat;
+      m.castShadow = true;
+      m.receiveShadow = true;
+    });
+    return c;
+  }, [bellGlb, bodyMat, deepMat]);
 
   useFrame(() => {
     const el = grp.current;
@@ -549,35 +515,10 @@ function Bell({ g, note, idx }: { g: YueRefs; note: YueNote; idx: number }) {
         <InkMat color={WOOD} grain="wood" repeat={[2, 1]} />
       </mesh>
       <group ref={grp} onPointerDown={(e) => { e.stopPropagation(); g.onStrike.current(note); }}>
-        {/* 甬柄（带旋环）+ 衡顶 */}
-        <mesh position={[0, 0.85 * s, 0]}>
-          <cylinderGeometry args={[0.052 * s, 0.065 * s, 0.3 * s, 10]} />
-          <meshStandardMaterial color={BRONZE_DEEP} metalness={0.82} roughness={0.42} envMapIntensity={0.7} />
-        </mesh>
-        <mesh position={[0, 0.8 * s, 0]} rotation={[Math.PI / 2, 0, 0]}>
-          <torusGeometry args={[0.075 * s, 0.018 * s, 8, 16]} />
-          <meshStandardMaterial color={BRONZE_DEEP} metalness={0.82} roughness={0.42} envMapIntensity={0.7} />
-        </mesh>
-        <mesh position={[0, 1.02 * s, 0]}>
-          <sphereGeometry args={[0.045 * s, 10, 8]} />
-          <meshStandardMaterial color={BRONZE_DEEP} metalness={0.82} roughness={0.42} envMapIntensity={0.7} />
-        </mesh>
-        {/* 钟体（甬钟制式: 近直壁瘦高+曲于口, z 压扁成合瓦形） */}
-        <mesh position={[0, -0.7 * s, 0]} scale={[1, 1, 0.62]} geometry={geo}>
-          <meshStandardMaterial map={skin.map} roughnessMap={skin.roughnessMap} metalness={0.85} roughness={1} envMapIntensity={0.8} side={THREE.DoubleSide} />
-        </mesh>
-        {/* 乳钉（三圈九钉） */}
-        {studs.map((p, i) => (
-          <mesh key={i} position={[p.x, p.y, p.z]} scale={[1, 1, 1.2]}>
-            <sphereGeometry args={[0.026 * s, 8, 6]} />
-            <meshStandardMaterial color={BRONZE_DEEP} metalness={0.82} roughness={0.45} envMapIntensity={0.65} />
-          </mesh>
-        ))}
-        {/* 肩箍（圆肩上缘装饰环） */}
-        <mesh position={[0, 0.52 * s, 0]} rotation={[Math.PI / 2, 0, 0]} scale={[1, 0.62, 1]}>
-          <torusGeometry args={[0.322 * s, 0.012 * s, 8, 24]} />
-          <meshStandardMaterial color={BRONZE_DEEP} metalness={0.82} roughness={0.42} envMapIntensity={0.7} />
-        </mesh>
+        {/* 钟体(Blender 建模): 甬/旋/衡+钟身(空心壁)+枚+篆带 */}
+        <Suspense fallback={null}>
+          <primitive object={model} scale={s} position={[0, -0.7 * s, 0]} />
+        </Suspense>
       </group>
       {/* 名牌（钟顶上方） */}
       <Label
