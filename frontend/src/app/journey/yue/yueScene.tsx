@@ -325,8 +325,21 @@ function bellGeometry(s: number): THREE.LatheGeometry {
   return geo;
 }
 
+/** 固定种子伪随机(mulberry32): 五口钟共用同源斑驳, 质感统一 */
+function bellRng(seed = 7) {
+  let a = seed >>> 0;
+  return () => {
+    a += 0x6d2b79f5;
+    let ta = a;
+    ta = Math.imul(ta ^ (ta >>> 15), ta | 1);
+    ta ^= ta + Math.imul(ta ^ (ta >>> 7), ta | 61);
+    return ((ta ^ (ta >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
 /** 钟体贴图：抛光青铜(馆展级) — 铸层软带+竖向拭痕+错金铭文带，干净温润不脏不塑料 */
 function bellSkin(note: YueNote): { map: THREE.CanvasTexture; roughnessMap: THREE.CanvasTexture } {
+  const rnd = bellRng(7); // 同源随机: 五钟纹理一致, 仅铭文随音名变化
   const W = 1024;
   const H = 512;
   const mk = () => {
@@ -346,8 +359,8 @@ function bellSkin(note: YueNote): { map: THREE.CanvasTexture; roughnessMap: THRE
   ca.fillRect(0, 0, W, H);
   // 铸层带：4 条超宽软横带，极低对比，给大面层次而非噪点
   for (let i = 0; i < 4; i++) {
-    const y = H * (0.1 + i * 0.22) + Math.random() * 18;
-    const h = H * (0.1 + Math.random() * 0.08);
+    const y = H * (0.1 + i * 0.22) + rnd() * 18;
+    const h = H * (0.1 + rnd() * 0.08);
     const bg = ca.createLinearGradient(0, y, 0, y + h);
     bg.addColorStop(0, "rgba(0,0,0,0)");
     bg.addColorStop(0.5, i % 2 === 0 ? "rgba(36,44,28,0.08)" : "rgba(198,206,158,0.06)");
@@ -357,21 +370,21 @@ function bellSkin(note: YueNote): { map: THREE.CanvasTexture; roughnessMap: THRE
   }
   // 竖向拭痕：跟随钟形的抛光痕迹(细长条, 极低透明度)
   for (let i = 0; i < 42; i++) {
-    const x = Math.random() * W;
-    const w = 2 + Math.random() * 4;
-    const h = 60 + Math.random() * 240;
-    const y = Math.random() * (H - h);
-    ca.fillStyle = Math.random() < 0.5 ? "rgba(206,212,164,0.05)" : "rgba(44,52,32,0.05)";
+    const x = rnd() * W;
+    const w = 2 + rnd() * 4;
+    const h = 60 + rnd() * 240;
+    const y = rnd() * (H - h);
+    ca.fillStyle = rnd() < 0.5 ? "rgba(206,212,164,0.05)" : "rgba(44,52,32,0.05)";
     ca.fillRect(x, y, w, h);
   }
   // 粗糙度：抛光基准 + 少量大块柔变(反射缓变, 无颗粒)
   cr.fillStyle = "#52"; // 0.32 抛光基准
   cr.fillRect(0, 0, W, H);
   for (let i = 0; i < 6; i++) {
-    const x = Math.random() * W;
-    const y = Math.random() * H;
-    const r = 90 + Math.random() * 140;
-    const v = Math.random() < 0.5 ? 86 : 52; // 局部更哑/更亮
+    const x = rnd() * W;
+    const y = rnd() * H;
+    const r = 90 + rnd() * 140;
+    const v = rnd() < 0.5 ? 86 : 52; // 局部更哑/更亮
     cr.save();
     cr.translate(x, y);
     cr.scale(1, 0.6);
