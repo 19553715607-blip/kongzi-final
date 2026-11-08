@@ -57,7 +57,6 @@ const BRONZE = "#a8905a";
 const BRONZE_DARK = "#8a7448";
 const BRONZE_DEEP = "#454c36"; // 甬/钉/箍等深绿铜强调件
 const LACQUER = "#6b2420"; // 髹漆朱
-const RACK_LACQUER = "#6e4e2c"; // 簨簴天然木色(曾侯乙式木架)
 const WOOD = "#5a3b1d";
 const SHENG_COLOR = "#2f8f7b"; // 相生 · 青
 const REVERSE_COLOR = "#8a3530"; // 逆跳 · 暗红
@@ -244,6 +243,8 @@ function Lanterns() {
 
 // ── 编钟架（簨簴）+ 五口甬钟 ──
 function BellRack({ g }: { g: YueRefs }) {
+  const woodCol = useMemo(() => rackWoodTexture(false), []);
+  const woodBeam = useMemo(() => rackWoodTexture(true), []);
   return (
     <group position={[0, 0.3, 0]}>
       {/* 立柱（髹漆） */}
@@ -251,11 +252,11 @@ function BellRack({ g }: { g: YueRefs }) {
         <group key={x} position={[x, 0, RACK_Z]}>
           <mesh position={[0, 1.9, 0]}>
             <cylinderGeometry args={[0.13, 0.17, 3.8, 10]} />
-            <InkMat color={RACK_LACQUER} grain="wood" repeat={[2, 2]} />
+            <meshStandardMaterial map={woodCol} roughness={0.72} />
           </mesh>
           <mesh position={[0, 0.12, 0]}>
             <boxGeometry args={[0.6, 0.24, 0.6]} />
-            <InkMat color={WOOD} grain="wood" repeat={[2, 1]} />
+            <meshStandardMaterial map={woodCol} color="#d8c3a0" roughness={0.75} />
           </mesh>
           <mesh position={[0, 3.86, 0]}>
             <sphereGeometry args={[0.14, 10, 8]} />
@@ -266,7 +267,7 @@ function BellRack({ g }: { g: YueRefs }) {
       {/* 横梁（髹漆彩绘：朱梁金缘） */}
       <mesh position={[0, BEAM_Y, RACK_Z]}>
         <boxGeometry args={[7.4, 0.22, 0.26]} />
-        <InkMat color={RACK_LACQUER} grain="wood" repeat={[2, 2]} />
+        <meshStandardMaterial map={woodBeam} roughness={0.72} />
       </mesh>
       <mesh position={[0, BEAM_Y + 0.13, RACK_Z]}>
         <boxGeometry args={[7.4, 0.05, 0.28]} />
@@ -291,6 +292,83 @@ const INSCRIPTION: Record<YueNote, [string, string]> = {
 
 /** 钟体贴图：青铜底 + 铜绿斑 + 错金铭文（两面各一组竖排） */
 /** 青铜斑驳斑块: dark 锈暗 / patina 铜绿 / wear 磨亮, 同源坐标喂三张贴图保持对齐 */
+/** 簨簴木质贴图: 竖向年轮纹+节疤+板色带, 固定种子; rot=true 供横梁横向用 */
+function rackWoodTexture(rot = false): THREE.CanvasTexture {
+  const W = 512;
+  const H = 512;
+  const rnd = bellRng(11);
+  const c = document.createElement("canvas");
+  c.width = W;
+  c.height = H;
+  const ctx = c.getContext("2d")!;
+  const g = ctx.createLinearGradient(0, 0, 0, H);
+  g.addColorStop(0, "#755431");
+  g.addColorStop(1, "#66472a");
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, W, H);
+  // 宽板色带(竖向软带, 分板感)
+  for (let i = 0; i < 6; i++) {
+    const x = rnd() * W;
+    const w = 30 + rnd() * 70;
+    const bg = ctx.createLinearGradient(x, 0, x + w, 0);
+    bg.addColorStop(0, "rgba(0,0,0,0)");
+    bg.addColorStop(0.5, i % 2 === 0 ? "rgba(64,42,20,0.10)" : "rgba(150,108,60,0.09)");
+    bg.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = bg;
+    ctx.fillRect(x, 0, w, H);
+  }
+  // 竖向年轮纹: 波浪细线, 明暗相间
+  for (let i = 0; i < 90; i++) {
+    const x0 = rnd() * W;
+    const ph = rnd() * Math.PI * 2;
+    const amp = 2 + rnd() * 5;
+    const dark = rnd() < 0.55;
+    ctx.strokeStyle = dark
+      ? `rgba(58,38,18,${(0.14 + rnd() * 0.14).toFixed(3)})`
+      : `rgba(146,106,60,${(0.1 + rnd() * 0.12).toFixed(3)})`;
+    ctx.lineWidth = 1.2 + rnd() * 2.6;
+    ctx.beginPath();
+    for (let y = 0; y <= H; y += 8) {
+      const x = x0 + Math.sin(ph + (y / H) * Math.PI * 2) * amp;
+      if (y === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+  }
+  // 节疤(深芯+亮环)
+  for (let i = 0; i < 6; i++) {
+    const x = rnd() * W;
+    const y = rnd() * H;
+    ctx.fillStyle = `rgba(52,34,16,${(0.18 + rnd() * 0.12).toFixed(3)})`;
+    ctx.beginPath();
+    ctx.ellipse(x, y, 3 + rnd() * 6, 7 + rnd() * 12, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = `rgba(150,110,62,${(0.14 + rnd() * 0.08).toFixed(3)})`;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.ellipse(x, y, 5 + rnd() * 7, 10 + rnd() * 13, 0, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+  // 细碎木屑点
+  for (let i = 0; i < 260; i++) {
+    ctx.fillStyle = rnd() < 0.5 ? "rgba(60,40,20,0.06)" : "rgba(160,120,70,0.05)";
+    ctx.fillRect(rnd() * W, rnd() * H, 1 + rnd() * 2, 1 + rnd() * 2);
+  }
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 8;
+  tex.wrapS = THREE.RepeatWrapping;
+  tex.wrapT = THREE.RepeatWrapping;
+  if (rot) {
+    tex.center.set(0.5, 0.5);
+    tex.rotation = Math.PI / 2; // 横梁: 纹理转向水平
+    tex.repeat.set(2, 1);
+  } else {
+    tex.repeat.set(1, 2); // 柱: 竖纹拉密
+  }
+  return tex;
+}
+
 /** 编钟车削轮廓（甬钟制式）: 近直壁上收、瘦高 h:w≈1.67、铣角最宽, 总高 1.4s */
 function bellProfile(s: number): THREE.Vector2[] {
   const p = (r: number, y: number) => new THREE.Vector2(r * s, y * s);
