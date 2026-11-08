@@ -56,7 +56,7 @@ export function createYueRefs(): YueRefs {
 const GOLD = "#d9a521";
 const BRONZE = "#a8905a";
 const BRONZE_DARK = "#8a7448";
-const BRONZE_DEEP = "#454c36"; // 甬/钉/箍等深绿铜强调件
+const BRONZE_DEEP = "#755d2b"; // 甬/钉/箍等深黄铜强调件
 const LACQUER = "#6b2420"; // 髹漆朱
 const WOOD = "#5a3b1d";
 const SHENG_COLOR = "#2f8f7b"; // 相生 · 青
@@ -397,9 +397,9 @@ function bellSkin(note: YueNote): { map: THREE.CanvasTexture; roughnessMap: THRE
   const cr = mk(); // 粗糙度
   // 底色：温润青铜纵向渐变
   const g = ca.createLinearGradient(0, 0, 0, H);
-  g.addColorStop(0, "#8f9a78");
-  g.addColorStop(0.55, "#7d8866");
-  g.addColorStop(1, "#636b4e");
+  g.addColorStop(0, "#b2914e");
+  g.addColorStop(0.55, "#a0803f");
+  g.addColorStop(1, "#83672f");
   ca.fillStyle = g;
   ca.fillRect(0, 0, W, H);
   // 铸层带：4 条超宽软横带，极低对比，给大面层次而非噪点
@@ -408,7 +408,7 @@ function bellSkin(note: YueNote): { map: THREE.CanvasTexture; roughnessMap: THRE
     const h = H * (0.1 + rnd() * 0.08);
     const bg = ca.createLinearGradient(0, y, 0, y + h);
     bg.addColorStop(0, "rgba(0,0,0,0)");
-    bg.addColorStop(0.5, i % 2 === 0 ? "rgba(36,44,28,0.08)" : "rgba(198,206,158,0.06)");
+    bg.addColorStop(0.5, i % 2 === 0 ? "rgba(78,58,22,0.08)" : "rgba(226,196,126,0.06)");
     bg.addColorStop(1, "rgba(0,0,0,0)");
     ca.fillStyle = bg;
     ca.fillRect(0, y, W, h);
@@ -423,7 +423,7 @@ function bellSkin(note: YueNote): { map: THREE.CanvasTexture; roughnessMap: THRE
     ca.fillRect(x, y, w, h);
   }
   // 粗糙度：抛光基准 + 少量大块柔变(反射缓变, 无颗粒)
-  cr.fillStyle = "#52"; // 0.32 抛光基准
+  cr.fillStyle = "#96"; // 0.59 哑光基准
   cr.fillRect(0, 0, W, H);
   for (let i = 0; i < 6; i++) {
     const x = rnd() * W;
@@ -449,7 +449,7 @@ function bellSkin(note: YueNote): { map: THREE.CanvasTexture; roughnessMap: THRE
   ca.textAlign = "center";
   ca.textBaseline = "middle";
   for (const face of [{ cx: W * 0.25, col: lines[0] }, { cx: W * 0.75, col: lines[1] }]) {
-    ca.fillStyle = "rgba(30,34,22,0.75)";
+    ca.fillStyle = "rgba(40,31,13,0.78)";
     ca.fillRect(face.cx - 78, bandY, 156, bandH);
     ca.fillStyle = "#caa245";
     ca.fillRect(face.cx - 78, bandY, 156, 3);
@@ -484,8 +484,8 @@ function Bell({ g, note, idx }: { g: YueRefs; note: YueNote; idx: number }) {
   const ropeH = BEAM_Y - 0.11 - (center.y + 0.8 * s); // 挂索: 梁底→甬上旋环
   // Blender 建模 GLB(合瓦形+曲于口+甬旋衡+枚+篆带), 材质按名覆写
   const { scene: bellGlb } = useGLTF("/models/sixarts/bianzhong.glb", false, true);
-  const bodyMat = useMemo(() => new THREE.MeshStandardMaterial({ map: skin.map, roughnessMap: skin.roughnessMap, metalness: 0.85, roughness: 1, envMapIntensity: 0.8, side: THREE.DoubleSide }), [skin]);
-  const deepMat = useMemo(() => new THREE.MeshStandardMaterial({ color: BRONZE_DEEP, metalness: 0.82, roughness: 0.45, envMapIntensity: 0.65 }), []);
+  const bodyMat = useMemo(() => new THREE.MeshStandardMaterial({ map: skin.map, roughnessMap: skin.roughnessMap, metalness: 0.9, roughness: 1, envMapIntensity: 0.5, side: THREE.DoubleSide }), [skin]);
+  const deepMat = useMemo(() => new THREE.MeshStandardMaterial({ color: BRONZE_DEEP, metalness: 0.88, roughness: 0.58, envMapIntensity: 0.5 }), []);
   const model = useMemo(() => {
     const c = bellGlb.clone(true);
     c.traverse((o) => {
