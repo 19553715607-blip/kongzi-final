@@ -215,6 +215,94 @@ SECTIONS = {
 }
 
 
+# ── 问题关键词 → 经文提示(选证用): 词表只指向 passages 表内真实经文 ──
+KEYWORD_HINTS: dict[str, list[str]] = {
+    # 治理/权力
+    "lunyu.weizheng.2.1": ["治理", "政府", "领导", "德治", "示范", "气候治理", "全球治理", "施政", "为政"],
+    "lunyu.weizheng.2.3": ["法律", "刑罚", "立法", "监管", "禁令", "道德", "制度", "法治"],
+    "xunzi.jundao.1": ["民意", "政权", "监督", "腐败", "民粹", "革命", "合法性", "人民", "覆舟"],
+    "lunyu.yanyuan.12.7": ["信任", "信用", "公信", "诚信", "承诺", "立信"],
+    # 公平/分配
+    "lunyu.jishi.16.1": ["均衡", "公平", "分配", "贫富", "差距", "不平等", "正义", "减排", "责任划分", "共享"],
+    "guanzi.chengma.1": ["土地", "资源", "生态", "环境", "国土", "开发", "自然"],
+    "zhouli.junshu.1": ["负担", "赋税", "劳役", "义务", "分担", "均"],
+    "jiuzhang.junshu.1": ["算法", "配额", "碳交易", "均输", "测算"],
+    "jiuzhang.cuifen.1": ["比例", "分配", "份额", "分级", "按劳"],
+    # 义利/换位
+    "lunyu.liren.4.16": ["利益", "利润", "盈利", "商业", "经济", "功利", "利弊", "权衡", "资本"],
+    "lunyu.yanyuan.12.2": ["换位", "将心比心", "同理", "尊重", "包容", "冒犯", "隐私", "监控", "代际", "后代"],
+    "lunyu.liren.4.15": ["忠恕", "宽容", "体谅", "推己及人"],
+    # 学习/教育
+    "lunyu.shuer.7.21": ["榜样", "借鉴", "合作", "他人", "跨文化", "对话"],
+    "lunyu.liren.4.17": ["自省", "进步", "竞争", "嫉妒", "比较心", "内卷", "见贤思齐"],
+    "lunyu.xueer.1.4": ["反思", "复盘", "习惯", "自律", "日常", "省身"],
+    "lunyu.xueer.1.1": ["终身学习", "复习", "朋友", "认同", "被误解", "学习"],
+    "lunyu.xueer.1.6": ["教育", "教养", "儿童", "青少年", "家庭", "课程", "德育"],
+    "lunyu.shuer.7.8": ["课堂", "启发", "讨论", "提问", "引导", "教学"],
+    "lunyu.weizheng.2.11": ["创新", "传统", "历史", "经验", "传承", "温故"],
+    "lunyu.weizheng.2.15": ["思考", "批判", "独立思考", "信息", "媒体", "谣言", "盲从"],
+    "lunyu.weizheng.2.17": ["诚实", "无知", "谦逊", "科学", "边界", "承认"],
+    "lunyu.yongye.6.20": ["兴趣", "热爱", "动力", "内驱", "心流", "热情"],
+    "lunyu.zihan.9.2": ["博学", "专才", "通才", "标签", "成名", "做自己"],
+    "zhouli.baoshi.1": ["六艺", "素养", "体育", "美育", "通识", "全面发展"],
+    # 人生/情感
+    "lunyu.weizheng.2.4": ["人生", "成长", "阶段", "年龄", "规划", "中年", "天命", "职业", "意义", "立志"],
+    "lunyu.liren.4.2": ["逆境", "焦虑", "处困", "贫穷", "富足", "韧性", "复原", "约"],
+    "lunyu.liren.4.8": ["理想", "真理", "追求", "价值", "信仰", "闻道"],
+    "lunyu.liren.4.1": ["邻居", "社区", "圈层", "择友", "居住", "城市化", "环境"],
+    "lunyu.bayi.3.20": ["情感", "节制", "适度", "放纵", "娱乐", "成瘾", "中和"],
+    "lunyu.bayi.3.25": ["完美", "尽善尽美", "完美主义", "评价", "艺术"],
+    "liji.yueji.1": ["情绪", "情感", "共鸣", "表达", "心动", "哀乐"],
+    "lunyu.shuer.7.14": ["沉浸", "专注", "审美", "体验", "痴迷"],
+    "lunyu.taibo.8.8": ["诗", "乐", "人格", "素养", "美育"],
+    "lunyu.bayi.3.3": ["礼", "形式", "诚意", "仪式", "本质", "表演"],
+    # 家庭/孝
+    "lunyu.xueer.1.2": ["家庭", "父母", "长辈", "亲情", "孝顺", "代际", "弟"],
+    "lunyu.weizheng.2.7": ["孝", "养老", "老龄化", "赡养", "陪伴", "敬"],
+    # 事业/技术
+    "lunyu.xianwen.14.5": ["技术", "实干", "勤劳", "实力", "逞强", "成功", "失败"],
+    "mengzi.tengwengong.xia": ["竞争", "攀比", "对手", "尊严", "正当"],
+}
+
+# 全题兜底对(与问题词无关时的通用证据), 按问题稳定散列轮转
+UNIVERSAL_POOL = [
+    "lunyu.yanyuan.12.2", "lunyu.liren.4.16", "lunyu.weizheng.2.4",
+    "lunyu.xueer.1.1", "lunyu.liren.4.15", "lunyu.weizheng.2.1",
+]
+
+
+def _select_citations(db: Session, topic: Topic, question: str) -> list[dict]:
+    """按问题关键词在 39 条经文池中打分选 2 条; 零命中时按稳定散列取通用对。
+    引文一律取 passages 原文与 ref_label, 不改动一字(事实完整性)。"""
+    texts: dict[str, tuple[str, str]] = {}
+    for rid in set(list(topic.related_passages or []) + list(KEYWORD_HINTS.keys()) + UNIVERSAL_POOL):
+        t_, l_ = _passage_text(db, rid)
+        if t_:
+            texts[rid] = (t_, l_)
+    scores: dict[str, int] = {}
+    for rid, hints in KEYWORD_HINTS.items():
+        if rid not in texts:
+            continue
+        s = sum(1 for k in hints if k in question)
+        if s:
+            scores[rid] = s
+    ranked = sorted(scores.items(), key=lambda x: (-x[1], x[0]))
+    picked = [rid for rid, _ in ranked[:2]]
+    if len(picked) < 2:  # 零命中/不足: 主题关联 + 稳定散列轮转兜底
+        seed = sum(ord(ch) for ch in question)
+        pool = list(topic.related_passages or []) + [u for u in UNIVERSAL_POOL if u in texts]
+        for rid in pool[seed % max(1, len(pool)):] + pool:
+            if rid in texts and rid not in picked:
+                picked.append(rid)
+            if len(picked) == 2:
+                break
+    return [
+        {"ref_id": rid, "ref_label": texts[rid][1], "text": texts[rid][0]}
+        for rid in picked[:2]
+        if rid in texts
+    ]
+
+
 def _passage_text(db: Session, ref_id: str) -> tuple[str, str]:
     p = db.get(Passage, ref_id)
     if not p:
@@ -233,13 +321,8 @@ def _compose_case(
     angle_name, q_tpl, instruction = angle
     full_q = q_tpl.format(q=question)
 
-    # 选 1-2 个关联经典作为证据
-    cits = []
-    related = list(topic.related_passages or [])[:2]
-    for rid in related:
-        text, label = _passage_text(db, rid)
-        if text:
-            cits.append({"ref_id": rid, "ref_label": label, "text": text})
+    # 按问题关键词选 1-2 条经文作证据(条条不同, 引文取自 passages 原文)
+    cits = _select_citations(db, topic, question)
 
     # 儒家答案：议题导入 + 经典依据 + 实践建议（紧扣已审立场，不发挥）
     confucian = next((v for v in views if v.civilization == "confucian"), None)
@@ -249,6 +332,7 @@ def _compose_case(
         )
         answer = (
             f"【议题】{topic.name_zh} — {(topic.description or {}).get('zh', '')}\n\n"
+            f"【本问聚焦】{question}\n\n"
             f"【儒家价值推理】\n{(confucian.headline or {}).get('zh', '')}。\n"
             f"{(confucian.detail or {}).get('zh', '')}\n\n"
             f"【经典依据】\n{cit_lines}\n\n"
@@ -282,9 +366,16 @@ def _compose_case(
         cit_lines = "\n".join(
             f"  · {c['text']} — {c['ref_label']}" for c in cits
         )
+        focus = {
+            "en": f"[This question] {question}",
+            "fr": f"[Cette question] {question}",
+            "es": f"[Esta pregunta] {question}",
+            "ar": f"[هذا السؤال] {question}",
+        }
         answer_i18n[lg] = (
             f"[{sec['topic']}] {(topic.name_i18n or {}).get(lg, topic.name_zh)} — "
             f"{(topic.description or {}).get(lg, '')}\n\n"
+            f"{focus[lg]}\n\n"
             f"[{sec['reason']}]\n{(confucian.headline or {}).get(lg, '')}.\n"
             f"{(confucian.detail or {}).get(lg, '')}\n\n"
             f"[{sec['basis']}]\n{cit_lines}\n\n"
@@ -308,7 +399,12 @@ def _compose_case(
 
 
 def generate(db: Session, reset: bool = False) -> dict:
+    published_keys: set[tuple[str, str]] = set()
     if reset:
+        published_keys = {
+            (c.topic_id, c.title)
+            for c in db.execute(select(DialogCase).where(DialogCase.status == "published")).scalars()
+        }
         db.execute(delete(DialogCase))
         db.commit()
 
@@ -343,6 +439,16 @@ def generate(db: Session, reset: bool = False) -> dict:
                 total += 1
         counts[t.id] = per_topic
     db.commit()
+    if reset and published_keys:
+        republished = 0
+        for c in db.execute(select(DialogCase)).scalars():
+            if (c.topic_id, c.title) in published_keys:
+                c.status = "published"
+                c.reviewer = "editorial-seed"
+                c.review_note = "初始发布批次"
+                republished += 1
+        db.commit()
+        print(f"[generate_cases] republished {republished}")
     return {"total_added": total, "per_topic": counts}
 
 
