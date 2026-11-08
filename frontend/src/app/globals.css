@@ -858,3 +858,21 @@ html:not(.dark) .nz-glass {
 @media (prefers-reduced-motion: reduce) {
   .nz-hero *, .nz-btn, .nz-e { animation: none !important; transition: none !important; }
 }
+
+/* ── 各语言字体本地化适配(母语者常用栈; 全站零 webfont, 依本地安装回退) ── */
+/* EN/FR/ES: 拉丁衬线优先(母语印刷惯例), CJK 字体仅作中文片段兜底 */
+html[lang="en"] .font-serif, html[lang="fr"] .font-serif, html[lang="es"] .font-serif {
+  font-family: Georgia, "Times New Roman", "Noto Serif SC", "Songti SC", serif;
+}
+/* AR: 正文用阿语网页事实标准(Tahoma/Segoe UI 系纳斯赫无衬线) */
+html[lang="ar"] body {
+  font-family: "Segoe UI", Tahoma, "Noto Naskh Arabic", "Geeza Pro", "Traditional Arabic", sans-serif;
+}
+/* AR 古典衬线场景(标题/金句): Naskh 体优先 */
+html[lang="ar"] .font-serif, html[lang="ar"] .font-garamond {
+  font-family: "Amiri", "Noto Naskh Arabic", "Traditional Arabic", "Times New Roman", serif;
+}
+/* AR 为连写体: 字距会拆散字母连笔, 一律豁免 */
+html[lang="ar"] *, html[lang="ar"] *::before, html[lang="ar"] *::after {
+  letter-spacing: normal !important;
+}
