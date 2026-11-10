@@ -6,21 +6,24 @@ The password is read interactively and is never placed in shell history.
 from __future__ import annotations
 
 import getpass
+import re
 import uuid
 
-from pydantic import ValidationError
 from sqlalchemy import func, select
 
+from .config import get_settings
 from .db import SessionLocal, init_db
 from .models import User
-from .routers.auth import EmailCredentials
 from .services.auth import hash_password
 
 
 def main() -> int:
     try:
-        email = EmailCredentials(email=input("Admin email: ").strip()).email
-    except (ValidationError, EOFError, KeyboardInterrupt):
+        email = input("Admin email: ").strip().lower()
+    except (EOFError, KeyboardInterrupt):
+        print("Setup cancelled.")
+        return 2
+    if len(email) > 254 or not re.fullmatch(r"[^@\s]+@[^@.\s]+(?:\.[^@.\s]+)+", email):
         print("A valid email address is required.")
         return 2
 
@@ -43,23 +46,25 @@ def main() -> int:
     init_db()
     db = SessionLocal()
     try:
-        existing = db.execute(
-            select(User).where(func.lower(User.email) == email)
-        ).scalar_one_or_none()
+        existing = db.scalars(select(User).where(func.lower(User.email) == email)).first()
         if existing:
-            print("That email already has an account. Use bootstrap_admin to grant its role.")
+            print("That email already has an account. Its password has not been changed.")
+            print("For admin access, include its email in ADMIN_EMAILS in backend/.env, restart the backend and sign in.")
             return 1
 
+        is_admin = email in get_settings().admin_email_set
         db.add(User(
             id=str(uuid.uuid4()),
             email=email,
             password_hash=hash_password(password),
             is_guest=False,
-            is_admin=True,
+            is_admin=is_admin,
             display_name="管理员",
         ))
         db.commit()
-        print(f"Administrator account created for {email}.")
+        print(f"Account created for {email}.")
+        if not is_admin:
+            print("Before signing in as admin, add this email to ADMIN_EMAILS in backend/.env and restart the backend.")
         return 0
     finally:
         db.close()
