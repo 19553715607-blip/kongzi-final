@@ -7,7 +7,7 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from "
 export type Lang = "zh" | "en" | "fr" | "es" | "ar";
 
 export const LANGS: { code: Lang; label: string; native: string }[] = [
-  { code: "zh", label: "中", native: "中文" },
+  { code: "zh", label: "ZH", native: "中文" },
   { code: "en", label: "EN", native: "English" },
   { code: "fr", label: "FR", native: "Français" },
   { code: "es", label: "ES", native: "Español" },
