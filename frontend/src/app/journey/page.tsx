@@ -44,12 +44,24 @@ export default function JourneyPage() {
   // 游客点到登录专属区（成就 / 任务）时弹出解锁引导
   const [gateOpen, setGateOpen] = useState(false);
 
-  const load = () => {
-    getGamifyProfile().then(setP).catch((e) => setErr(isAuthError(e) ? t("common.loginRequired", lang) : t("jrn.noBackend", lang)));
-    getJourneyOverview(lang).then(setOv).catch(() => {});
-    getJourneyLeaderboard(10).then(setLb).catch(() => {});
-  };
-  useEffect(load, []);
+  // 段位/六艺/任务/勋章的名称由后端按 lang 返回，语言切换后需要重取。
+  // 挂载时会先按初始语言发一次、再按存储语言发一次，两个请求可能乱序返回；
+  // alive 标记保证只有最后一次语言对应的结果落地。
+  useEffect(() => {
+    let alive = true;
+    getGamifyProfile(lang)
+      .then((d) => {
+        if (alive) setP(d);
+      })
+      .catch((e) => {
+        if (alive) setErr(isAuthError(e) ? t("common.loginRequired", lang) : t("jrn.noBackend", lang));
+      });
+    getJourneyOverview(lang).then((d) => alive && setOv(d)).catch(() => {});
+    getJourneyLeaderboard(10).then((d) => alive && setLb(d)).catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, [lang]);
 
   const showAwards = (ids?: string[], badges?: Badge[]) => {
     if (!ids?.length || !badges) return;
@@ -66,7 +78,7 @@ export default function JourneyPage() {
     if (busy) return;
     setBusy(true);
     try {
-      const r = await checkin();
+      const r = await checkin(lang);
       setP(r);
       showAwards(r.awarded_badges, r.badges);
       getJourneyOverview(lang).then(setOv).catch(() => {});
@@ -79,7 +91,7 @@ export default function JourneyPage() {
     if (busy) return;
     setBusy(true);
     try {
-      const r = await completeTask(id);
+      const r = await completeTask(id, lang);
       setP(r);
       showAwards(r.awarded_badges, r.badges);
       getJourneyOverview(lang).then(setOv).catch(() => {});

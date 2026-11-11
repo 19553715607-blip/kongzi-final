@@ -36,10 +36,14 @@ export default function MePage() {
   // 游客点到登录专属区（成就）时弹出解锁引导
   const [gateOpen, setGateOpen] = useState(false);
 
-  const load = () => {
-    getGamifyProfile().then(setP).catch((e) => setMsg(isAuthError(e) ? t("common.loginRequired", lang) : t("me.noBackend", lang)));
-    getMe().then(setMe).catch(() => setMe(null));
-    getFavorites().then(setFavs).catch(() => {});
+  // alive 用于丢弃过期响应：语言切换时挂载期与切换期两次请求可能乱序返回，
+  // 先发的旧语言结果若后到会把界面盖回旧语言
+  const load = (alive: () => boolean = () => true) => {
+    getGamifyProfile(lang)
+      .then((d) => alive() && setP(d))
+      .catch((e) => alive() && setMsg(isAuthError(e) ? t("common.loginRequired", lang) : t("me.noBackend", lang)));
+    getMe().then((d) => alive() && setMe(d)).catch(() => alive() && setMe(null));
+    getFavorites().then((d) => alive() && setFavs(d)).catch(() => {});
   };
 
   // 头像更换：选中即上传（服务端裁方压缩 256px），成功后即时刷新
@@ -66,7 +70,8 @@ export default function MePage() {
     }
   };
   useEffect(() => {
-    load();
+    let live = true;
+    load(() => live);
     // 登录时后端并入了游客进度，这里提示一次后清除
     try {
       const mergedXp = sessionStorage.getItem("kongzi_merged_xp");
@@ -77,6 +82,9 @@ export default function MePage() {
     } catch {
       /* sessionStorage 不可用时忽略 */
     }
+    return () => {
+      live = false;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lang]);
 
@@ -146,7 +154,12 @@ export default function MePage() {
               aria-label={t("me.avatar.change", lang)}
               className="group relative block rounded-full focus-visible:outline-2 focus-visible:outline-accent"
             >
-              <Avatar url={me?.avatar_url} name={p?.display_name} size={56} className={avatarBusy ? "opacity-50" : ""} />
+              <Avatar
+                url={me?.avatar_url}
+                name={p ? (p.is_guest ? t("user.guestName", lang) : p.display_name) : undefined}
+                size={56}
+                className={avatarBusy ? "opacity-50" : ""}
+              />
               <span className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 text-[10px] tracking-widest text-white opacity-0 transition group-hover:opacity-100">
                 {avatarBusy ? t("me.avatar.busy", lang) : t("me.avatar.changeHint", lang)}
               </span>
@@ -163,7 +176,9 @@ export default function MePage() {
             />
           </div>
           <div className="flex-1">
-            <div className="font-serif text-lg text-fg">{p.display_name}</div>
+            <div className="font-serif text-lg text-fg">
+              {p.is_guest ? t("user.guestName", lang) : p.display_name}
+            </div>
             <div className="mt-0.5 flex flex-wrap items-center gap-x-2 text-xs text-faint">
               <span>
                 {p.level.name} ·{" "}

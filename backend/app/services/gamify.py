@@ -9,35 +9,110 @@ from sqlalchemy.orm import Session
 
 from ..models import Favorite, User, UserBadge
 
-# 科举段位（xp 阈值）
+def _pick(entry: dict, lang: str) -> str:
+    """取当前语言的文案，缺语种时回落中文（与前端 t() 的回退口径一致）。"""
+    return entry.get(lang) or entry["zh"]
+
+
+# 科举段位（xp 阈值）。段位名按科举原意做意译，不音译：
+# 海外读者看「Tongsheng」读不出这是「入门考生」。
 LEVELS = [
-    ("tongsheng", "童生", 0),
-    ("xiucai", "秀才", 100),
-    ("juren", "举人", 300),
-    ("jinshi", "进士", 600),
-    ("hanlin", "翰林", 1000),
+    ("tongsheng", {"zh": "童生", "en": "Novice", "fr": "Novice", "es": "Novato", "ar": "مبتدئ"}, 0),
+    ("xiucai", {"zh": "秀才", "en": "Scholar", "fr": "Lettré", "es": "Erudito", "ar": "عالم"}, 100),
+    ("juren", {"zh": "举人", "en": "Provincial Scholar", "fr": "Érudit provincial",
+               "es": "Erudito provincial", "ar": "عالم إقليمي"}, 300),
+    ("jinshi", {"zh": "进士", "en": "Metropolitan Scholar", "fr": "Érudit métropolitain",
+                "es": "Erudito metropolitano", "ar": "عالم العاصمة"}, 600),
+    ("hanlin", {"zh": "翰林", "en": "Academician", "fr": "Académicien",
+                "es": "Académico", "ar": "أكاديمي"}, 1000),
 ]
 
 # 六艺
 LIUYI = [
-    ("li", "礼"), ("yue", "乐"), ("she", "射"),
-    ("yu", "御"), ("shu", "书"), ("shu2", "数"),
+    ("li", {"zh": "礼", "en": "Rites", "fr": "Rites", "es": "Ritos", "ar": "الطقوس"}),
+    ("yue", {"zh": "乐", "en": "Music", "fr": "Musique", "es": "Música", "ar": "الموسيقى"}),
+    ("she", {"zh": "射", "en": "Archery", "fr": "Tir à l'arc", "es": "Tiro con arco", "ar": "الرماية"}),
+    ("yu", {"zh": "御", "en": "Charioteering", "fr": "Conduite du char", "es": "Carruaje", "ar": "العربة"}),
+    ("shu", {"zh": "书", "en": "Calligraphy", "fr": "Calligraphie", "es": "Caligrafía", "ar": "الخط"}),
+    ("shu2", {"zh": "数", "en": "Arithmetic", "fr": "Arithmétique", "es": "Aritmética", "ar": "الحساب"}),
 ]
 
 # 今日修行（每日 3 个微任务）
 TASKS = [
-    {"id": "read", "title": "读一句经典", "xp": 10, "art": "shu", "hint": "去「读一读」翻一章"},
-    {"id": "ask", "title": "问子曰君一次", "xp": 10, "art": "shu2", "hint": "去「聊一聊」提个问题"},
-    {"id": "collect", "title": "收藏一条经典", "xp": 10, "art": "li", "hint": "在读经页点收藏"},
+    {
+        "id": "read",
+        "title": {"zh": "读一句经典", "en": "Read one passage", "fr": "Lire un passage",
+                  "es": "Leer un pasaje", "ar": "اقرأ نصًا واحدًا"},
+        "hint": {"zh": "去「读一读」翻一章", "en": "Open Read and turn a chapter",
+                 "fr": "Ouvrez « Lecture » et tournez une page",
+                 "es": "Abre « Lectura » y pasa un capítulo",
+                 "ar": "افتح «القراءة» واقلب فصلًا"},
+        "xp": 10, "art": "shu",
+    },
+    {
+        "id": "ask",
+        "title": {"zh": "问子曰君一次", "en": "Ask Master Zi once",
+                  "fr": "Poser une question à Maître Zi",
+                  "es": "Pregunta una vez al Maestro Zi",
+                  "ar": "اسأل المعلم زي مرة"},
+        "hint": {"zh": "去「聊一聊」提个问题", "en": "Open Chat and ask something",
+                 "fr": "Ouvrez « Dialogue » et posez une question",
+                 "es": "Abre « Diálogo » y haz una pregunta",
+                 "ar": "افتح «الحوار» واطرح سؤالًا"},
+        "xp": 10, "art": "shu2",
+    },
+    {
+        "id": "collect",
+        "title": {"zh": "收藏一条经典", "en": "Save one passage", "fr": "Enregistrer un passage",
+                  "es": "Guardar un pasaje", "ar": "احفظ نصًا واحدًا"},
+        "hint": {"zh": "在读经页点收藏", "en": "Tap Save on a reading page",
+                 "fr": "Touchez « Enregistrer » sur une page de lecture",
+                 "es": "Toca Guardar en una página de lectura",
+                 "ar": "اضغط حفظ في صفحة القراءة"},
+        "xp": 10, "art": "li",
+    },
 ]
 
 # 勋章定义（criteria 在 evaluate_badges 内判定）
 BADGES = {
-    "first_step": {"name": "初心", "desc": "首次打卡", "tier": "gold"},
-    "week_streak": {"name": "七日不辍", "desc": "连续打卡 7 天", "tier": "gold"},
-    "xiucai": {"name": "秀才及第", "desc": "晋升秀才", "tier": "silver"},
-    "collector": {"name": "集萃", "desc": "收藏满 5 条", "tier": "silver"},
-    "curious": {"name": "好学", "desc": "完成「问子曰君」修行", "tier": "silver"},
+    "first_step": {
+        "name": {"zh": "初心", "en": "First Step", "fr": "Premier pas",
+                 "es": "Primer paso", "ar": "الخطوة الأولى"},
+        "desc": {"zh": "首次打卡", "en": "First check-in", "fr": "Premier enregistrement",
+                 "es": "Primer registro", "ar": "أول تسجيل"},
+        "tier": "gold",
+    },
+    "week_streak": {
+        "name": {"zh": "七日不辍", "en": "Seven-Day Streak", "fr": "Sept jours d'affilée",
+                 "es": "Siete días seguidos", "ar": "سبعة أيام متتالية"},
+        "desc": {"zh": "连续打卡 7 天", "en": "Checked in 7 days in a row",
+                 "fr": "7 jours consécutifs", "es": "7 días consecutivos",
+                 "ar": "سبعة أيام متتالية"},
+        "tier": "gold",
+    },
+    "xiucai": {
+        "name": {"zh": "秀才及第", "en": "Scholar Attained", "fr": "Promu Lettré",
+                 "es": "Ascenso a Erudito", "ar": "بلوغ رتبة عالم"},
+        "desc": {"zh": "晋升秀才", "en": "Promoted to Scholar", "fr": "Passage au rang de Lettré",
+                 "es": "Ascenso a Erudito", "ar": "الترقي إلى رتبة عالم"},
+        "tier": "silver",
+    },
+    "collector": {
+        "name": {"zh": "集萃", "en": "Collection", "fr": "Collection",
+                 "es": "Colección", "ar": "مجموعة"},
+        "desc": {"zh": "收藏满 5 条", "en": "Saved 5 passages", "fr": "5 passages enregistrés",
+                 "es": "5 pasajes guardados", "ar": "حفظ 5 نصوص"},
+        "tier": "silver",
+    },
+    "curious": {
+        "name": {"zh": "好学", "en": "Curious Mind", "fr": "Esprit curieux",
+                 "es": "Mente curiosa", "ar": "عقل فضولي"},
+        "desc": {"zh": "完成「问子曰君」修行", "en": "Completed the Ask task",
+                 "fr": "Tâche « Poser une question » terminée",
+                 "es": "Tarea « Preguntar » completada",
+                 "ar": "أكملت مهمة السؤال"},
+        "tier": "silver",
+    },
 }
 
 
@@ -45,7 +120,7 @@ def _today() -> str:
     return date.today().isoformat()
 
 
-def level_of(xp: int) -> dict:
+def level_of(xp: int, lang: str = "zh") -> dict:
     cur = LEVELS[0]
     nxt = None
     for i, lv in enumerate(LEVELS):
@@ -56,8 +131,9 @@ def level_of(xp: int) -> dict:
     ceil = nxt[2] if nxt else cur[2]
     progress = 1.0 if not nxt else round((xp - floor) / (ceil - floor), 3)
     return {
-        "key": cur[0], "name": cur[1], "xp": xp,
-        "next_name": nxt[1] if nxt else None,
+        "key": cur[0], "name": _pick(cur[1], lang), "xp": xp,
+        "next_key": nxt[0] if nxt else None,
+        "next_name": _pick(nxt[1], lang) if nxt else None,
         "next_at": ceil if nxt else None, "progress": progress,
     }
 
@@ -100,10 +176,10 @@ def evaluate_badges(db: Session, user: User) -> List[str]:
     return newly
 
 
-def checkin(db: Session, user: User) -> dict:
+def checkin(db: Session, user: User, lang: str = "zh") -> dict:
     today = _today()
     if user.last_checkin == today:
-        return {"already": True, **profile(db, user)}
+        return {"already": True, **profile(db, user, lang)}
 
     yesterday = (date.today() - timedelta(days=1)).isoformat()
     user.streak_days = (user.streak_days or 0) + 1 if user.last_checkin == yesterday else 1
@@ -114,10 +190,10 @@ def checkin(db: Session, user: User) -> dict:
     newly = [] if user.is_guest else evaluate_badges(db, user)
     db.commit()
     db.refresh(user)
-    return {"already": False, "awarded_badges": newly, **profile(db, user)}
+    return {"already": False, "awarded_badges": newly, **profile(db, user, lang)}
 
 
-def complete_task(db: Session, user: User, task_id: str) -> dict:
+def complete_task(db: Session, user: User, task_id: str, lang: str = "zh") -> dict:
     task = next((t for t in TASKS if t["id"] == task_id), None)
     if not task:
         raise ValueError("unknown task")
@@ -132,10 +208,10 @@ def complete_task(db: Session, user: User, task_id: str) -> dict:
     newly = evaluate_badges(db, user)
     db.commit()
     db.refresh(user)
-    return {"awarded_badges": newly, **profile(db, user)}
+    return {"awarded_badges": newly, **profile(db, user, lang)}
 
 
-def profile(db: Session, user: User) -> dict:
+def profile(db: Session, user: User, lang: str = "zh") -> dict:
     daily = user.daily or {}
     done = set(daily.get("done", [])) if daily.get("date") == _today() else set()
     owned = {
@@ -152,19 +228,30 @@ def profile(db: Session, user: User) -> dict:
         "display_name": user.display_name,
         "is_guest": user.is_guest,
         "locked": locked,
-        "level": level_of(user.xp or 0),
+        "level": level_of(user.xp or 0, lang),
         "streak_days": user.streak_days or 0,
         "checked_in_today": user.last_checkin == _today(),
         "liuyi": [
-            {"key": k, "label": label, "value": (user.liuyi or {}).get(k, 0)}
+            {"key": k, "label": _pick(label, lang), "value": (user.liuyi or {}).get(k, 0)}
             for k, label in LIUYI
         ],
         "tasks": [
-            {**t, "done": (t["id"] in done) and not locked} for t in TASKS
+            {
+                "id": t["id"],
+                "title": _pick(t["title"], lang),
+                "hint": _pick(t["hint"], lang),
+                "xp": t["xp"],
+                "art": t["art"],
+                "done": (t["id"] in done) and not locked,
+            }
+            for t in TASKS
         ],
         "badges": [
             {
-                "id": bid, **meta,
+                "id": bid,
+                "name": _pick(meta["name"], lang),
+                "desc": _pick(meta["desc"], lang),
+                "tier": meta["tier"],
                 "unlocked": (bid in owned) and not locked,
                 "unlocked_at": None if locked else owned.get(bid),
             }

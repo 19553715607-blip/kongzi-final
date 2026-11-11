@@ -368,12 +368,13 @@ async function authJSON<T>(path: string, init?: RequestInit): Promise<T> {
   return res.json() as Promise<T>;
 }
 
-export const getGamifyProfile = () =>
-  authJSON<GamifyProfile>("/api/v1/gamify/profile");
-export const checkin = () =>
-  authJSON<GamifyProfile>("/api/v1/gamify/checkin", { method: "POST" });
-export const completeTask = (id: string) =>
-  authJSON<GamifyProfile>(`/api/v1/gamify/task/${id}/complete`, { method: "POST" });
+// 段位/六艺/任务/勋章的名称由后端按语言返回，lang 缺省 zh 保持旧行为
+export const getGamifyProfile = (lang = "zh") =>
+  authJSON<GamifyProfile>(`/api/v1/gamify/profile?lang=${encodeURIComponent(lang)}`);
+export const checkin = (lang = "zh") =>
+  authJSON<GamifyProfile>(`/api/v1/gamify/checkin?lang=${encodeURIComponent(lang)}`, { method: "POST" });
+export const completeTask = (id: string, lang = "zh") =>
+  authJSON<GamifyProfile>(`/api/v1/gamify/task/${id}/complete?lang=${encodeURIComponent(lang)}`, { method: "POST" });
 
 export const getFavorites = () => authJSON<Favorite[]>("/api/v1/gamify/favorites");
 export const addFavorite = (target_type: string, target_ref: string, label = "") =>

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -15,21 +15,26 @@ router = APIRouter(prefix="/api/v1/gamify", tags=["gamify"])
 
 @router.get("/profile")
 def get_profile(
-    db: Session = Depends(get_db), user: User = Depends(get_current_user)
+    lang: str = Query("zh"),
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
 ) -> dict:
-    return gamify.profile(db, user)
+    return gamify.profile(db, user, lang)
 
 
 @router.post("/checkin")
 def checkin(
-    db: Session = Depends(get_db), user: User = Depends(get_current_user)
+    lang: str = Query("zh"),
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
 ) -> dict:
-    return gamify.checkin(db, user)
+    return gamify.checkin(db, user, lang)
 
 
 @router.post("/task/{task_id}/complete")
 def complete_task(
     task_id: str,
+    lang: str = Query("zh"),
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ) -> dict:
@@ -37,7 +42,7 @@ def complete_task(
     if user.is_guest:
         raise HTTPException(403, "guest_not_allowed")
     try:
-        return gamify.complete_task(db, user, task_id)
+        return gamify.complete_task(db, user, task_id, lang)
     except ValueError as e:
         raise HTTPException(404, str(e))
 

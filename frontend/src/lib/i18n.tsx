@@ -530,6 +530,11 @@ const DICT: Dict = {
   "user.guest": {
     zh: "游客身份", en: "Guest", fr: "Invité", es: "Invitado", ar: "زائر",
   },
+  // 游客账号在后端统一以「小君子」建库（排行榜靠同名去重），
+  // 展示层按语言覆盖，避免法语界面出现中文名
+  "user.guestName": {
+    zh: "小君子", en: "Little Junzi", fr: "Petit Junzi", es: "Pequeño Junzi", ar: "جونزي الصغير",
+  },
   "user.account": {
     zh: "正式账号", en: "Registered account", fr: "Compte enregistré",
     es: "Cuenta registrada", ar: "حساب مسجّل",
