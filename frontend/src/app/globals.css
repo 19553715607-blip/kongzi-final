@@ -9,9 +9,6 @@
   color-scheme: light;
   --paper: #F7F2E7;
   --bg: #F8F4EB;
-  /* 英雄区底部渐隐目标色:--bg 按宣纸颗粒(body::before,~3.5% 灰噪)的均值压暗,
-     使英雄区底缘与页面实际底色(含颗粒)一致 */
-  --hero-fade: color-mix(in srgb, var(--bg) 96%, #000000 4%);
   --surface: #FFFEF9;
   --surface-2: #F0E9D9;
   --ink: #26211A;
@@ -53,7 +50,6 @@
   color-scheme: dark;
   --paper: #070B13;
   --bg: #0A0F1A;
-  --hero-fade: color-mix(in srgb, var(--bg) 96%, #FFFFFF 4%);
   --surface: #131B2E;
   --surface-2: #0F1728;
   --ink: #F5F1E6;
@@ -722,10 +718,7 @@ body::after {
   .like-stamp .stamp-seal { opacity: 0; }
 }
 
-/* ══ 首页作用域（随全局明暗主题：夜游 / 破晓纸·天亮版）════════════════
-   .kz-night 保留为首页外壳的样式钩子（历史类名），不再强制夜色令牌——
-   首页与全站一起跟随明暗主题：暗=夜游博物馆，明=天亮晨光版。
-   底图双份（hero-dawn 夜 / hero-morning 晨），由 .dark 切换显示。 */
+/* 首页使用全站主题色；海报跟随 html.dark 切换。 */
 .kz-night { color: var(--fg); }
 
 /* 首页透明导航：页面顶部时压在 Hero 上，滚动后恢复实底 */
@@ -739,74 +732,53 @@ body::after {
 html:not(.dark) .kz-night header:not(.nav-ghost) { background: rgba(250, 247, 240, 0.86); }
 .dark .kz-night header:not(.nav-ghost) { background: rgba(10, 15, 26, 0.82); }
 
-/* ── Hero 底图：双份按主题显示（同一构图，夜/晨两个时辰）── */
-/* 底色兜底：英雄区因内含 backdrop-filter 成为独立合成层，高度落在小数
-   像素时层边缘的亚像素插值会把"上方几像素的内容"采样进边缘行，产生
-   1-2px 亮缝。给英雄区铺一层不透明底色，让边缘行采样到的永远是纯底色，
-   任何插值都发生在底色与页面底色之间（同族色，不可见）。 */
-.nz-hero { position: relative; overflow: hidden; background: var(--hero-fade); }
-.nz-img {
-  position: absolute !important; inset: 0 !important;
-  width: 100% !important; height: 100% !important;
-  object-fit: cover; object-position: 70% 38%;
+/* 海报首尾淡出到透明，让全站的纸色、纹理和导航自然透出来。 */
+.nz-hero {
+  position: relative;
+  isolation: isolate;
+  --poster-image: url("/home/poster-apricot.webp");
+  --poster-focus: 84%;
 }
-.nz-img-light { display: none; }
-html:not(.dark) .nz-img-light { display: block; }
-html:not(.dark) .nz-img-dark { display: none; }
+.dark .nz-hero {
+  --poster-image: url("/home/poster-bamboo.webp");
+  --poster-focus: 76%;
+}
+.nz-poster {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: linear-gradient(90deg, color-mix(in srgb, var(--paper) 55%, transparent), transparent 54%), var(--poster-image);
+  background-size: cover;
+  background-position: var(--poster-focus) 40%;
+  mask-image: linear-gradient(to bottom, transparent, #000 16%, #000 70%, transparent 99%);
+}
+.nz-copy { width: min(43vw, 31rem); margin-right: auto; }
+.nz-h1 {
+  margin-block: 0.45rem 0.5rem;
+  font-size: clamp(4.6rem, 7.6vw, 8rem);
+  letter-spacing: 0.04em;
+}
+html:lang(zh):not(.dark) .nz-h1 {
+  font-family: "KaiTi", "Kaiti SC", "STKaiti", "Noto Serif SC", serif;
+}
+.nz-subtitle { color: var(--fg); font-size: clamp(1.05rem, 1.65vw, 1.75rem); line-height: 1.45; }
+html:lang(zh) .nz-subtitle { letter-spacing: 0.2em; }
+[dir="rtl"] .nz-hero .nz-announce,
+[dir="rtl"] .nz-hero .nz-intro + div { margin-right: auto; }
 
-/* ── Hero 遮罩：暗=墨蓝压深；明=米纸柔化，保证左侧文字可读 ──
-   底部把底图整段渐隐到页面底色。两个关键点：
-   1) 页面实际底色 = --bg + body::before 的宣纸颗粒(平均抬/压 ~4 亮度)，
-      故渐隐目标 --hero-fade 按颗粒均值校正，避免英雄区边缘出现平底色差；
-   2) 底部 14% 保持全不透明纯色——英雄区是合成层，小数高度下纹理边缘
-      会向上采样数十像素，全不透明段让任何采样结果都是同一颜色。 */
-.dark .nz-scrim {
-  position: absolute; inset: 0; z-index: 1; pointer-events: none;
-  background:
-    linear-gradient(270deg, rgba(6, 9, 16, 0) 30%, rgba(6, 9, 16, 0.42) 56%, rgba(6, 9, 16, 0.86) 84%),
-    linear-gradient(
-      0deg,
-      var(--hero-fade) 0%,
-      var(--hero-fade) 14%,
-      color-mix(in srgb, var(--hero-fade) 96%, transparent) 24%,
-      color-mix(in srgb, var(--hero-fade) 78%, transparent) 34%,
-      color-mix(in srgb, var(--hero-fade) 42%, transparent) 46%,
-      color-mix(in srgb, var(--hero-fade) 14%, transparent) 56%,
-      transparent 62%
-    ),
-    linear-gradient(180deg, rgba(6, 9, 16, 0.58) 0%, rgba(6, 9, 16, 0) 22%);
-}
-html:not(.dark) .nz-scrim {
-  position: absolute; inset: 0; z-index: 1; pointer-events: none;
-  background:
-    linear-gradient(270deg, rgba(250, 247, 240, 0) 30%, rgba(250, 247, 240, 0.5) 56%, rgba(250, 247, 240, 0.92) 84%),
-    linear-gradient(
-      0deg,
-      var(--hero-fade) 0%,
-      var(--hero-fade) 14%,
-      color-mix(in srgb, var(--hero-fade) 96%, transparent) 24%,
-      color-mix(in srgb, var(--hero-fade) 80%, transparent) 34%,
-      color-mix(in srgb, var(--hero-fade) 46%, transparent) 46%,
-      color-mix(in srgb, var(--hero-fade) 16%, transparent) 56%,
-      transparent 62%
-    ),
-    linear-gradient(180deg, rgba(250, 247, 240, 0.55) 0%, rgba(250, 247, 240, 0) 22%);
-}
-@media (max-width: 767px) {
-  /* 移动端雕像居右更靠边，遮罩整幅覆盖 + 底部整段渐隐(同桌面口径) */
-  .dark .nz-scrim {
-    background:
-      linear-gradient(0deg, var(--hero-fade) 0%, var(--hero-fade) 10%, rgba(6, 9, 16, 0.34) 38%, rgba(6, 9, 16, 0.12) 58%, rgba(6, 9, 16, 0.45) 100%);
+@media (max-width: 767px), (max-width: 1023px) and (orientation: portrait) {
+  .nz-hero { --poster-height: clamp(18rem, 43svh, 28rem); }
+  .nz-poster {
+    height: var(--poster-height);
+    background-image: var(--poster-image);
+    mask-image: linear-gradient(to bottom, transparent 0.5rem, #000 5rem, #000 74%, transparent);
   }
-  html:not(.dark) .nz-scrim {
-    background:
-      linear-gradient(0deg, var(--hero-fade) 0%, var(--hero-fade) 10%, rgba(250, 247, 240, 0.46) 38%, rgba(250, 247, 240, 0.15) 58%, rgba(250, 247, 240, 0.5) 100%);
-  }
+  .nz-content { padding-top: var(--poster-height); }
+  .nz-intro { padding-block: 1.25rem; }
+  .nz-copy { width: 100%; }
+  .nz-h1 { font-size: clamp(3.3rem, 10vw, 5rem); }
+  .nz-hero .nz-announce { max-width: 100%; }
 }
-
-/* ── 大标题：暗=墨影浮起；明=纸色柔光衬托墨字 ── */
-.dark .nz-h1 { text-shadow: 0 2px 30px rgba(0, 0, 0, 0.55); }
-html:not(.dark) .nz-h1 { text-shadow: 0 1px 26px rgba(250, 247, 240, 0.85); }
 
 /* ── 金线 kicker：前置短横线（令牌驱动，随主题）── */
 .nz-kicker { display: flex; align-items: center; gap: 0.75rem; font-size: 0.6875rem; letter-spacing: 0.46em; color: var(--accent); }
@@ -823,6 +795,7 @@ html:not(.dark) .nz-h1 { text-shadow: 0 1px 26px rgba(250, 247, 240, 0.85); }
   transition: background 0.25s ease, border-color 0.25s ease;
 }
 .nz-btn:hover { background: color-mix(in srgb, var(--accent) 18%, transparent); border-color: var(--accent); }
+html:not(.dark) .nz-btn { color: var(--accent-deep); }
 
 /* ── 底部入口行：金点分隔的安静链接（令牌驱动）── */
 .nz-e { position: relative; padding: 0.375rem 1.05rem; font-size: 0.75rem; letter-spacing: 0.22em; color: color-mix(in srgb, var(--fg) 82%, transparent); text-decoration: none; transition: color 0.2s ease; }
