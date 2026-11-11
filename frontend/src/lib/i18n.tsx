@@ -37,7 +37,6 @@ const DICT: Dict = {
   "nav.cases":   { zh: "案例", en: "Cases", fr: "Cas", es: "Casos", ar: "حالات" },
   "nav.journey": { zh: "君子路", en: "Path", fr: "Voie", es: "Camino", ar: "السبيل" },
   "nav.me":      { zh: "我", en: "Me", fr: "Compte", es: "Cuenta", ar: "حسابي" },
-  "nav.developers": { zh: "开放接口", en: "Developers", fr: "API", es: "API", ar: "API" },
   "nav.cocreate": { zh: "共创", en: "Co-create", fr: "Co-créer", es: "Co-crear", ar: "إبداع مشترك" },
   "nav.plugins":  { zh: "插件", en: "Plugins", fr: "Modules", es: "Plugins", ar: "إضافات" },
   "nav.reach":    { zh: "覆盖", en: "Reach", fr: "Portée", es: "Alcance", ar: "الانتشار" },
@@ -50,37 +49,13 @@ const DICT: Dict = {
     zh: "聊一聊", en: "Talk to Kongzi",
     fr: "Discuter", es: "Conversar", ar: "حاور",
   },
-  "home.entry.chat.desc": {
-    zh: "向智能体提问，得到可溯源的经典解读。",
-    en: "Ask Kongzi; every reading is traceable to the classics.",
-    fr: "Posez votre question à Kongzi : chaque lecture renvoie au texte classique.",
-    es: "Pregunta a Kongzi: cada interpretación remite al texto clásico.",
-    ar: "اسأل كونفوشيوس؛ كل تفسير يُحال إلى النصوص الكلاسيكية.",
-  },
   "home.entry.read": {
     zh: "读一读", en: "Read the classics",
     fr: "Lire les classiques", es: "Leer los clásicos", ar: "اقرأ النصوص",
   },
-  "home.entry.read.desc": {
-    zh: "原文·拼音·译文·注释 五层并读。",
-    en: "Text, pinyin, translation and annotation — five layers side by side.",
-    fr: "Texte, pinyin, traduction et annotation — cinq couches côte à côte.",
-    es: "Texto, pinyin, traducción y anotación: cinco capas en paralelo.",
-    ar: "النص والبينين والترجمة والشرح في خمس طبقات.",
-  },
   "home.entry.graph": {
     zh: "知识图谱", en: "Knowledge graph",
     fr: "Graphe de connaissances", es: "Grafo de conocimiento", ar: "خريطة المعرفة",
-  },
-  "home.entry.graph.desc": {
-    zh: "人物·概念·命题的关系网络。",
-    en: "How people, concepts and propositions connect.",
-    fr: "Comment les personnes, les concepts et les propositions s’articulent.",
-    es: "Cómo se conectan las personas, los conceptos y las proposiciones.",
-    ar: "شبكة الأشخاص والمفاهيم والقضايا.",
-  },
-  "home.cta": {
-    zh: "进入", en: "Open →", fr: "Ouvrir →", es: "Entrar →", ar: "ادخل ←",
   },
 
   "corpus.title": {
@@ -304,9 +279,6 @@ const DICT: Dict = {
     es: "¿Eliminar la cuenta y todos los datos? Esta acción es irreversible.",
     ar: "هل تحذف الحساب وكل البيانات؟ لا يمكن التراجع عن هذا الإجراء.",
   },
-  "me.guestName": {
-    zh: "君", en: "Guest", fr: "Invité", es: "Invitado", ar: "زائر",
-  },
   "me.avatar.change": {
     zh: "更换头像", en: "Change avatar", fr: "Changer l'avatar", es: "Cambiar avatar", ar: "تغيير الصورة",
   },
@@ -400,12 +372,6 @@ const DICT: Dict = {
   },
 
   // ── 首页补充 ─────────────────────────────────────────────────────────
-  "home.corpus.cases": {
-    zh: "跨文明对话案例（条）", en: "Cross-civilizational dialogue cases",
-    fr: "Cas de dialogue entre civilisations",
-    es: "Casos de diálogo entre civilizaciones",
-    ar: "حالات الحوار بين الحضارات",
-  },
 
   // 站点元信息（标题 / 描述）不放这里 —— 见 `lib/metaText.ts`：
   // layout.tsx 是服务端组件，需要一份不带 "use client" 的数据源。
@@ -542,10 +508,6 @@ const DICT: Dict = {
   "user.center": {
     zh: "我的中心", en: "My space", fr: "Mon espace", es: "Mi espacio", ar: "مساحتي",
   },
-  "user.journey": {
-    zh: "君子之路", en: "The junzi path", fr: "La voie du junzi",
-    es: "El camino del junzi", ar: "طريق الجونزي",
-  },
   "user.switchGuest": {
     zh: "换游客身份", en: "Switch guest", fr: "Changer de session invité",
     es: "Cambiar de invitado", ar: "تبديل الزائر",
@@ -589,7 +551,6 @@ const DICT: Dict = {
     ar: "خدمة الخادم غير متاحة حاليًا. أعد المحاولة بعد قليل.",
   },
   "chat.personaName": { zh: "子曰君", en: "Master Ziyue", fr: "Maître Ziyue", es: "Maestro Ziyue", ar: "المعلم زيويه" },
-  "chat.avatar": { zh: "曰", en: "Say", fr: "Dit", es: "Dice", ar: "قال" },
   "chat.tagline": {
     zh: "儒家经典 · 同行者，不是老师",
     en: "Confucian classics · a companion, not a teacher",
@@ -695,8 +656,6 @@ const DICT: Dict = {
   },
   "feed.saved": { zh: "已收藏到「我的」", en: "Saved to My space", fr: "Enregistré dans Mon espace", es: "Guardado en Mi espacio", ar: "حُفظ في مساحتي" },
   "feed.copied": { zh: "已复制金句", en: "Quote copied", fr: "Citation copiée", es: "Cita copiada", ar: "تم نسخ الحكمة" },
-  "feed.wallpaperBusy": { zh: "壁纸生成中…（demo）", en: "Generating wallpaper… (demo)", fr: "Génération du fond d'écran… (démo)", es: "Generando fondo de pantalla… (demo)", ar: "جارٍ توليد الخلفية… (تجريبي)" },
-  "feed.loading": { zh: "加载中…", en: "Loading…", fr: "Chargement…", es: "Cargando…", ar: "جارٍ التحميل…" },
   "feed.comment": { zh: "评论", en: "Comment", fr: "Commenter", es: "Comentar", ar: "تعليق" },
   "feed.share": { zh: "分享", en: "Share", fr: "Partager", es: "Compartir", ar: "مشاركة" },
   "feed.wallpaper": { zh: "壁纸", en: "Wallpaper", fr: "Fond d'écran", es: "Fondo", ar: "خلفية" },
@@ -947,7 +906,6 @@ const DICT: Dict = {
   "dev.ep.topics": { zh: "5 大全球议题列表", en: "List of the 5 global topics", fr: "Liste des 5 thèmes mondiaux", es: "Lista de los 5 temas globales", ar: "قائمة الموضوعات العالمية الخمسة" },
   "dev.ep.topicStances": { zh: "议题 + 5 文明对照立场", en: "Topic + 5-civilization stances", fr: "Thème + positions de 5 civilisations", es: "Tema + posturas de 5 civilizaciones", ar: "الموضوع + مواقف 5 حضارات" },
   "dev.ep.cases": { zh: "跨文明对话案例列表（已审）", en: "Cross-civilizational dialogue cases (reviewed)", fr: "Cas de dialogue entre civilisations (relus)", es: "Casos de diálogo entre civilizaciones (revisados)", ar: "حالات الحوار بين الحضارات (مراجَعة)" },
-  "dev.ep.caseDetail": { zh: "案例详情", en: "Case detail", fr: "Détail du cas", es: "Detalle del caso", ar: "تفاصيل الحالة" },
   "dev.ep.corpus": { zh: "平台语料规模", en: "Corpus scale", fr: "Taille du corpus", es: "Escala del corpus", ar: "حجم المدونة" },
 
   // ── 通用状态 ─────────────────────────────────────────────────────────
@@ -982,7 +940,6 @@ const DICT: Dict = {
   // ── 管理后台 · 案例审核 ──────────────────────────────────────────────
   "adm.publishedCount": { zh: "已发 {n}", en: "{n} published", fr: "{n} publiés", es: "{n} publicados", ar: "{n} منشور" },
   "adm.qualityDist": { zh: "审核质量分布 · 共 {n} 条", en: "Review-quality distribution · {n} total", fr: "Répartition de la qualité de relecture · {n} au total", es: "Distribución de calidad de revisión · {n} en total", ar: "توزيع جودة المراجعة · الإجمالي {n}" },
-  "adm.audit.title": { zh: "AI 一键盖章 vs 真正人审", en: "AI rubber-stamp vs. real human review", fr: "Validation automatique par IA vs. relecture humaine", es: "Sello automático de IA vs. revisión humana real", ar: "ختم آلي بالذكاء الاصطناعي مقابل مراجعة بشرية حقيقية" },
   "adm.audit.none": { zh: "完全未审", en: "Never reviewed", fr: "Jamais relu", es: "Nunca revisado", ar: "لم تُراجَع إطلاقًا" },
   "adm.audit.noneDesc": { zh: "还没有 reviewer 字段，未走过任何审核流程", en: "No reviewer field yet — has not gone through any review", fr: "Pas encore de champ relecteur — aucun processus de relecture", es: "Aún sin campo de revisor: no ha pasado por ninguna revisión", ar: "لا حقل مراجع بعد — لم تمر بأي مراجعة" },
   "adm.audit.ai": { zh: "AI 一键盖章", en: "AI rubber-stamp", fr: "Validation automatique", es: "Sello automático", ar: "ختم آلي" },
@@ -1033,7 +990,6 @@ const DICT: Dict = {
   "jrn.noBank": { zh: "无法加载题库", en: "Cannot load the question bank", fr: "Impossible de charger la banque de questions", es: "No se puede cargar el banco de preguntas", ar: "تعذّر تحميل بنك الأسئلة" },
   "jrn.submitFail": { zh: "提交失败", en: "Submission failed", fr: "Échec de l'envoi", es: "Error al enviar", ar: "فشل الإرسال" },
   "jrn.submit": { zh: "提交", en: "Submit", fr: "Envoyer", es: "Enviar", ar: "إرسال" },
-  "jrn.enter": { zh: "进入 →", en: "Enter →", fr: "Entrer →", es: "Entrar →", ar: "ادخل ←" },
   "jrn.learned": { zh: "已学", en: "Learned", fr: "Appris", es: "Aprendido", ar: "مُتعلَّم" },
   "jrn.shu": { zh: "书艺", en: "Calligraphy", fr: "Calligraphie", es: "Caligrafía", ar: "الخط" },
   "jrn.newUnlock": { zh: "新解锁经典", en: "New classic unlocked", fr: "Nouveau classique débloqué", es: "Nuevo clásico desbloqueado", ar: "نص كلاسيكي جديد مفتوح" },
@@ -1077,7 +1033,6 @@ const DICT: Dict = {
   "jrn.totalPlayers": { zh: "共 {n} 位君子", en: "{n} junzi in total", fr: "{n} junzi au total", es: "{n} junzi en total", ar: "الإجمالي {n} من الجونزي" },
   "jrn.youRank": { zh: "· 你第 {n} 位", en: "· you, #{n}", fr: "· vous, n° {n}", es: "· tú, n.º {n}", ar: "· أنت، رقم {n}" },
   "jrn.you": { zh: "· 你", en: "· you", fr: "· vous", es: "· tú", ar: "· أنت" },
-  "jrn.enterArrow": { zh: "进入 →", en: "Enter →", fr: "Entrer →", es: "Entrar →", ar: "ادخل ←" },
 
   // 六艺名（礼·乐·射·御·书·数）
   "jrn.art.li": { zh: "礼", en: "Rites", fr: "Rites", es: "Ritos", ar: "الطقوس" },
@@ -1116,10 +1071,6 @@ const DICT: Dict = {
   "home.quote.shuffle": { zh: "换一句", en: "Shuffle", fr: "Suivante", es: "Otra", ar: "الأخرى" },
   "home.quote.prev": { zh: "上一句", en: "Previous", fr: "Précédente", es: "Anterior", ar: "السابق" },
   "home.quote.next": { zh: "下一句", en: "Next", fr: "Suivante", es: "Siguiente", ar: "التالي" },
-  "home.topics": { zh: "全球议题 · 每日思考", en: "Global topics · Daily thinking", fr: "Enjeux mondiaux · Pensée du jour", es: "Temas globales · Pensamiento diario", ar: "قضايا عالمية · تأمل يومي" },
-  "home.topics.more": { zh: "全部案例", en: "All cases", fr: "Tous les cas", es: "Todos los casos", ar: "كل الحالات" },
-  "home.topics.ask": { zh: "去对话", en: "Ask", fr: "Discuter", es: "Preguntar", ar: "حاور" },
-  "home.topics.empty": { zh: "该议题暂无关联经典", en: "No related classics yet", fr: "Aucun classique associé", es: "Sin clásicos relacionados", ar: "لا نصوص مرتبطة" },
 
   "read.copy": { zh: "复制", en: "Copy", fr: "Copier", es: "Copiar", ar: "نسخ" },
   "read.copied": { zh: "已复制", en: "Copied", fr: "Copié", es: "Copiado", ar: "تم النسخ" },
@@ -1141,10 +1092,6 @@ const DICT: Dict = {
   "chat.clear": { zh: "清空", en: "Clear", fr: "Effacer", es: "Borrar", ar: "مسح" },
   "chat.cleared": { zh: "对话已清空", en: "Conversation cleared", fr: "Conversation effacée", es: "Conversación borrada", ar: "تم مسح الحوار" },
 
-  "lang.label": {
-    zh: "语言", en: "Language",
-    fr: "Langue", es: "Idioma", ar: "اللغة",
-  },
 
   // ── 本轮新增：主页面散落文案五语化 ──
   "graph.relationsN": {
@@ -1466,13 +1413,6 @@ const DICT: Dict = {
     es: "Reintentar",
     ar: "إعادة المحاولة",
   },
-  "graph.empty.sub": {
-    zh: "图谱数据尚未就绪，双击节点可深入其关系网络。",
-    en: "The graph is warming up. Double-click a node to dive into its network.",
-    fr: "Le graphe se prépare. Double-cliquez sur un nœud pour explorer son réseau.",
-    es: "El grafo se está preparando. Haz doble clic en un nodo para explorar su red.",
-    ar: "خريطة المعرفة قيد التجهيز. انقر نقرًا مزدوجًا على عقدة لاستكشاف شبكتها.",
-  },
   "feed.empty.sub": {
     zh: "金句还在整理中，下拉刷新一下试试。",
     en: "The quotes are being gathered. Pull to refresh.",
@@ -1525,40 +1465,6 @@ const DICT: Dict = {
     es: "Exposición permanente: Las Analectas en veinte capítulos — desde las tiras de bambú Han hasta la edición crítica digital",
     ar: "معرض دائم: «مقولات كونفوشيوس» في عشرين فصلاً — من شرائح الخيزران في عهد أسرة الهان إلى الطبعة النقدية الرقمية",
   },
-  "home.curator.kicker": {
-    zh: "馆藏 · 专题", en: "Collection · Curated", fr: "Collection · Dossier", es: "Colección · Dossier", ar: "مقتنيات · موضوع",
-  },
-  "home.curator.title": {
-    zh: "《论语》版本流传",
-    en: "The Transmission of the Analects",
-    fr: "La transmission des Analectes",
-    es: "La transmisión de las Analectas",
-    ar: "تداول «مقولات كونفوشيوس» عبر العصور",
-  },
-  "home.curator.desc": {
-    zh: "从西汉竹书到宋刻元刊，一部经典如何被抄写、校勘与阐释了两千余年。",
-    en: "From Han bamboo slips to Song blockprints: how a classic was copied, collated and read across two millennia.",
-    fr: "Des manuscrits sur bambou des Han aux impressions Song : comment un classique fut copié, établi et lu pendant plus de deux mille ans.",
-    es: "De las tiras de bambú Han a las impresiones Song: cómo un clásico fue copiado, cotejado y leído durante dos milenios.",
-    ar: "من شرائح الخيزران في عهد أسرة الهان إلى الطبعات الخشبية في عهد سونغ: كيف نُسخ هذا الكلاسيكي وحُقّق وقُرئ على مدى ألفي عام.",
-  },
-  "home.curator.cta": {
-    zh: "进入读经", en: "Start reading", fr: "Commencer la lecture", es: "Comenzar la lectura", ar: "ابدأ القراءة",
-  },
-  "home.rail.title": {
-    zh: "继续探索 · 馆藏精选",
-    en: "Continue exploring · Selected works",
-    fr: "Poursuivre · Chefs-d'œuvre",
-    es: "Continuar · Obras destacadas",
-    ar: "واصل الاستكشاف · مختارات",
-  },
-  "home.rail.readNote": {
-    zh: "按篇浏览全部经文",
-    en: "Browse all passages by chapter",
-    fr: "Parcourir tous les passages par chapitre",
-    es: "Explorar todos los pasajes por capítulo",
-    ar: "تصفّح جميع النصوص حسب الفصل",
-  },
 
   // 溯源图注共享文案（出处/版本/编号/年代/译者/权属）
   "prov.label.source": { zh: "出处", en: "Source", fr: "Source", es: "Fuente", ar: "المصدر" },
@@ -1588,21 +1494,7 @@ const DICT: Dict = {
 
   // 首页新增功能入口（六艺 / 跨文明案例）
   "home.entry.journey": { zh: "君子路", en: "Path", fr: "Voie", es: "Camino", ar: "السبيل" },
-  "home.entry.journey.desc": {
-    zh: "六艺沉浸式游戏：礼、乐、射、御、书、数。",
-    en: "Six arts as immersive play: rites, music, archery, charioteering, calligraphy, numbers.",
-    fr: "Les six arts en jeu : rites, musique, tir, char, calligraphie, chiffres.",
-    es: "Los seis oficios como juego: ritos, música, arquería, carro, caligrafía, números.",
-    ar: "الفنون الستة في تجربة تفاعلية: الطقوس والموسيقى والرمي وقيادة المركبة والكتابة والحساب.",
-  },
   "home.entry.cases": { zh: "跨文明案例", en: "Cases", fr: "Cas", es: "Casos", ar: "حالات" },
-  "home.entry.cases.desc": {
-    zh: "同一命题，儒家与诸文明如何对话。",
-    en: "One question, many civilizations: how Confucian thought speaks across cultures.",
-    fr: "Une question, plusieurs civilisations : la pensée confucéenne en dialogue.",
-    es: "Una pregunta, muchas civilizaciones: el pensamiento confuciano en diálogo.",
-    ar: "سؤال واحد وحضارات متعددة: كيف يحاور الفكر الكونفوشيوسي الثقافات.",
-  },
   // ── The China Room 重构：主导航 / 首页 / 路径 / 小测 / 术语 / 教学 ──
   "nav.lang": {
     zh: "切换语言", en: "Switch language", fr: "Changer de langue",
@@ -1661,9 +1553,6 @@ const DICT: Dict = {
   "gate.lockedTag": {
     zh: "需登录", en: "Login required", fr: "Connexion requise", es: "Requiere sesión", ar: "يتطلّب تسجيل الدخول",
   },
-  "gate.tasksLocked": {
-    zh: "今日修行", en: "Daily practice", fr: "Pratique du jour", es: "Práctica diaria", ar: "تمرين اليوم",
-  },
   "login.mergedXp": {
     zh: "登录成功，游客态积累已并入账号：+{n} XP",
     en: "Signed in. Guest progress merged into your account: +{n} XP",
@@ -1698,29 +1587,6 @@ const DICT: Dict = {
     ar: "فشل إنشاء الحساب: قد يكون البريد مستخدمًا أو كلمة المرور قصيرة (6 على الأقل).",
   },
 
-  "home.hero.kicker": {
-    zh: "The China Room · 中国文化学院",
-    en: "The China Room · a modern academy for Chinese civilization",
-    fr: "The China Room · une académie moderne de civilisation chinoise",
-    es: "The China Room · una academia moderna de civilización china",
-    ar: "ذا تشاينا روم · أكاديمية حديثة للحضارة الصينية",
-  },
-  "home.hero.title": {
-    zh: "读中国 · 思中国 · 与中国同行",
-    en: "Read China. Think China. Walk with China.",
-    fr: "Lire la Chine. Penser la Chine. Cheminer avec la Chine.",
-    es: "Leer China. Pensar China. Caminar con China.",
-    ar: "اقرأ الصين. فكّر في الصين. سِر مع الصين.",
-  },
-  "home.hero.desc": {
-    zh: "一间安静的现代学院：原文、译文、注释与多语释义并陈，每一句都可追溯出处。",
-    en: "A calm modern academy: original text, translation, notes and multilingual definitions side by side — every sentence traceable to its source.",
-    fr: "Une académie paisible : texte original, traduction, notes et définitions multilingues côte à côte, chaque phrase traçable.",
-    es: "Una academia serena: texto original, traducción, notas y definiciones multilingües lado a lado, cada frase trazable.",
-    ar: "أكاديمية هادئة: النص الأصلي والترجمة والشروح والتعريفات متعددة اللغات جنبًا إلى جنب، وكل جملة قابلة للتتبّع.",
-  },
-  "home.hero.ctaRead": { zh: "开始读经", en: "Start reading", fr: "Commencer", es: "Comenzar", ar: "ابدأ القراءة" },
-  "home.hero.ctaChat": { zh: "向子曰君提问", en: "Ask Kongzi", fr: "Interroger Kongzi", es: "Pregunta a Kongzi", ar: "اسأل زيويه" },
   "home.hero.ctaJourney": { zh: "开始六艺", en: "Enter the Six Arts", fr: "Entrer dans les six arts", es: "Entrar en las seis artes", ar: "ادخل الفنون الستة" },
 
   // 夜游博物馆首屏（破晓底图）：大标题、装饰拉丁行、入口行标签
@@ -1730,13 +1596,6 @@ const DICT: Dict = {
     fr: "Interroger et réfléchir",
     es: "Preguntar & Reflexionar",
     ar: "اسأل وتأمّل",
-  },
-  "home.night.latin": {
-    zh: "Inquire & Reflect · Confucian Classics Platform",
-    en: "Inquire & Reflect · Confucian Classics Platform",
-    fr: "Inquire & Reflect · Confucian Classics Platform",
-    es: "Inquire & Reflect · Confucian Classics Platform",
-    ar: "Inquire & Reflect · Confucian Classics Platform",
   },
   "home.night.explore": {
     zh: "继续探索 —",
@@ -1748,131 +1607,14 @@ const DICT: Dict = {
 
   // 首页首屏四主入口（唯一强入口区，其余区块降权）
   "home.primary.journey": { zh: "君子路 · 六艺", en: "Six Arts Journey", fr: "La Voie des six arts", es: "El Camino de las seis artes", ar: "سبيل الفنون الستة" },
-  "home.primary.journey.desc": { zh: "礼乐射御书数六关，可玩、可评、可回溯。", en: "Ritual, music, archery, chariot, writing, math — playable and scored.", fr: "Rite, musique, tir, char, écriture, calcul : jouable et noté.", es: "Rito, música, tiro, carro, escritura, cálculo: jugable y puntuado.", ar: "الطقوس والموسيقى والرماية وقيادة المركبة والكتابة والحساب — قابلة للعب والتقييم." },
   "home.primary.chat": { zh: "向经典提问", en: "Ask the Classics", fr: "Interroger les classiques", es: "Pregunta a los clásicos", ar: "اسأل النصوص" },
-  "home.primary.chat.desc": { zh: "每个回答标注出处，可逐条核验。", en: "Every answer cites its source and can be checked.", fr: "Chaque réponse cite sa source et se vérifie.", es: "Cada respuesta cita su fuente y se puede verificar.", ar: "كل إجابة تُسنِد إلى مصدرها ويمكن التحقق منها." },
-  "home.primary.read": { zh: "读经", en: "Read", fr: "Lire", es: "Leer", ar: "اقرأ" },
-  "home.primary.read.desc": { zh: "原文 · 注译 · 多语平行对照。", en: "Original, annotations, parallel translations.", fr: "Original, annotations, traductions parallèles.", es: "Original, anotaciones, traducciones paralelas.", ar: "النص الأصلي والشروح والترجمات المتوازية." },
-  "home.primary.feed": { zh: "刷刷", en: "Feed", fr: "Fil", es: "Feed", ar: "تصفح" },
-  "home.primary.feed.desc": { zh: "竖滑金句，双击点赞，一键存壁纸。", en: "Swipe quotes, double-tap to like, save as wallpaper.", fr: "Faites défiler les citations, aimez, enregistrez en fond d'écran.", es: "Desliza citas, doble toque para me gusta, guarda como fondo.", ar: "مرّر الاقتباسات، وانقر مرتين للإعجاب، واحفظها كخلفية." },
-  "home.enter": { zh: "进入", en: "Enter", fr: "Entrer", es: "Entrar", ar: "دخول" },
-  "home.more": { zh: "更多内容与数据", en: "More content & data", fr: "Plus de contenu et de données", es: "Más contenido y datos", ar: "مزيد من المحتوى والبيانات" },
 
-  "home.mode.title": { zh: "选择你的进入方式", en: "Choose your mode", fr: "Choisissez votre mode", es: "Elige tu modo", ar: "اختر أسلوبك" },
-  "home.mode.modern": { zh: "现代学者", en: "Modern Scholar", fr: "Érudit moderne", es: "Erudito moderno", ar: "الباحث الحديث" },
-  "home.mode.modern.desc": {
-    zh: "用你的语言提问，获得可溯源的当代解读。",
-    en: "Ask in your language; get traceable, contemporary answers.",
-    fr: "Posez vos questions dans votre langue ; réponses traçables et actuelles.",
-    es: "Pregunta en tu idioma; respuestas trazables y contemporáneas.",
-    ar: "اسأل بلغتك واحصل على إجابات معاصرة قابلة للتتبّع.",
-  },
-  "home.mode.sage": { zh: "古典贤者", en: "Classical Sage", fr: "Sage classique", es: "Sabio clásico", ar: "الحكيم الكلاسيكي" },
-  "home.mode.sage.desc": {
-    zh: "直接读原文、拼音与注释，沿经典脉络缓步前行。",
-    en: "Read the original, pinyin and notes at your own pace.",
-    fr: "Lisez l'original, le pinyin et les notes à votre rythme.",
-    es: "Lee el original, el pinyin y las notas a tu ritmo.",
-    ar: "اقرأ النص الأصلي والبينين والشروح على مهلك.",
-  },
-  "home.mode.enter": { zh: "进入", en: "Enter", fr: "Entrer", es: "Entrar", ar: "ادخل" },
 
   "home.civ.title": { zh: "当孔子遇见苏格拉底", en: "When Confucius meets Socrates", fr: "Quand Confucius rencontre Socrate", es: "Cuando Confucio conoce a Sócrates", ar: "حين يلتقي كونفوشيوس بسقراط" },
   "home.civ.desc": { zh:"把《论语》放进世界思想的坐标系：与斯多葛、启蒙、功利主义正面对话，看共鸣，也看分歧。", en: "Set the Analects alongside world thought — in dialogue with Stoicism, the Enlightenment and utilitarianism: shared ground, and productive disagreement.", fr: "Situer les Entretiens dans la pensée mondiale — en dialogue avec le stoïcisme, les Lumières et l’utilitarisme : convergences et désaccords féconds.", es: "Situar las Analectas junto al pensamiento mundial: en diálogo con el estoicismo, la Ilustración y el utilitarismo, afinidades y desacuerdos fecundos.", ar: "ضع «مقولات كونفوشيوس» في خريطة الفكر العالمي: حوارات مع الرواقية والتنوير والنفعية؛ أصداء واختلافات مثمرة." },
   "home.civ.cta": { zh: "进入跨文明对话", en: "Enter the dialogue", fr: "Entrer dans le dialogue", es: "Entrar al diálogo", ar: "ادخل الحوار" },
-  "home.civ.q1": {
-    zh: "「己所不欲，勿施于人」与全球伦理是否相通？",
-    en: "Does the Confucian Golden Rule speak to global ethics?",
-    fr: "La règle d’or confucéenne rejoint-elle l’éthique mondiale ?",
-    es: "¿Habla la regla de oro confuciana a la ética global?",
-    ar: "هل تتّصل القاعدة الذهبية الكونفوشيوسية بالأخلاقيات العالمية؟",
-  },
-  "home.civ.q2": {
-    zh: "儒家如何看待个人与社群的关系？",
-    en: "How does Confucian thought understand the individual and the community?",
-    fr: "Comment la pensée confucéenne comprend-elle l'individu et la communauté ?",
-    es: "¿Cómo entiende el pensamiento confuciano al individuo y a la comunidad?",
-    ar: "كيف يفهم الفكر الكونفوشيوسي الفرد والمجتمع؟",
-  },
-  "home.civ.q3": {
-    zh: "「君子」在今天还意味着什么？",
-    en: "What does the junzi (noble person) mean today?",
-    fr: "Que signifie le junzi (personne noble) aujourd'hui ?",
-    es: "¿Qué significa hoy el junzi (persona noble)?",
-    ar: "ماذا يعني «الجونزي» (الإنسان النبيل) اليوم؟",
-  },
-  "home.civ.q4": {
-    zh: "礼与法：两种秩序观如何对话？",
-    en: "Ritual and law: how do two views of order converse?",
-    fr: "Le rite et la loi : deux conceptions de l'ordre en dialogue ?",
-    es: "Rito y ley: ¿cómo dialogan dos visiones del orden?",
-    ar: "الطقوس والقانون: كيف يتحاور تصوّران للنظام؟",
-  },
-  "home.civ.ask": { zh: "去对话", en: "Ask", fr: "Demander", es: "Preguntar", ar: "اسأل" },
 
-  "home.why.title": { zh: "为何了解中国文化？", en: "Why learn Chinese culture?", fr: "Pourquoi apprendre la culture chinoise ?", es: "¿Por qué aprender la cultura china?", ar: "لماذا نتعلّم الثقافة الصينية؟" },
-  "home.why.history": { zh: "历史", en: "History", fr: "Histoire", es: "Historia", ar: "التاريخ" },
-  "home.why.history.desc": {
-    zh: "从先秦诸子到近现代，一条连续而变动的思想长河。",
-    en: "A continuous, changing river of thought from pre-Qin masters to modern times.",
-    fr: "Un fleuve continu de pensée, des maîtres pré-Qin à l'époque moderne.",
-    es: "Un río continuo de pensamiento, de los maestros pre-Qin hasta hoy.",
-    ar: "نهر فكري متّصل من حكماء ما قبل تشين إلى العصر الحديث.",
-  },
-  "home.why.philosophy": { zh: "哲学", en: "Philosophy", fr: "Philosophie", es: "Filosofía", ar: "الفلسفة" },
-  "home.why.philosophy.desc": {
-    zh: "仁、义、礼、智、信——概念的关系网络。",
-    en: "Benevolence, rightness, ritual, wisdom, trust — a network of concepts.",
-    fr: "Bienveillance, justice, rite, sagesse, confiance — un réseau de concepts.",
-    es: "Benevolencia, rectitud, rito, sabiduría, confianza: una red de conceptos.",
-    ar: "الإنسانية والاستقامة والطقوس والحكمة والثقة — شبكة مفاهيم.",
-  },
-  "home.why.literature": { zh: "文学", en: "Literature", fr: "Littérature", es: "Literatura", ar: "الأدب" },
-  "home.why.literature.desc": {
-    zh: "《论语》《孟子》《道德经》——原典原文并读。",
-    en: "The Analects, Mencius, Dao De Jing — read in the original.",
-    fr: "Les Analectes, Mencius, Dao De Jing — dans le texte original.",
-    es: "Las Analectas, Mencio, Dao De Jing: en el texto original.",
-    ar: "«مقولات كونفوشيوس» و«مينسيوس» و«داو دي جينغ» — بنصّها الأصلي.",
-  },
-  "home.why.visual": { zh: "视觉艺术", en: "Visual arts", fr: "Arts visuels", es: "Artes visuales", ar: "الفنون البصرية" },
-  "home.why.visual.desc": {
-    zh: "书艺、乐舞与六艺——可动手的文化实践。",
-    en: "Calligraphy, music and the Six Arts — culture you can practice.",
-    fr: "Calligraphie, musique et Six Arts — une culture qui se pratique.",
-    es: "Caligrafía, música y Seis Artes: cultura que puedes practicar.",
-    ar: "الخط والموسيقى والفنون الستة — ثقافة تمارسها بيدك.",
-  },
 
-  "home.need.title": { zh: "按你的需求开始", en: "Start with what you need", fr: "Commencez selon vos besoins", es: "Empieza según lo que necesitas", ar: "ابدأ حسب حاجتك" },
-  "home.need.exam": { zh: "考试", en: "For exams", fr: "Examens", es: "Para exámenes", ar: "للامتحانات" },
-  "home.need.exam.desc": {
-    zh: "按章节读经、术语速查、掌握度小测。",
-    en: "Read by chapter, quick glossary, mastery quizzes.",
-    fr: "Lecture par chapitre, glossaire rapide, quiz de maîtrise.",
-    es: "Lectura por capítulo, glosario rápido, cuestionarios.",
-    ar: "القراءة بحسب الفصل، مسرد سريع، اختبارات إتقان.",
-  },
-  "home.need.business": { zh: "商务", en: "For business", fr: "Affaires", es: "Para negocios", ar: "للأعمال" },
-  "home.need.business.desc": {
-    zh: "礼与和的当代含义，跨文明对话案例。",
-    en: "Contemporary meaning of ritual and harmony; cross-civ cases.",
-    fr: "Sens actuel du rite et de l'harmonie ; cas entre civilisations.",
-    es: "Sentido actual del rito y la armonía; casos entre civilizaciones.",
-    ar: "المعنى المعاصر للطقوس والوئام؛ حالات بين الحضارات.",
-  },
-  "home.need.culture": { zh: "文化", en: "For curiosity", fr: "Curiosité", es: "Por curiosidad", ar: "للفضول الثقافي" },
-  "home.need.culture.desc": {
-    zh: "从一个金句或一张图谱进入世界。",
-    en: "Enter through a single quote or the knowledge graph.",
-    fr: "Entrez par une citation ou le graphe de connaissances.",
-    es: "Entra por una cita o por el grafo de conocimiento.",
-    ar: "ادخل عبر حكمة واحدة أو عبر الرسم المعرفي.",
-  },
-  "home.need.quick": { zh: "快捷入口", en: "Quick links", fr: "Accès rapides", es: "Accesos rápidos", ar: "روابط سريعة" },
-  "home.need.timeline": { zh: "时间轴", en: "Timeline", fr: "Chronologie", es: "Línea de tiempo", ar: "الخط الزمني" },
-  "home.need.terms": { zh: "术语", en: "Glossary", fr: "Glossaire", es: "Glosario", ar: "المصطلحات" },
-  "home.need.classics": { zh: "读原典", en: "Read classics", fr: "Lire les classiques", es: "Leer clásicos", ar: "قراءة النصوص" },
 
   "home.paths.title": { zh: "精选学习路径", en: "Featured learning paths", fr: "Parcours recommandés", es: "Rutas destacadas", ar: "مسارات تعلّم مختارة" },
   "home.paths.more": { zh: "全部路径", en: "All paths", fr: "Tous les parcours", es: "Todas las rutas", ar: "كل المسارات" },
@@ -1889,8 +1631,6 @@ const DICT: Dict = {
   "paths.arts.desc": { zh: "礼、乐、射、御、书、数——游戏化通关。", en: "Rites, music, archery, charioteering, calligraphy, numbers — gamified.", fr: "Rites, musique, tir, char, calligraphie, chiffres — en jeu.", es: "Ritos, música, arquería, carro, caligrafía, números: en juego.", ar: "الطقوس والموسيقى والرمي والقيادة والخط والحساب — بأسلوب الألعاب." },
   "paths.crossciv.title": { zh: "跨文明对话", en: "Cross-civilizational dialogue", fr: "Dialogue entre civilisations", es: "Diálogo entre civilizaciones", ar: "الحوار بين الحضارات" },
   "paths.crossciv.desc": { zh: "同一议题，儒家与基督教、启蒙、佛教并陈。", en: "One topic, set beside Christian, Enlightenment and Buddhist stances.", fr: "Un thème, mis en regard des positions chrétienne, lumiériste et bouddhique.", es: "Un tema, junto a posiciones cristiana, ilustrada y budista.", ar: "موضوع واحد بموازاة المواقف المسيحية والتنويرية والبوذية." },
-  "paths.feedEntry.title": { zh: "刷刷 · 流式经典", en: "Feed · swipe through the classics", fr: "Fil · faites défiler les classiques", es: "Feed · desliza por los clásicos", ar: "تصفّح · مرّر النصوص الكلاسيكية" },
-  "paths.feedEntry.sub": { zh: "不用规划路径，直接流式刷：一条金句、一段注疏，往下滑就好。", en: "No path to plan — just scroll: one quote, one gloss, keep swiping.", fr: "Aucun parcours à planifier : défilez, une citation, une glose, continuez.", es: "Sin ruta que planificar: desplázate, una cita, una glosa, sigue.", ar: "لا مسار تخطّط له — فقط مرّر: حكمة واحدة، شرح واحد، تابع التمرير." },
 
   "quiz.kicker": { zh: "掌握度 · Mastery", en: "Mastery", fr: "Maîtrise", es: "Maestría", ar: "الإتقان" },
   "quiz.title": { zh: "检验你掌握了多少", en: "Check how much has taken root", fr: "Vérifiez ce qui a pris racine", es: "Comprueba lo que ha echado raíces", ar: "اختبر ما رَسَخ لديك" },
@@ -1899,7 +1639,6 @@ const DICT: Dict = {
   "quiz.readTitle": { zh: "读经问答", en: "Read & answer", fr: "Lire et répondre", es: "Leer y responder", ar: "اقرأ وأجب" },
   "quiz.readDesc": { zh: "在《论语》章节中边读边问，让智能体溯源作答。", en: "Read the Analects and ask as you go; the agent answers with sources.", fr: "Lisez les Analectes et questionnez : l'agent répond avec sources.", es: "Lee las Analectas y pregunta mientras lees; el agente responde con fuentes.", ar: "اقرأ «مقولات كونفوشيوس» واسأل أثناء القراءة؛ والمساعد الذكي يجيب بالمصادر." },
   "quiz.enter": { zh: "开始", en: "Start", fr: "Commencer", es: "Comenzar", ar: "ابدأ" },
-  "quiz.learned": { zh: "已掌握", en: "Mastered", fr: "Maîtrisé", es: "Dominado", ar: "متقَن" },
 
   "read.parallel": { zh: "平行文本", en: "Parallel text", fr: "Texte parallèle", es: "Texto paralelo", ar: "نص موازٍ" },
   "read.parallelHint": {
@@ -2115,7 +1854,6 @@ const DICT: Dict = {
   "comments.hideReplies": { zh: "收起回复", en: "Hide replies", fr: "Masquer les réponses", es: "Ocultar respuestas", ar: "طي الردود" },
   "comments.empty.title": { zh: "还没有评论", en: "No comments yet", fr: "Pas encore de commentaire", es: "Sin comentarios", ar: "لا تعليقات بعد" },
   "comments.empty.sub": { zh: "读完这一段，留下你的第一句感想。", en: "Be the first to share a thought on this passage.", fr: "Soyez le premier à partager une lecture.", es: "Sé el primero en compartir una lectura.", ar: "كن أول من يشارك تأمله في هذا النص." },
-  "comments.loading": { zh: "正在加载评论…", en: "Loading comments…", fr: "Chargement des commentaires…", es: "Cargando comentarios…", ar: "جارٍ تحميل التعليقات…" },
   "comments.error.title": { zh: "评论加载失败", en: "Couldn't load comments", fr: "Impossible de charger les commentaires", es: "No se pudieron cargar los comentarios", ar: "تعذّر تحميل التعليقات" },
   "comments.error.retry": { zh: "重试", en: "Retry", fr: "Réessayer", es: "Reintentar", ar: "إعادة المحاولة" },
   "comments.charLimit": { zh: "最多 500 字", en: "Up to 500 characters", fr: "500 caractères max.", es: "Máx. 500 caracteres", ar: "حتى 500 حرف" },
