@@ -56,8 +56,9 @@ export default function NightHero({
           </div>
         </div>
 
-        {/* 金句面板：桌面固定宽度靠左，移动端占满 */}
-        <div className="relative max-w-[22.5rem] md:max-w-[24rem]">{quotePanel}</div>
+        {/* 金句面板：桌面固定宽度靠左，移动端占满。
+            nz-quote 供 CSS 限高——各语言译文长度不同，不限制会把首屏撑高 */}
+        <div className="nz-quote relative max-w-[22.5rem] md:max-w-[24rem]">{quotePanel}</div>
 
         {/* 底部入口行 */}
         <nav

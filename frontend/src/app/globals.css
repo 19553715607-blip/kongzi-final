@@ -767,17 +767,78 @@ html:lang(zh) .nz-subtitle { letter-spacing: 0.2em; }
 [dir="rtl"] .nz-hero .nz-intro + div { margin-right: auto; }
 
 @media (max-width: 767px), (max-width: 1023px) and (orientation: portrait) {
-  .nz-hero { --poster-height: clamp(18rem, 43svh, 28rem); }
+  /* 竖屏：海报不再是一条「顶部横带」，而是纵向铺满首屏、内容压在图上。
+     旧做法是给 .nz-content 加 padding-top = 海报高度，把正文推到图片下方，
+     阅读时像两张图上下拼接；改成重叠后与桌面端一致。 */
+  .nz-hero { --poster-height: clamp(18rem, 76svh, 42rem); }
   .nz-poster {
     height: var(--poster-height);
-    background-image: var(--poster-image);
-    mask-image: linear-gradient(to bottom, transparent 0.5rem, #000 5rem, #000 74%, transparent);
+    /* 纵向叠一层纸色渐隐：顶部轻、底部重，保证「孔子」大字与副标题压在画面上仍然可读 */
+    background-image: linear-gradient(
+        to bottom,
+        color-mix(in srgb, var(--paper) 16%, transparent) 0%,
+        color-mix(in srgb, var(--paper) 30%, transparent) 38%,
+        color-mix(in srgb, var(--paper) 58%, transparent) 64%,
+        color-mix(in srgb, var(--paper) 88%, transparent) 86%,
+        var(--paper) 100%
+      ),
+      var(--poster-image);
+    background-position: var(--poster-focus) 32%;
+    mask-image: linear-gradient(to bottom, #000 0, #000 84%, transparent 100%);
   }
-  .nz-content { padding-top: var(--poster-height); }
-  .nz-intro { padding-block: 1.25rem; }
+  /* 正文从导航下方直接开始，与海报重叠；不再被海报高度顶下去 */
+  .nz-content { padding-top: 5.5rem; }
+  /* 竖屏高度随内容走：内容压在图上之后，若仍强制 min-h-svh，
+     平板竖屏（820×1180）会在正文下方留出四五百像素的空洞 */
+  .nz-hero, .nz-content { min-height: 0; }
+  /* 桌面靠 flex-1 把正文压在垂直中部；竖屏内容改压在图上后若继续吃余量，
+     正文与金句面板之间会被撑出一道空洞（平板竖屏尤其明显），这里取消伸展 */
+  .nz-intro { padding-block: 1.25rem; flex: 0 1 auto; }
   .nz-copy { width: 100%; }
   .nz-h1 { font-size: clamp(3.3rem, 10vw, 5rem); }
-  .nz-hero .nz-announce { max-width: 100%; }
+  /* 公告条现在压在画面上，细字（fg 66%）直接叠在枝干笔画上会糊。
+     给这一行一层纸色底 + 轻模糊，范围只到文字本身，不动整张图。 */
+  .nz-hero .nz-announce {
+    max-width: 100%;
+    margin-inline: -0.5rem;
+    padding: 0.3rem 0.5rem;
+    border-radius: 4px;
+    background: color-mix(in srgb, var(--paper) 70%, transparent);
+    backdrop-filter: blur(6px);
+  }
+}
+
+/* 手机仍保持整屏首屏：内容不满一屏时余量留在底部，
+   否则下一屏内容会从折叠线上露头，像首屏被截断 */
+@media (max-width: 767px) {
+  .nz-hero, .nz-content { min-height: 100svh; }
+}
+
+/* ── 桌面：消除「换语言就缩放」的观感 ──
+   同一字号下，法语/西语的金句面板比中文高约 150px（多一段译文），
+   首屏随之从 900 涨到 1023（1366×657 下 834 → 1015，差 181px）。
+   处理分两级：
+   1) 所有桌面宽度：面板按视口比例封顶，内部滚动——先压掉大部分差异；
+   2) 屏幕够高（≥820px）且横屏：首屏高度直接钉死 100svh，差异归零。
+   矮屏（1280×720 一类）只封顶不钉高：固定高度会把面板压到必须滚动，
+   且容易溢出下一屏，那种尺寸页面本来就要滚，保留自然流更稳；
+   竖屏平板同理（820×1180 钉死后会在正文下方留出五百像素空洞）。 */
+@media (min-width: 768px) {
+  .nz-quote {
+    max-height: max(16rem, 42svh);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+}
+
+@media (min-width: 768px) and (min-height: 820px) and (orientation: landscape) {
+  .nz-content { height: 100svh; }
+  /* 正文不再吸收余量，否则面板拿不到确定的剩余高度 */
+  .nz-intro { padding-block: 1.25rem; flex: 0 0 auto; }
+  /* 面板弹性占位：内容短时卡片保持自然高度（外层透明不显形），
+     内容长时由剩余空间封顶 */
+  .nz-quote { flex: 1 1 auto; min-height: 0; max-height: none; }
+  .nz-content > nav { flex: none; margin-top: auto; }
 }
 
 /* ── 金线 kicker：前置短横线（令牌驱动，随主题）── */
