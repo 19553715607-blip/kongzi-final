@@ -24,8 +24,24 @@ export default function KioskPage() {
     const c = url.get("campus");
     setCampus(c);
     track("/kiosk", { device: "kiosk", source: "qr", campus: c || undefined });
-    getFeed("en", 30).then(setItems).catch(() => {});
   }, []);
+
+  // 展屏内容按当前语言取：原先写死 "en"，导致切到法语/西语/阿语后
+  // 界面文案变了、引文却始终是英文。语言切换时重取并回到第一条，
+  // 避免 idx 越界到新列表之外。
+  useEffect(() => {
+    let alive = true;
+    getFeed(lang, 30)
+      .then((d) => {
+        if (!alive) return;
+        setItems(d);
+        setIdx(0);
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, [lang]);
 
   // 自动轮播
   useEffect(() => {

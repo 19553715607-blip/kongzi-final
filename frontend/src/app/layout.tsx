@@ -11,6 +11,7 @@ import "./globals.css";
 import PublicChrome from "@/components/PublicChrome";
 import Toaster from "@/components/Toast";
 import Tracker from "@/components/Tracker";
+import LangMeta from "@/components/LangMeta";
 import { META_DESCRIPTION, META_KEYWORDS, META_TITLE } from "@/lib/metaText";
 import { I18nProvider, type Lang } from "@/lib/i18n";
 
@@ -93,6 +94,8 @@ export default function RootLayout({
       <body className="min-h-screen bg-bg font-sans text-fg antialiased">
         <I18nProvider initialLang={initialLang}>
           <Tracker />
+          {/* 注水后按语言重写 title/meta：服务端 metadata 会把脚本写的值覆盖回中文 */}
+          <LangMeta />
           <PublicChrome>{children}</PublicChrome>
           <Toaster />
         </I18nProvider>

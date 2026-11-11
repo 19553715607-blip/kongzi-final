@@ -67,8 +67,11 @@ export default function Nav({ ghost = false }: { ghost?: boolean }) {
               孔
             </span>
             <span className="font-serif text-base font-medium text-fg">
-              <span className="hidden sm:inline">{t("brand.title", lang)}</span>
-              <span className="sm:hidden">{t("brand.short", lang)}</span>
+              {/* 品牌全称到 lg 才显示：768–1023 区间里法语/西语的
+                  「Kongzi · Plateforme des classiques confucéens」会把页头顶出视口
+                  （实测 768px 下溢出 56–59px，右侧「Connexion」被裁掉） */}
+              <span className="hidden lg:inline">{t("brand.title", lang)}</span>
+              <span className="lg:hidden">{t("brand.short", lang)}</span>
             </span>
           </Link>
 
