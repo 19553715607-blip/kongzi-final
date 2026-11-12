@@ -54,8 +54,6 @@ export function createYueRefs(): YueRefs {
 
 // ── 场景常量（与数场景同一宣纸色调） ──
 const GOLD = "#d9a521";
-const BRONZE = "#a8905a";
-const BRONZE_DARK = "#8a7448";
 const BRONZE_DEEP = "#755d2b"; // 甬/钉/箍等深黄铜强调件
 const LACQUER = "#6b2420"; // 髹漆朱
 const WOOD = "#5a3b1d";

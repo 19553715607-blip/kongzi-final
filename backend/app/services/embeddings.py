@@ -11,11 +11,18 @@ from __future__ import annotations
 
 import hashlib
 import math
+import os
 from typing import List, Optional
 
 from ..config import get_settings
 
 settings = get_settings()
+
+# 离线优先：禁止 huggingface_hub 在导入后发起任何联网探测（否则无网络时
+# 每个请求/启动都要等 HEAD 超时重试）。必须在导入 sentence-transformers 之前设置。
+if settings.embedding_local_only:
+    os.environ.setdefault("HF_HUB_OFFLINE", "1")
+    os.environ.setdefault("TRANSFORMERS_OFFLINE", "1")
 
 
 class Embedder:
@@ -31,7 +38,9 @@ class LocalEmbedder(Embedder):
         from sentence_transformers import SentenceTransformer  # 懒加载
 
         self.name = model_name or settings.embedding_model
-        self._model = SentenceTransformer(self.name)
+        self._model = SentenceTransformer(
+            self.name, local_files_only=settings.embedding_local_only
+        )
         self.dim = self._model.get_sentence_embedding_dimension()
 
     def embed(self, texts: List[str]) -> List[List[float]]:
@@ -82,17 +91,28 @@ class HashEmbedder(Embedder):
 
 
 _embedder: Optional[Embedder] = None
+_failure: Optional[RuntimeError] = None
 
 
 def get_embedder() -> Embedder:
-    global _embedder
+    global _embedder, _failure
     if _embedder is not None:
         return _embedder
+    if _failure is not None:
+        raise _failure
     provider = settings.embedding_provider.lower()
     if provider == "openai" and settings.openai_api_key:
         _embedder = OpenAIEmbedder()
     elif provider == "hash":
         _embedder = HashEmbedder()
     else:
-        _embedder = LocalEmbedder()
+        try:
+            _embedder = LocalEmbedder()
+        except Exception as exc:
+            _failure = RuntimeError(
+                f"本地 embedding 模型不可用（{type(exc).__name__}）：{settings.embedding_model}。"
+                "离线环境请设 RETRIEVAL_BACKEND=keyword；或把模型放入本地缓存，"
+                "或设 EMBEDDING_LOCAL_ONLY=false 允许首次下载。"
+            )
+            raise _failure from exc
     return _embedder

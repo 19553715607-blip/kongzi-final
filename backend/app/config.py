@@ -18,6 +18,9 @@ class Settings(BaseSettings):
     # Embedding：local(sentence-transformers) | openai | hash(无语义，仅保证可跑)
     embedding_provider: str = "local"
     embedding_model: str = "paraphrase-multilingual-MiniLM-L12-v2"
+    # 只读本地缓存，不联网下载权重。离线环境下避免启动卡在 HuggingFace 超时；
+    # 需要首次下载模型时设为 false。
+    embedding_local_only: bool = True
     openai_embedding_model: str = "text-embedding-3-small"
 
     # 知识图谱：memory(内存图，零配置) | neo4j(需 NEO4J_URI 可达)

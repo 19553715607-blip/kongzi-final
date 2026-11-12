@@ -5,8 +5,6 @@ import { getTopics, streamChat } from "@/lib/api";
 import { copyText } from "@/lib/ui";
 import { toast } from "@/components/Toast";
 import { t, useLang } from "@/lib/i18n";
-import { Reveal } from "@/lib/motion";
-import { TactileButton } from "@/components/museum";
 import type {
   CitationEvent,
   CrossCivView,
