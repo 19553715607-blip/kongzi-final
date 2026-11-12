@@ -14,6 +14,7 @@ from ..db import get_db
 from ..models import DialogCase, Topic, User
 from ..questions_i18n import ANGLE_LABEL_BY_ZH
 from ..services.auth import get_current_user
+from ..services.i18n import localize_ref_label
 
 router = APIRouter(prefix="/api/v1", tags=["cases"])
 
@@ -75,15 +76,26 @@ def _localize_view(v: dict, lang: str) -> dict:
 
 
 def _full(c: DialogCase, lang: str = "zh", topic_en: str = "") -> dict:
+    brief = _brief(c, lang, topic_en)
+    # 长答案:优先该语版本,缺译回落中文。
+    # 预置译文开头的「[This question] …」仍嵌中文原问题，按当前语种替换。
+    answer = (c.answer_i18n or {}).get(lang) or c.confucian_answer
+    if lang not in ("zh", "all") and answer and c.question:
+        q_loc = brief.get("question")
+        if q_loc and q_loc != c.question:
+            answer = answer.replace(c.question, q_loc)
     return {
-        **_brief(c, lang, topic_en),
-        # 长答案:优先该语版本,缺译回落中文
-        "confucian_answer": (c.answer_i18n or {}).get(lang) or c.confucian_answer,
+        **brief,
+        "confucian_answer": answer,
         "cross_civ_views": [_localize_view(v, lang) for v in (c.cross_civ_views or [])],
-        "citations": list(c.citations or []),
+        "citations": [
+            {**cit, "ref_label": localize_ref_label(cit.get("ref_label"), lang)}
+            for cit in (c.citations or [])
+        ],
         "reviewer": c.reviewer,
         "reviewed_at": c.reviewed_at.isoformat() if c.reviewed_at else None,
-        "review_note": c.review_note,
+        # 审核备注为中文后台批注，非中文界面不展示
+        "review_note": c.review_note if lang in ("zh", "all") else None,
     }
 
 

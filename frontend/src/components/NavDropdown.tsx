@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { t, type Lang } from "@/lib/i18n";
 import { isActive, type NavGroup } from "@/lib/nav";
+import Icon from "./ui/Icon";
 
 // 指针离开后延迟收起。给用户留出「从一级按钮移到面板内」的时间，
 // 同时避免指针擦过按钮边缘时菜单闪退。
@@ -91,15 +92,13 @@ export default function NavDropdown({ group, path, lang, onNavigate }: Props) {
   };
 
   const main = t(group.labelKey, lang);
-  // 非中文界面下，用该栏目实际包含的前 3 个中文标签做 hover 提示。
+  // 用该栏目实际包含的前 3 个标签做 hover 提示（按当前语言）。
   // 由 items 派生而非手写字符串，避免出现「副标题写君子路·六艺、下拉里却没有」这类漂移。
   const tip =
-    lang !== "zh"
-      ? group.items
-          .slice(0, 3)
-          .map((it) => t(it.labelKey, "zh"))
-          .join("·") || undefined
-      : undefined;
+    group.items
+      .slice(0, 3)
+      .map((it) => t(it.labelKey, lang))
+      .join("·") || undefined;
 
   return (
     <div
@@ -126,20 +125,12 @@ export default function NavDropdown({ group, path, lang, onNavigate }: Props) {
         }`}
       >
         {main}
-        <svg
-          width="10"
-          height="10"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          aria-hidden="true"
+        <Icon
+          name="chevronDown"
+          size={12}
+          strokeWidth={2}
           className={`transition-transform ${open ? "rotate-180" : ""}`}
-        >
-          <path d="M6 9l6 6 6-6" />
-        </svg>
+        />
       </button>
 
       {open && (

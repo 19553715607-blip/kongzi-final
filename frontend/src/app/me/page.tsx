@@ -197,7 +197,7 @@ export default function MePage() {
               {me?.avatar_url && !avatarBusy && (
                 <button
                   onClick={() => void onResetAvatar()}
-                  className="pressable rounded-full border border-line px-2 py-0.5 text-[10px] text-faint transition hover:border-accent hover:text-accent"
+                  className="chip"
                 >
                   {t("me.avatar.reset", lang)}
                 </button>

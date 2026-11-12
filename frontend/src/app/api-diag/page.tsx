@@ -118,14 +118,14 @@ export default function ApiDiagPage() {
             type="button"
             onClick={() => void run()}
             disabled={busy}
-            className="ms-auto rounded-full bg-accent px-3 py-1.5 text-xs text-on-accent disabled:opacity-50"
+            className="btn btn-primary btn-sm ms-auto"
           >
             {busy ? "检测中…" : "重新检测"}
           </button>
           <button
             type="button"
             onClick={copy}
-            className="rounded-full border border-line px-3 py-1.5 text-xs text-muted"
+            className="chip"
           >
             复制
           </button>

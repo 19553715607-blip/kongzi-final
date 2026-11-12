@@ -16,6 +16,7 @@ import { exportQuoteCard } from "@/lib/shareCard";
 import { toast } from "@/components/Toast";
 import { t, useLang } from "@/lib/i18n";
 import { Reveal, CountUp, Pressable } from "@/lib/motion";
+import Icon from "@/components/ui/Icon";
 import { HorizontalRail, CollectionCard, ProvenanceCaption } from "@/components/museum";
 import NightHero from "@/components/home/NightHero";
 import type { CorpusStats, Passage } from "@/lib/types";
@@ -279,58 +280,38 @@ export default function Home() {
             <Pressable
               onClick={doCopy}
               title={t("home.quote.copy", lang)}
-              className="flex h-7 items-center gap-1 rounded-full border border-line px-2.5 text-[11px] text-muted transition hover:border-accent hover:text-accent"
+              className="chip pressable"
             >
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="9" y="9" width="12" height="12" rx="2" />
-                <path d="M5 15V5a2 2 0 012-2h10" />
-              </svg>
+              <Icon name="copy" size={12} />
               {t("home.quote.copy", lang)}
             </Pressable>
             <Pressable
               onClick={() => void doCite()}
               title={t("home.quote.cite", lang)}
-              className="flex h-7 items-center gap-1 rounded-full border border-line px-2.5 text-[11px] text-muted transition hover:border-accent hover:text-accent"
+              className="chip pressable"
             >
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <path d="M9 7H5a2 2 0 00-2 2v4a2 2 0 002 2h2c0 2-1 3-3 4" />
-                <path d="M19 7h-4a2 2 0 00-2 2v4a2 2 0 002 2h2c0 2-1 3-3 4" />
-              </svg>
+              <Icon name="quote" size={12} />
               {t("home.quote.cite", lang)}
             </Pressable>
             <Pressable
               onClick={() => void doShareCard()}
               title={t("home.quote.share", lang)}
-              className="flex h-7 items-center gap-1 rounded-full border border-line px-2.5 text-[11px] text-muted transition hover:border-accent hover:text-accent"
+              className="chip pressable"
             >
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <rect x="9" y="9" width="12" height="12" rx="2" />
-                <path d="M5 15V5a2 2 0 012-2h10" />
-              </svg>
+              <Icon name="image" size={12} />
               {t("home.quote.share", lang)}
             </Pressable>
             <Pressable
               onClick={() => void doListen()}
               title={audioState === "playing" ? t("home.quote.stop", lang) : t("home.quote.listen", lang)}
-              className={`flex h-7 items-center gap-1 rounded-full border px-2.5 text-[11px] transition ${
-                audioState === "playing"
-                  ? "border-accent bg-accent-soft text-accent"
-                  : "border-line text-muted hover:border-accent hover:text-accent"
-              }`}
+              className={`chip pressable ${audioState === "playing" ? "chip-accent" : ""}`}
             >
               {audioState === "loading" ? (
-                <svg className="animate-spin" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                  <path d="M21 12a9 9 0 11-6.219-8.56" />
-                </svg>
+                <Icon name="refresh" size={12} strokeWidth={2} className="animate-spin" />
               ) : audioState === "playing" ? (
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="6" y="6" width="12" height="12" rx="1" />
-                </svg>
+                <Icon name="stop" size={12} strokeWidth={1.75} />
               ) : (
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
-                  <path d="M15.5 8.5a5 5 0 010 7M18.5 5.5a9 9 0 010 13" />
-                </svg>
+                <Icon name="volume" size={12} strokeWidth={1.75} />
               )}
               {audioState === "playing"
                 ? t("home.quote.stop", lang)
@@ -341,41 +322,33 @@ export default function Home() {
             <Pressable
               onClick={doFav}
               title={faved ? t("home.quote.saved", lang) : t("home.quote.save", lang)}
-              className={`flex h-7 items-center gap-1 rounded-full border px-2.5 text-[11px] transition ${
-                faved
-                  ? "border-gold/60 bg-gold/20 text-gold"
-                  : "border-line text-muted hover:border-accent hover:text-accent"
-              }`}
+              className={`chip pressable ${faved ? "chip-gold" : ""}`}
             >
-              <svg width="12" height="12" viewBox="0 0 24 24" fill={faved ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 21s-7-4.6-9.5-9C.8 8.5 2.5 5 6 5c2 0 3.2 1.2 4 2.4C10.8 6.2 12 5 14 5c3.5 0 5.2 3.5 3.5 7-2.5 4.4-9.5 9-9.5 9z" />
-              </svg>
+              <Icon name="heart" size={12} strokeWidth={faved ? 2 : 1.75} />
             </Pressable>
             <span className="ms-auto flex items-center gap-1">
               <button
                 onClick={() => goTo(neighbors.prev?.id ?? null)}
                 disabled={!neighbors.prev}
-                className="pressable flex h-7 w-7 items-center justify-center rounded-full border border-line text-muted transition hover:border-accent hover:text-accent disabled:opacity-30"
+                className="btn btn-outline btn-sm btn-icon pressable text-muted disabled:opacity-30"
                 title={t("home.quote.prev", lang)}
               >
-                ←
+                <Icon name="arrowLeft" size={12} />
               </button>
               <button
                 onClick={() => void loadQuote("random")}
-                className="pressable flex h-7 w-7 items-center justify-center rounded-full border border-line text-muted transition hover:border-accent hover:text-accent"
+                className="btn btn-outline btn-sm btn-icon pressable text-muted"
                 title={t("home.quote.shuffle", lang)}
               >
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M17 2l4 4-4 4M3 11V9a4 4 0 014-4h14M7 22l-4-4 4-4M21 13v2a4 4 0 01-4 4H3" />
-                </svg>
+                <Icon name="shuffle" size={12} />
               </button>
               <button
                 onClick={() => goTo(neighbors.next?.id ?? null)}
                 disabled={!neighbors.next}
-                className="pressable flex h-7 w-7 items-center justify-center rounded-full border border-line text-muted transition hover:border-accent hover:text-accent disabled:opacity-30"
+                className="btn btn-outline btn-sm btn-icon pressable text-muted disabled:opacity-30"
                 title={t("home.quote.next", lang)}
               >
-                →
+                <Icon name="arrowRight" size={12} />
               </button>
             </span>
           </div>

@@ -364,9 +364,7 @@ export default function AdminContentPage() {
                   setTab(k);
                   setSelected(null);
                 }}
-                className={`pressable rounded-full px-3 py-1 text-xs ${
-                  tab === k ? "bg-accent text-on-accent" : "border border-line text-muted"
-                }`}
+                className={`chip ${tab === k ? "chip-accent" : ""}`}
               >
                 {t(`admin.content.tab.${k}`, lang)}
               </button>

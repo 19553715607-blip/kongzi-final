@@ -3,15 +3,15 @@
 import Link from "next/link";
 import { useLang, t } from "@/lib/i18n";
 import { Reveal } from "@/lib/motion";
-import { TactileButton } from "@/components/museum";
+import Icon, { type IconName } from "@/components/ui/Icon";
 
-const GAMES = [
-  { href: "/journey/li",  labelKey: "jrn.art.li",  glyph: "礼" },
-  { href: "/journey/yue", labelKey: "jrn.art.yue", glyph: "乐" },
-  { href: "/journey/she", labelKey: "jrn.art.she", glyph: "射" },
-  { href: "/journey/yu",  labelKey: "jrn.art.yu",  glyph: "御" },
-  { href: "/journey/shu", labelKey: "jrn.art.shu", glyph: "书" },
-  { href: "/journey/math", labelKey: "jrn.art.shu2", glyph: "数" },
+const GAMES: { href: string; labelKey: string; icon: IconName }[] = [
+  { href: "/journey/li",  labelKey: "jrn.art.li",  icon: "institution" },
+  { href: "/journey/yue", labelKey: "jrn.art.yue", icon: "music" },
+  { href: "/journey/she", labelKey: "jrn.art.she", icon: "target" },
+  { href: "/journey/yu",  labelKey: "jrn.art.yu",  icon: "wheel" },
+  { href: "/journey/shu", labelKey: "jrn.art.shu", icon: "edit" },
+  { href: "/journey/math", labelKey: "jrn.art.shu2", icon: "calculator" },
 ];
 
 export default function QuizPage() {
@@ -33,17 +33,21 @@ export default function QuizPage() {
               href={g.href}
               className="group card-hover pressable flex items-center gap-3 rounded-xl border border-line bg-bg p-4"
             >
-              <span className="seal inline-flex h-9 w-9 items-center justify-center rounded-md font-serif text-sm">
-                {g.glyph}
+              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-line bg-surface-2 text-accent">
+                <Icon name={g.icon} size={17} />
               </span>
               <span className="text-sm text-fg">{t(g.labelKey, lang)}</span>
-              <span className="ms-auto text-accent opacity-0 transition group-hover:opacity-100">→</span>
+              <Icon
+                name="chevronRight"
+                size={14}
+                className="ms-auto text-accent opacity-0 transition group-hover:opacity-100"
+              />
             </Link>
           ))}
         </div>
         <div className="mt-4 flex justify-start">
-          <Link href="/journey">
-            <TactileButton variant="accent">{t("jrn.overview", lang)} →</TactileButton>
+          <Link href="/journey" className="nz-btn">
+            {t("quiz.pathCta", lang)} →
           </Link>
         </div>
       </Reveal>
@@ -52,8 +56,8 @@ export default function QuizPage() {
         <h2 className="font-serif text-base font-medium text-fg">{t("quiz.readTitle", lang)}</h2>
         <p className="mt-1.5 text-sm leading-relaxed text-muted">{t("quiz.readDesc", lang)}</p>
         <div className="mt-4">
-          <Link href="/read">
-            <TactileButton variant="gold">{t("quiz.enter", lang)} →</TactileButton>
+          <Link href="/read" className="nz-btn">
+            {t("quiz.enter", lang)} →
           </Link>
         </div>
       </Reveal>

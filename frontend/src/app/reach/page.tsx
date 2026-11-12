@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { getReachStats } from "@/lib/api";
 import { t, useLang } from "@/lib/i18n";
 import { Reveal, CountUp } from "@/lib/motion";
+import BrandGlyph from "@/components/BrandGlyph";
 import type { ReachStats } from "@/lib/types";
 
 export default function ReachPage() {
@@ -34,7 +35,7 @@ export default function ReachPage() {
       <Reveal as="section" delay={0} className="rounded-2xl border border-line bg-surface p-5">
         <div className="flex items-center gap-2.5">
           <span className="seal inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md font-serif text-xs leading-none">
-            {t("brand.short", lang)}
+            <BrandGlyph className="text-[18px]" />
           </span>
           <span className="text-xs tracking-[0.25em] text-accent">{t("reach.kicker", lang)}</span>
         </div>

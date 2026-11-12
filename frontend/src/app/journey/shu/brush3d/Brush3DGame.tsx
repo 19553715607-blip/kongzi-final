@@ -89,7 +89,7 @@ export default function Brush3DGame() {
 
   const loadAll = useCallback(() => {
     getShuToday(lang).then(setToday).catch(() => setLoadErr(gt("无法加载书艺字卡，请稍后重试", getLang())));
-    getShuProgress().then(setProgress).catch(() => {});
+    getShuProgress(lang).then(setProgress).catch(() => {});
   }, [lang]);
   useEffect(() => { loadAll(); }, [loadAll]);
 
@@ -155,11 +155,11 @@ export default function Brush3DGame() {
     sfx.submitBell();
     setPhase("submitting");
     try {
-      const res = await traceShuCard(current.id, fin.strokes, fin.durationMs, fin.score, fin.precision, fin.recall);
+      const res = await traceShuCard(current.id, fin.strokes, fin.durationMs, fin.score, fin.precision, fin.recall, getLang());
       setResult(res);
       sfx.finish(res.score);
       setPhase("scored");
-      getShuProgress().then(setProgress).catch(() => {});
+      getShuProgress(lang).then(setProgress).catch(() => {});
       getShuToday(lang).then(setToday).catch(() => {});
     } catch {
       say(gt("提交失败 — 请检查登录/网络", getLang()), false);
@@ -219,9 +219,9 @@ export default function Brush3DGame() {
             <div className="mt-1 text-xs text-muted">{gt("执笔写大字 · 墨入宣纸 · 交卷定品第", lang)}</div>
           </div>
           <div className="flex flex-wrap items-center gap-2 text-xs text-muted">
-            {progress && <Stat label={gt("称号", lang)} value={progress.title} />}
+            {progress && <Stat label={gt("称号", lang)} value={gt(progress.title, lang)} />}
             {progress && <Stat label={gt("书艺", lang)} value={`${progress.liuyi_shu}`} numeric />}
-            <Link href="/journey/shu" className="rounded-full border border-line px-3 py-1.5 text-xs text-muted hover:bg-surface-2">
+            <Link href="/journey/shu" className="chip">
               {gt("← 书艺", lang)}
             </Link>
           </div>

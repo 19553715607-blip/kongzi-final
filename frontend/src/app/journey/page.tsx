@@ -177,11 +177,7 @@ export default function JourneyPage() {
           <button
             onClick={doCheckin}
             disabled={busy || p.checked_in_today}
-            className={`rounded-full px-4 py-1.5 text-sm ${
-              p.checked_in_today
-                ? "bg-surface-2 text-faint"
-                : "bg-accent text-on-accent hover:opacity-90"
-            }`}
+            className="btn btn-primary"
           >
             {p.checked_in_today ? t("jrn.checkedToday", lang) : t("jrn.checkin", lang)}
           </button>
@@ -238,9 +234,7 @@ export default function JourneyPage() {
                 <button
                   onClick={() => doTask(task.id)}
                   disabled={busy || task.done}
-                  className={`rounded-full px-3 py-1.5 text-xs ${
-                    task.done ? "bg-cel-soft text-cel-ink" : "bg-accent text-on-accent"
-                  }`}
+                  className={`chip ${task.done ? "" : "chip-accent"}`}
                 >
                   {task.done ? t("jrn.done", lang) : t("jrn.todo", lang)}
                 </button>
@@ -426,12 +420,14 @@ function LeaderRow({ row }: { row: { rank: number; name: string; total: number; 
   const [lang] = useLang();
   const rankPill =
     row.rank === 1
-      ? { text: "状元", cls: "border-gold bg-accent-soft text-accent-ink" }
+      ? { text: t("jrn.rank.first", lang), cls: "border-gold bg-accent-soft text-accent-ink" }
       : row.rank === 2
-        ? { text: "榜眼", cls: "border-line bg-surface-2 text-muted" }
+        ? { text: t("jrn.rank.second", lang), cls: "border-line bg-surface-2 text-muted" }
         : row.rank === 3
-          ? { text: "探花", cls: "border-line bg-surface-2 text-muted" }
+          ? { text: t("jrn.rank.third", lang), cls: "border-line bg-surface-2 text-muted" }
           : null;
+  // 游客账号在库里统一叫「小君子」，展示层按语言覆盖
+  const name = row.name === "小君子" ? t("user.guestName", lang) : row.name;
   return (
     <div
       className={`flex items-center gap-3 rounded-lg px-3 py-2 ${
@@ -449,7 +445,7 @@ function LeaderRow({ row }: { row: { rank: number; name: string; total: number; 
       </div>
       <div className="flex-1">
         <div className={`text-sm ${row.is_self ? "font-medium text-accent-ink" : "text-fg"}`}>
-          {row.name}{row.is_self && t("jrn.you", lang)}
+          {name}{row.is_self && t("jrn.you", lang)}
         </div>
         <div className="mt-0.5 flex flex-wrap gap-1 text-[9px] text-muted">
           {[

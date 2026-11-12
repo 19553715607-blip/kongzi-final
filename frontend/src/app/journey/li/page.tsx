@@ -58,8 +58,8 @@ export default function LiGamePage() {
   const [lang] = useLang();
 
   const refresh = useCallback(() => {
-    getLiHostToday().then(setToday).catch((e) => setErr(isAuthError(e) ? t("common.loginRequired", lang) : gt("无法加载礼艺场景，请稍后重试", lang) + `（${errorHint(e)}）`));
-    getLiHostLeaderboard(8).then(setBoard).catch(() => {});
+    getLiHostToday(lang).then(setToday).catch((e) => setErr(isAuthError(e) ? t("common.loginRequired", lang) : gt("无法加载礼艺场景，请稍后重试", lang) + `（${errorHint(e)}）`));
+    getLiHostLeaderboard(8, lang).then(setBoard).catch(() => {});
   }, [lang]);
 
   useEffect(refresh, [refresh]);
@@ -84,7 +84,7 @@ export default function LiGamePage() {
     setDetail(d);
     setView("result");
     try {
-      const r = await submitLiHostResult(currentKey, s);
+      const r = await submitLiHostResult(currentKey, s, lang);
       setResult(r);
     } catch {
       setErr(gt("结算上报失败，分数未入账", lang));
@@ -123,7 +123,7 @@ export default function LiGamePage() {
                 setErr("");
                 refresh();
               }}
-              className="pressable shrink-0 rounded-full bg-surface px-2.5 py-1 text-accent"
+              className="chip chip-accent shrink-0"
             >
               {gt("再试一次", lang)}
             </button>
@@ -276,7 +276,7 @@ function HubView({
         <section className="rounded-lg border border-line bg-surface p-4">
           <div className="mb-3 flex items-baseline justify-between">
             <div className="font-serif text-base text-fg">{t("执礼排行")}</div>
-            <div className="text-[10px] text-faint">{board.note}</div>
+            <div className="text-[10px] text-faint">{t(board.note)}</div>
           </div>
           <div className="space-y-1.5">
             {board.items.map((it) => (
@@ -287,7 +287,7 @@ function HubView({
                 }`}
               >
                 <span className="w-6 font-serif text-faint">{it.rank}</span>
-                <span className="flex-1 font-medium">{it.name}</span>
+                <span className="flex-1 font-medium">{t(it.name)}</span>
                 <span className="font-serif" style={{ color: GRADE_COLOR[it.best_grade] ?? "#6b7280" }}>
                   {it.best_total}
                 </span>
@@ -409,11 +409,11 @@ function ResultView({
         <button
           type="button"
           onClick={onShare}
-          className="flex-1 rounded-lg border border-line bg-surface py-3 text-sm text-fg hover:bg-surface-2"
+          className="btn btn-outline btn-lg flex-1"
         >
           {t("分享成绩")}
         </button>
-        <button type="button" onClick={onBack} className="flex-1 rounded-lg bg-accent py-3 text-sm font-medium text-on-accent">
+        <button type="button" onClick={onBack} className="btn btn-primary btn-lg flex-1">
           {t("回到修行场")}
         </button>
       </div>

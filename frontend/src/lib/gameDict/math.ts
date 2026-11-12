@@ -440,4 +440,15 @@ export const MATH: Record<string, E> = {
     es: "Digno de 'Equilibrio': números y sentido concuerdan, acercándose al juicio de gobierno del cálculo.",
     ar: "يُقال له «الميزان»: وافق الحسابُ والوجدان، وقارب حكم السياسة في فنّ الحساب.",
   },
+
+  // —— HUD 引导与目标句 ——
+  "把": { en: "distribute", fr: "répartir", es: "repartir", ar: "وزّع" },
+  "总": { en: "Total", fr: "Total", es: "Total", ar: "الإجمالي" },
+  "按各项指标比例分入各村": { en: "among the villages by each indicator's ratio", fr: "entre les villages au prorata de chaque indicateur", es: "entre las aldeas según la proporción de cada indicador", ar: "على القرى بنسبة كل مؤشر" },
+  "分完封仓验收": { en: "seal and inspect once all is allotted", fr: "sceller et vérifier une fois tout réparti", es: "sellar y revisar cuando todo esté repartido", ar: "ثم أختم المخازن وافحص بعد اكتمال التوزيع" },
+  "按题分粮 · 金框为当前村": { en: "Allot grain by the tally · gold frame marks the current village", fr: "Répartir selon le calcul · le cadre doré marque le village courant", es: "Reparte según el cálculo · el marco dorado señala la aldea actual", ar: "وزّع الحبوب حسب الحساب · الإطار الذهبي للقرية الحالية" },
+  "怎么玩": { en: "How to play", fr: "Comment jouer", es: "Cómo jugar", ar: "كيف تلعب" },
+  "←→ 或 ◀▶ 选村": { en: "←→ or ◀▶: choose a village", fr: "←→ ou ◀▶ : choisir un village", es: "←→ o ◀▶: elegir aldea", ar: "←→ أو ◀▶: اختر قرية" },
+  "↑ 按住出粮 · ↓ 回粮": { en: "↑ hold to pour grain · ↓ return it", fr: "↑ maintenir pour verser · ↓ reprendre", es: "↑ mantén para verter · ↓ devolver", ar: "↑ اضغط للصبّ · ↓ لإرجاع الحبوب" },
+  "粮分完 → 封仓验收": { en: "All grain allotted → seal and inspect", fr: "Tout réparti → sceller et vérifier", es: "Todo repartido → sellar y revisar", ar: "اكتمل التوزيع → أختم وافحص" },
 };

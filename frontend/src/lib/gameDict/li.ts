@@ -1009,4 +1009,13 @@ export const LI: Record<string, E> = {
   '朋友': { en: 'Friends', fr: 'Amis', es: 'Amigos', ar: 'أصدقاء' },
   '家庭': { en: 'Family', fr: 'Famille', es: 'Familia', ar: 'عائلة' },
   '公共': { en: 'Public', fr: 'Public', es: 'Público', ar: 'عام' },
+
+  // —— 3D 场景外壳补遗 ——
+  '礼仪进程': { en: 'Rite progress', fr: 'Progression du rite', es: 'Progreso del rito', ar: 'تقدّم الطقس' },
+  '按住按钮作揖 · 松手定深浅': { en: 'Hold to bow · release to set the depth', fr: 'Maintenez pour saluer · relâchez pour régler la profondeur', es: 'Mantén para inclinarte · suelta para fijar la profundidad', ar: 'اضغط للانحناء · ارفع لتحديد العمق' },
+  '按住空格作揖 · 松手定深浅': { en: 'Hold Space to bow · release to set the depth', fr: 'Maintenez Espace pour saluer · relâchez pour régler la profondeur', es: 'Mantén Espacio para inclinarte · suelta para fijar la profundidad', ar: 'اضغط المسافة للانحناء · ارفع لتحديد العمق' },
+  '无法加载礼艺场景，请稍后重试': { en: 'Could not load the rites scene — please try again later', fr: 'Impossible de charger la scène des rites — réessayez plus tard', es: 'No se pudo cargar la escena de ritos; inténtalo más tarde', ar: 'تعذّر تحميل مشهد الطقوس — أعد المحاولة لاحقًا' },
+  '宾至如归': { en: 'Guests feel at home', fr: 'Comme à la maison', es: 'Como en casa', ar: 'ضيوف كأنهم في ديارهم' },
+  '排行按执礼单局最高分': { en: 'Ranked by best single-round score in the rites game', fr: 'Classement selon le meilleur score sur une manche', es: 'Clasificación por la mejor puntuación de una ronda', ar: 'الترتيب حسب أفضل نتيجة لجولة واحدة' },
+  '小君子': { en: 'Little Junzi', fr: 'Petit Junzi', es: 'Pequeño Junzi', ar: 'جونزي الصغير' },
 };

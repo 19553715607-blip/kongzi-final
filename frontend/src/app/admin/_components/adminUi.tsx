@@ -3,6 +3,7 @@
 import { ReactNode, useEffect } from "react";
 import { TactileButton } from "@/components/museum";
 import { useReducedMotion } from "@/lib/motion";
+import Icon from "@/components/ui/Icon";
 
 // ── 共享管理 UI：Modal / ConfirmDialog / Drawer ──────────────────
 // 全部使用逻辑属性（ms-/me-/ps-/pe-/start-/end-/border-s-/border-e-），
@@ -49,9 +50,9 @@ export function Modal({
             <button
               onClick={onClose}
               aria-label="close"
-              className="rounded-md px-2 py-1 text-muted hover:bg-surface-2 hover:text-fg"
+              className="btn btn-quiet btn-sm btn-icon"
             >
-              ✕
+              <Icon name="close" size={15} />
             </button>
           </div>
         )}
@@ -142,9 +143,9 @@ export function Drawer({
           <button
             onClick={onClose}
             aria-label="close"
-            className="rounded-md px-2 py-1 text-muted hover:bg-surface-2 hover:text-fg"
+            className="btn btn-quiet btn-sm btn-icon"
           >
-            ✕
+            <Icon name="close" size={15} />
           </button>
         </div>
         {children}

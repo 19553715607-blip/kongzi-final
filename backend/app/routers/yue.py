@@ -284,6 +284,7 @@ def play(
 def progress(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
+    lang: str = Query("zh"),
 ) -> dict:
     answers = db.execute(
         select(YueAnswer).where(YueAnswer.user_id == user.id).order_by(YueAnswer.id.desc())
@@ -306,7 +307,7 @@ def progress(
     all_scenarios = db.execute(select(YueScenario).order_by(YueScenario.sort_order)).scalars().all()
     scenarios = [
         {
-            **_scenario_brief(s, s.id in played_ids),
+            **_scenario_brief(s, s.id in played_ids, lang),
             "best_score": max((a.score for a in answers if a.scenario_id == s.id), default=0),
         }
         for s in all_scenarios

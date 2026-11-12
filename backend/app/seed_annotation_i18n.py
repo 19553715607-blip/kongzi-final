@@ -205,6 +205,81 @@ ANNOTATION_I18N: dict[tuple[str, str], dict[str, str]] = {
 }
 
 
+# 注疏出处标签（Annotation.source）→ 各语种译名。
+# 早期 seed 只写了中文 source，`/read` 等页面在非 zh 下会直接显示中文出处。
+SOURCE_I18N: dict[str, dict[str, str]] = {
+    "现代释义": {
+        "en": "Modern interpretation", "fr": "Interprétation moderne",
+        "es": "Interpretación moderna", "ar": "تفسير معاصر",
+    },
+    "编者": {
+        "en": "Editor", "fr": "Rédacteur", "es": "Redactor", "ar": "المحرر",
+    },
+    "孔颖达疏": {
+        "en": "Kong Yingda's subcommentary",
+        "fr": "Sous-commentaire de Kong Yingda",
+        "es": "Subcomentario de Kong Yingda",
+        "ar": "شرح كونغ ينغدا",
+    },
+    "朱熹": {
+        "en": "Zhu Xi", "fr": "Zhu Xi", "es": "Zhu Xi", "ar": "تشو شي",
+    },
+    "朱熹《论语集注》": {
+        "en": "Zhu Xi, Collected Commentaries on the Analects",
+        "fr": "Zhu Xi, Commentaires réunis sur les Entretiens",
+        "es": "Zhu Xi, Comentarios reunidos sobre las Analectas",
+        "ar": "تشو شي، الشروح المجموعة على المحاورات",
+    },
+    "朱熹《孟子集注》": {
+        "en": "Zhu Xi, Collected Commentaries on the Mencius",
+        "fr": "Zhu Xi, Commentaires réunis sur le Mencius",
+        "es": "Zhu Xi, Comentarios reunidos sobre el Mencio",
+        "ar": "تشو شي، الشروح المجموعة على منسيوس",
+    },
+    "郑玄注": {
+        "en": "Zheng Xuan's commentary", "fr": "Commentaire de Zheng Xuan",
+        "es": "Comentario de Zheng Xuan", "ar": "شرح تشنغ شيوان",
+    },
+    "刘徽注": {
+        "en": "Liu Hui's commentary", "fr": "Commentaire de Liu Hui",
+        "es": "Comentario de Liu Hui", "ar": "شرح ليو هوي",
+    },
+    "李淳风注": {
+        "en": "Li Chunfeng's commentary", "fr": "Commentaire de Li Chunfeng",
+        "es": "Comentario de Li Chunfeng", "ar": "شرح لي تشونفنغ",
+    },
+    "尹知章注": {
+        "en": "Yin Zhizhang's commentary", "fr": "Commentaire de Yin Zhizhang",
+        "es": "Comentario de Yin Zhizhang", "ar": "شرح يين تشيتشانغ",
+    },
+    "杨倞注": {
+        "en": "Yang Jing's commentary", "fr": "Commentaire de Yang Jing",
+        "es": "Comentario de Yang Jing", "ar": "شرح يانغ جينغ",
+    },
+}
+
+
+def apply_source_i18n(db: Session) -> int:
+    """按 source 中文标签补齐 source_i18n，已有语种不动。"""
+    updated = 0
+    for src, want in SOURCE_I18N.items():
+        rows = db.execute(
+            select(Annotation).where(Annotation.source == src)
+        ).scalars().all()
+        for a in rows:
+            i18n = dict(a.source_i18n or {})
+            changed = False
+            for lang, text in want.items():
+                if lang in LANGS and text and not i18n.get(lang):
+                    i18n[lang] = text
+                    changed = True
+            if changed:
+                a.source_i18n = i18n
+                flag_modified(a, "source_i18n")
+                updated += 1
+    return updated
+
+
 def apply_annotation_i18n(db: Session) -> dict:
     """按 (passage_id, type) 补齐注文译文，已有语种不动。"""
     counts = {"checked": 0, "updated": 0, "langs": 0}
@@ -227,5 +302,6 @@ def apply_annotation_i18n(db: Session) -> dict:
                 a.content_i18n = i18n
                 flag_modified(a, "content_i18n")
                 counts["updated"] += 1
+    counts["sources"] = apply_source_i18n(db)
     db.commit()
     return counts

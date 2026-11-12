@@ -1,11 +1,12 @@
 "use client";
 
-import { ReactNode, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { downloadAdminUsersCsv } from "@/lib/api";
 import { t, useLang } from "@/lib/i18n";
 import { useReducedMotion } from "@/lib/motion";
 import { toast } from "@/components/Toast";
+import Icon, { type IconName } from "@/components/ui/Icon";
 
 // ── 全局命令面板：⌘K / Ctrl+K 唤起，搜索跳转任意管理页 + 常用动作 ──
 // 独立组件；ESC 关闭，方向键选择，Enter 执行；reduced-motion 下不做动画。
@@ -14,90 +15,21 @@ type CmdItem =
   | { kind: "page"; label: string; href: string; icon: string; hint?: string }
   | { kind: "action"; label: string; icon: string; run: () => void };
 
-// 极简 16px 线性图标（stroke=currentColor），不引新依赖
-const ICONS: Record<string, ReactNode> = {
-  dash: (
-    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4">
-      <rect x="2" y="2" width="5" height="5" rx="1" />
-      <rect x="9" y="2" width="5" height="5" rx="1" />
-      <rect x="2" y="9" width="5" height="5" rx="1" />
-      <rect x="9" y="9" width="5" height="5" rx="1" />
-    </svg>
-  ),
-  users: (
-    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4">
-      <circle cx="6" cy="5.5" r="2.5" />
-      <path d="M1.8 13.5c.6-2.4 2.4-3.6 4.2-3.6s3.6 1.2 4.2 3.6" />
-      <circle cx="12" cy="6" r="1.8" />
-      <path d="M11.2 10.2c1.8.2 3 .6 3.6 2.3" />
-    </svg>
-  ),
-  game: (
-    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4">
-      <path d="M5 3.5h6a2.5 2.5 0 0 1 2.4 1.8l.9 3.2a2.6 2.6 0 0 1-4.3 2.6L9 9.5H7l-1 1.6a2.6 2.6 0 0 1-4.3-2.6l.9-3.2A2.5 2.5 0 0 1 5 3.5Z" />
-      <path d="M6 6v2M5 7h2M10 6.5h.01M11.5 8h.01" />
-    </svg>
-  ),
-  doc: (
-    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4">
-      <path d="M4 1.5h5L12.5 5v9.5H4V1.5Z" />
-      <path d="M9 1.5V5h3.5" />
-      <path d="M6.5 8.5h4M6.5 11h4" />
-    </svg>
-  ),
-  bell: (
-    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4">
-      <path d="M8 2a4 4 0 0 0-4 4c0 3-.8 4-.8 4h9.6s-.8-1-.8-4a4 4 0 0 0-4-4Z" />
-      <path d="M6.5 13.5a1.6 1.6 0 0 0 3 0" />
-    </svg>
-  ),
-  check: (
-    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4">
-      <rect x="2.5" y="2.5" width="11" height="11" rx="2" />
-      <path d="M5.5 8l2 2 3-4" />
-    </svg>
-  ),
-  build: (
-    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4">
-      <path d="M8 2v2M8 12v2M2 8h2M12 8h2M4.5 4.5l1.4 1.4M10.1 10.1l1.4 1.4M11.5 4.5l-1.4 1.4M5.9 10.1l-1.4 1.4" />
-      <circle cx="8" cy="8" r="2.2" />
-    </svg>
-  ),
-  gear: (
-    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4">
-      <circle cx="8" cy="8" r="2.2" />
-      <path d="M8 1.8v2M8 12.2v2M1.8 8h2M12.2 8h2M3.6 3.6l1.4 1.4M11 11l1.4 1.4M12.4 3.6L11 5M5 11l-1.4 1.4" />
-    </svg>
-  ),
-  eye: (
-    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4">
-      <path d="M1.5 8S4 3.5 8 3.5 14.5 8 14.5 8 12 12.5 8 12.5 1.5 8 1.5 8Z" />
-      <circle cx="8" cy="8" r="2" />
-    </svg>
-  ),
-  download: (
-    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4">
-      <path d="M8 2v8M5 7l3 3 3-3" />
-      <path d="M2.5 12.5h11" />
-    </svg>
-  ),
-  external: (
-    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4">
-      <path d="M6 3.5H3.5v9h9V10M9.5 2.5H13.5V6.5M13.5 2.5L7 9" />
-    </svg>
-  ),
-  trend: (
-    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4">
-      <path d="M2 13.5V2M2 13.5h12" />
-      <path d="M4 10l3-3 2.5 2L13 5" />
-    </svg>
-  ),
-  chat: (
-    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4">
-      <path d="M2.5 3.5h11v8H6l-3.5 3v-3H2.5v-8Z" />
-      <path d="M5.5 6.5h5M5.5 9h3" />
-    </svg>
-  ),
+// 图标取自全站唯一图标源（components/ui/Icon），与侧边栏同一套线条
+const ICONS: Record<string, IconName> = {
+  dash: "dashboard",
+  users: "users",
+  game: "game",
+  doc: "doc",
+  bell: "bell",
+  check: "review",
+  build: "institution",
+  gear: "settings",
+  eye: "eye",
+  download: "download",
+  external: "external",
+  trend: "trend",
+  chat: "chat",
 };
 
 export default function CommandPalette() {
@@ -227,7 +159,7 @@ export default function CommandPalette() {
         onMouseEnter={() => setActive(i)}
         onClick={() => choose(item)}
       >
-        <span className="cmd-ico">{ICONS[item.icon]}</span>
+        <span className="cmd-ico"><Icon name={ICONS[item.icon]} size={16} /></span>
         <span>{item.label}</span>
         <span className="cmd-tail">
           {item.kind === "page" ? t("admin.cmds.goto", lang) : t("admin.cmds.run", lang)}
@@ -246,10 +178,7 @@ export default function CommandPalette() {
         aria-label={t("admin.nav.title", lang)}
       >
         <div className="cmd-input-row">
-          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-            <circle cx="7" cy="7" r="4.5" />
-            <path d="M10.5 10.5L14 14" />
-          </svg>
+          <Icon name="search" size={16} />
           <input
             ref={inputRef}
             value={q}

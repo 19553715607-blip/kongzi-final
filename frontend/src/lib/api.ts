@@ -191,7 +191,8 @@ export const reviewContrib = (id: number, status: string) =>
 export const myContribs = () => authJSON<Contribution[]>("/api/v1/contributions/mine");
 
 // ── 插件清单 ───────────────────────────────────────────────────
-export const listPlugins = () => getJSON<{ total: number; items: PluginItem[] }>("/api/v1/embed/plugins");
+export const listPlugins = (lang = "zh") =>
+  getJSON<{ total: number; items: PluginItem[] }>(`/api/v1/embed/plugins?lang=${lang}`);
 
 // ── 传播看板 ───────────────────────────────────────────────────
 export const getReachStats = () => getJSON<ReachStats>("/api/v1/reach/stats");
@@ -199,22 +200,28 @@ export const getReachStats = () => getJSON<ReachStats>("/api/v1/reach/stats");
 // ── 礼之器游戏 ─────────────────────────────────────────────────
 export const getLiToday = (lang = "zh") =>
   authJSON<import("./types").LiTodayResp>(`/api/v1/li/today?lang=${lang}`);
-export const getLiProgress = () =>
-  authJSON<import("./types").LiProgressResp>("/api/v1/li/progress");
+export const getLiProgress = (lang = "zh") =>
+  authJSON<import("./types").LiProgressResp>(`/api/v1/li/progress?lang=${lang}`);
 export const chooseLiOption = (sid: number, optionKey: string, lang = "zh") =>
   authJSON<import("./types").LiChooseResp>(`/api/v1/li/scenario/${sid}/choose?lang=${lang}`, {
     method: "POST",
     body: JSON.stringify({ option_key: optionKey }),
   });
-export const getLiHostToday = () =>
-  authJSON<import("./types").LiHostTodayResp>("/api/v1/li/host/today");
-export const submitLiHostResult = (key: string, scores: import("./types").LiHostScores) =>
-  authJSON<import("./types").LiHostResultResp>(`/api/v1/li/host/${key}/result`, {
+export const getLiHostToday = (lang = "zh") =>
+  authJSON<import("./types").LiHostTodayResp>(`/api/v1/li/host/today?lang=${lang}`);
+export const submitLiHostResult = (
+  key: string,
+  scores: import("./types").LiHostScores,
+  lang = "zh",
+) =>
+  authJSON<import("./types").LiHostResultResp>(`/api/v1/li/host/${key}/result?lang=${lang}`, {
     method: "POST",
     body: JSON.stringify(scores),
   });
-export const getLiHostLeaderboard = (limit = 10) =>
-  authJSON<import("./types").LiHostLeaderboardResp>(`/api/v1/li/host/leaderboard?limit=${limit}`);
+export const getLiHostLeaderboard = (limit = 10, lang = "zh") =>
+  authJSON<import("./types").LiHostLeaderboardResp>(
+    `/api/v1/li/host/leaderboard?limit=${limit}&lang=${lang}`,
+  );
 
 // ── 书艺游戏 ───────────────────────────────────────────────────
 export const getShuToday = (lang = "zh") =>
@@ -224,8 +231,8 @@ export const answerShuCard = (cardId: number, optionKey: string, lang = "zh") =>
     method: "POST",
     body: JSON.stringify({ option_key: optionKey }),
   });
-export const assembleShuCard = (cardId: number, parts: string[]) =>
-  authJSON<import("./types").ShuAssembleResp>(`/api/v1/shu/card/${cardId}/assemble`, {
+export const assembleShuCard = (cardId: number, parts: string[], lang = "zh") =>
+  authJSON<import("./types").ShuAssembleResp>(`/api/v1/shu/card/${cardId}/assemble?lang=${lang}`, {
     method: "POST",
     body: JSON.stringify({ parts }),
   });
@@ -236,8 +243,9 @@ export const traceShuCard = (
   score: number = 0,
   precision: number = 0,
   recall: number = 0,
+  lang = "zh",
 ) =>
-  authJSON<import("./types").ShuTraceResp>(`/api/v1/shu/card/${cardId}/trace`, {
+  authJSON<import("./types").ShuTraceResp>(`/api/v1/shu/card/${cardId}/trace?lang=${lang}`, {
     method: "POST",
     body: JSON.stringify({
       strokes,
@@ -247,8 +255,8 @@ export const traceShuCard = (
       recall,
     }),
   });
-export const getShuProgress = () =>
-  authJSON<import("./types").ShuProgressResp>("/api/v1/shu/progress");
+export const getShuProgress = (lang = "zh") =>
+  authJSON<import("./types").ShuProgressResp>(`/api/v1/shu/progress?lang=${lang}`);
 export const getShuLeaderboard = (limit = 20) =>
   getJSON<import("./types").ShuLeaderboardResp>(`/api/v1/shu/leaderboard?limit=${limit}`);
 
@@ -271,8 +279,8 @@ export const driveYuScenario = (
     method: "POST",
     body: JSON.stringify({ trajectory, events }),
   });
-export const getYuProgress = () =>
-  authJSON<import("./types").YuProgressResp>("/api/v1/yu/progress");
+export const getYuProgress = (lang = "zh") =>
+  authJSON<import("./types").YuProgressResp>(`/api/v1/yu/progress?lang=${lang}`);
 
 // ── 数艺·均输衰分 ──────────────────────────────────────────────
 export const getMathToday = (lang = "zh") =>
@@ -286,8 +294,8 @@ export const solveMathScenario = (
     method: "POST",
     body: JSON.stringify({ allocations }),
   });
-export const getMathProgress = () =>
-  authJSON<import("./types").MathProgressResp>("/api/v1/math/progress");
+export const getMathProgress = (lang = "zh") =>
+  authJSON<import("./types").MathProgressResp>(`/api/v1/math/progress?lang=${lang}`);
 
 // ── 乐艺·五音合鸣 ──────────────────────────────────────────────
 export const getYueToday = (lang = "zh") =>
@@ -297,19 +305,19 @@ export const playYueScenario = (sid: number, sequence: import("./types").YueNote
     method: "POST",
     body: JSON.stringify({ sequence }),
   });
-export const getYueProgress = () =>
-  authJSON<import("./types").YueProgressResp>("/api/v1/yue/progress");
+export const getYueProgress = (lang = "zh") =>
+  authJSON<import("./types").YueProgressResp>(`/api/v1/yue/progress?lang=${lang}`);
 
 // ── 射艺游戏 ───────────────────────────────────────────────────
-export const startSheRound = () =>
-  authJSON<import("./types").SheRoundResp>("/api/v1/she/round", { method: "POST" });
-export const submitSheResult = (body: import("./types").SheResultIn) =>
-  authJSON<import("./types").SheResultResp>("/api/v1/she/result", {
+export const startSheRound = (lang = "zh") =>
+  authJSON<import("./types").SheRoundResp>(`/api/v1/she/round?lang=${lang}`, { method: "POST" });
+export const submitSheResult = (body: import("./types").SheResultIn, lang = "zh") =>
+  authJSON<import("./types").SheResultResp>(`/api/v1/she/result?lang=${lang}`, {
     method: "POST",
     body: JSON.stringify(body),
   });
-export const getSheProgress = () =>
-  authJSON<import("./types").SheProgressResp>("/api/v1/she/progress");
+export const getSheProgress = (lang = "zh") =>
+  authJSON<import("./types").SheProgressResp>(`/api/v1/she/progress?lang=${lang}`);
 export const getSheLeaderboard = (metric = "reflection", limit = 20) =>
   getJSON<import("./types").SheLeaderboardResp>(
     `/api/v1/she/leaderboard?metric=${metric}&limit=${limit}`,
@@ -352,9 +360,9 @@ export const reviewCase = (
 // promoteSelfAdmin 已移除：admin 通过后端 ADMIN_EMAILS 白名单授予
 
 // ── 知识图谱 ───────────────────────────────────────────────────
-export const getNeighborhood = (nodeId: string, depth = 2) =>
+export const getNeighborhood = (nodeId: string, depth = 2, lang = "zh") =>
   getJSON<GraphData>(
-    `/api/v1/graph/concept/${encodeURIComponent(nodeId)}/neighborhood?depth=${depth}`,
+    `/api/v1/graph/concept/${encodeURIComponent(nodeId)}/neighborhood?depth=${depth}&lang=${lang}`,
   );
 export const getPath = (from: string, to: string) =>
   getJSON<GraphData>(

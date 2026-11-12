@@ -474,7 +474,7 @@ export default function Li3DGame({
           }}
         >
           <Suspense fallback={null}>
-            <CourtyardScene atmosphere={atmosphere} />
+            <CourtyardScene atmosphere={atmosphere} title={t("宾至如归")} />
             {guests.map((g, i) => (
               <GuestNPC
                 key={g.id}

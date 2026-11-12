@@ -263,18 +263,6 @@ export const SHE: Record<string, E> = {
     es: "Clásicos de arquería ·",
     ar: "كلاسيكيات الرماية ·",
   },
-  "✓ 已解锁": {
-    en: "✓ Unlocked",
-    fr: "✓ Débloqué",
-    es: "✓ Desbloqueado",
-    ar: "✓ فُتح",
-  },
-  "🔒 未解锁": {
-    en: "🔒 Locked",
-    fr: "🔒 Verrouillé",
-    es: "🔒 Bloqueado",
-    ar: "🔒 مقفل",
-  },
   反省归因分布: {
     en: "Reflection breakdown",
     fr: "Répartition des réflexions",

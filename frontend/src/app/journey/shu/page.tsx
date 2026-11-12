@@ -45,7 +45,7 @@ export default function ShuJourneyPage() {
 
   const load = () => {
     getShuToday(lang).then(setToday).catch((e) => setErr(gt("无法加载书艺内容，请稍后重试", getLang()) + `（${errorHint(e)}）`));
-    getShuProgress().then(setProgress).catch(() => {});
+    getShuProgress(lang).then(setProgress).catch(() => {});
   };
   useEffect(load, [lang]);
 
@@ -56,7 +56,7 @@ export default function ShuJourneyPage() {
       const r = await answerShuCard(card.id, optionKey, lang);
       setResults((prev) => ({ ...prev, [card.id]: r }));
       // 异步刷新 progress
-      getShuProgress().then(setProgress).catch(() => {});
+      getShuProgress(lang).then(setProgress).catch(() => {});
     } catch {
       setErr(gt("提交失败 — 网络异常", getLang()));
     } finally {
@@ -91,14 +91,14 @@ export default function ShuJourneyPage() {
             </div>
           </div>
           <div className="flex flex-wrap gap-3 text-xs text-muted">
-            <Stat label={gt("称号", lang)} value={progress.title} />
+            <Stat label={gt("称号", lang)} value={gt(progress.title, lang)} />
             <Stat label={gt("书艺", lang)} value={`${progress.liuyi_shu}`} numeric />
             <Stat label={gt("已学", lang)} value={`${progress.correct_cards} / ${progress.total_cards}`} />
             <Stat label={gt("正确率", lang)} value={`${Math.round(progress.correct_rate * 100)}%`} />
           </div>
           <Link
             href="/journey"
-            className="rounded-full border border-line px-3 py-1.5 text-xs text-muted hover:bg-surface-2"
+            className="chip"
           >
             {gt("← 六艺", lang)}
           </Link>
@@ -181,7 +181,7 @@ export default function ShuJourneyPage() {
         </div>
         {today.cards.length === 0 ? (
           <div className="empty-state">
-            <div className="icon-plate">✦</div>
+            <div className="icon-plate">字</div>
             <div className="state-title">{gt("已学完今日字卡", lang)}</div>
             <p className="state-sub">
               {gt("没有可学的字了 — 你已学完全部 {n} 字 🎉", lang).replace("{n}", String(progress.total_cards))}

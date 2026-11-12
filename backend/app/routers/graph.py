@@ -19,13 +19,14 @@ def meta() -> dict:
 def neighborhood(
     node_id: str,
     depth: int = Query(2, ge=1, le=4),
+    lang: str = Query("zh"),
     db: Session = Depends(get_db),
 ) -> dict:
     """返回以某节点为中心、depth 跳内的子图。node_id 可为任意类型节点。"""
     store = get_graph_store(db)
     if store.node(node_id) is None:
         raise HTTPException(404, f"node {node_id} not found")
-    return store.neighborhood(node_id, depth)
+    return store.neighborhood(node_id, depth, lang)
 
 
 @router.get("/path")

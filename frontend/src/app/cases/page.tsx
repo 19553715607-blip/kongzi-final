@@ -104,9 +104,7 @@ export default function CasesPage() {
               setTopicId(null);
               setPage(1);
             }}
-            className={`pressable rounded-full px-2.5 py-1 text-xs ${
-              topicId === null ? "bg-accent text-on-accent" : "border border-line text-muted"
-            }`}
+            className={`chip pressable ${topicId === null ? "chip-accent" : ""}`}
           >
             {t("cases.all", lang)}
           </button>
@@ -117,10 +115,7 @@ export default function CasesPage() {
                 setTopicId(tp.id);
                 setPage(1);
               }}
-              className={`pressable rounded-full px-2.5 py-1 text-xs ${
-                topicId === tp.id ? "text-white" : "border border-line text-muted"
-              }`}
-              style={topicId === tp.id ? { background: tp.color } : undefined}
+              className={`chip pressable ${topicId === tp.id ? "chip-accent" : ""}`}
             >
               {tp.name}
             </button>
@@ -184,7 +179,7 @@ export default function CasesPage() {
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page === 1}
-            className="pressable rounded-full border border-line px-3 py-1 text-muted disabled:opacity-40"
+            className="chip pressable disabled:opacity-40"
           >
             {t("cases.prev", lang)}
           </button>
@@ -197,7 +192,7 @@ export default function CasesPage() {
           <button
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page === totalPages}
-            className="pressable rounded-full border border-line px-3 py-1 text-muted disabled:opacity-40"
+            className="chip pressable disabled:opacity-40"
           >
             {t("cases.next", lang)}
           </button>

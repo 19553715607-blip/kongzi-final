@@ -74,7 +74,7 @@ export default function ShuWritePage() {
   // 启动
   useEffect(() => {
     getShuToday(lang).then((d) => setCards(d.cards)).catch(() => setErr(gt("无法加载题库", getLang())));
-    getShuProgress().then(setProgress).catch(() => {});
+    getShuProgress(lang).then(setProgress).catch(() => {});
   }, [lang]);
 
   const current = cards[idx];
@@ -210,9 +210,10 @@ export default function ShuWritePage() {
         score,
         1.0,                          // precision — 完成 quiz 即"全在字内"
         1.0,                          // recall — 全部笔画都写过
+        lang,
       );
       setResult(r);
-      getShuProgress().then(setProgress).catch(() => {});
+      getShuProgress(lang).then(setProgress).catch(() => {});
     } catch {
       setErr(gt("提交失败", getLang()));
     } finally {
@@ -315,7 +316,7 @@ export default function ShuWritePage() {
           )}
           <Link
             href="/journey/shu"
-            className="rounded-full border border-line px-3 py-1.5 text-xs text-muted hover:bg-surface-2"
+            className="chip"
           >
             {gt("← 书艺", lang)}
           </Link>

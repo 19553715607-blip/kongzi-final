@@ -7,6 +7,7 @@ import { listPlugins } from "@/lib/api";
 import { t, useLang } from "@/lib/i18n";
 import { Reveal } from "@/lib/motion";
 import { TactileButton } from "@/components/museum";
+import BrandGlyph from "@/components/BrandGlyph";
 import type { PluginItem } from "@/lib/types";
 
 
@@ -25,13 +26,13 @@ export default function PluginsPage() {
   const [failed, setFailed] = useState(false);
 
   const load = useCallback(() => {
-    listPlugins()
+    listPlugins(lang)
       .then((r) => {
         setItems(r.items);
         setFailed(false);
       })
       .catch(() => setFailed(true));
-  }, []);
+  }, [lang]);
 
   useEffect(() => {
     load();
@@ -48,7 +49,7 @@ export default function PluginsPage() {
       <Reveal as="section" delay={0} className="rounded-2xl border border-line bg-surface p-5">
         <div className="flex items-center gap-2.5">
           <span className="seal inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md font-serif text-xs leading-none">
-            {t("brand.short", lang)}
+            <BrandGlyph className="text-[18px]" />
           </span>
           <span className="text-xs tracking-[0.25em] text-accent">{t("plugins.kicker", lang)}</span>
         </div>
@@ -118,13 +119,13 @@ export default function PluginsPage() {
                   </div>
                 </div>
                 <div className="relative">
-                  <pre className="overflow-x-auto rounded-lg bg-surface-2/50 p-2.5 text-[11px] leading-relaxed text-muted">
+                  <pre className="overflow-x-auto rounded-lg bg-surface-2/50 p-2.5 pt-7 text-[11px] leading-relaxed text-muted">
                     {p.snippet}
                   </pre>
                   <TactileButton
                     variant="ghost"
                     onClick={() => copy(p.id, p.snippet)}
-                    className="!absolute !end-1 !top-1 !rounded !px-2 !py-0.5 !text-[10px]"
+                    className="!absolute !end-1 !top-1 !h-6 !px-2 !text-[10px]"
                   >
                     {copied === p.id ? t("plugins.copied", lang) : t("plugins.copy", lang)}
                   </TactileButton>

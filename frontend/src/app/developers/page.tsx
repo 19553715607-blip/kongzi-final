@@ -7,6 +7,7 @@ import { applyForApi, getDeveloperMe } from "@/lib/api";
 import { t, useLang } from "@/lib/i18n";
 import { Reveal, CountUp } from "@/lib/motion";
 import { CollectionCard, TactileButton } from "@/components/museum";
+import BrandGlyph from "@/components/BrandGlyph";
 import type { DeveloperMe } from "@/lib/types";
 
 
@@ -56,7 +57,7 @@ export default function DevelopersPage() {
       <Reveal as="section" delay={0} className="rounded-2xl border border-line bg-surface p-6">
         <div className="flex items-center gap-2.5">
           <span className="seal inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md font-serif text-xs leading-none">
-            {t("brand.short", lang)}
+            <BrandGlyph className="text-[18px]" />
           </span>
           <span className="text-xs tracking-[0.25em] text-accent">{t("dev.kicker", lang)}</span>
         </div>
@@ -123,7 +124,7 @@ export default function DevelopersPage() {
                 </div>
                 <button
                   onClick={() => navigator.clipboard?.writeText(apiKey)}
-                  className="pressable rounded-full border border-line px-3 py-1 text-xs text-muted hover:bg-surface-2"
+                  className="chip pressable"
                 >
                   {t("dev.copyKey", lang)}
                 </button>
@@ -142,7 +143,7 @@ export default function DevelopersPage() {
                 <button
                   onClick={loadDashboard}
                   disabled={!probeKey}
-                  className="pressable rounded-full border border-line px-3 py-1 text-xs text-muted hover:bg-surface-2 disabled:opacity-40"
+                  className="chip pressable disabled:opacity-40"
                 >
                   {t("dev.query", lang)}
                 </button>
@@ -247,7 +248,7 @@ topics = r.json()`} />
                       onClick={() => {
                         navigator.clipboard?.writeText(fullUrl);
                       }}
-                      className="rounded-full border border-line px-2.5 py-1 text-[11px] text-muted hover:bg-surface-2 hover:text-fg"
+                      className="chip"
                     >
                       {t("dev.copyUrl", lang)}
                     </button>
@@ -255,7 +256,7 @@ topics = r.json()`} />
                       href={fullUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="rounded-full border border-line px-2.5 py-1 text-[11px] text-muted hover:bg-surface-2 hover:text-fg"
+                      className="chip"
                     >
                       {t("dev.tryIt", lang)} ↗
                     </a>

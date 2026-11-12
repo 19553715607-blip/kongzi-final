@@ -10,6 +10,7 @@ import {
 } from "@/lib/api";
 import type { Contribution, TopicBrief } from "@/lib/types";
 import { t, useLang } from "@/lib/i18n";
+import Icon from "@/components/ui/Icon";
 import { Reveal } from "@/lib/motion";
 import { TactileButton } from "@/components/museum";
 
@@ -189,9 +190,7 @@ export default function CoCreatePage() {
           <span className="text-xs text-faint">{t("co.topicPrefix", lang)}</span>
           <button
             onClick={() => setFilter(null)}
-            className={`pressable rounded-full px-2.5 py-1 text-xs ${
-              filter === null ? "bg-accent text-on-accent" : "border border-line text-muted"
-            }`}
+            className={`chip ${filter === null ? "chip-accent" : ""}`}
           >
             {t("co.all", lang)}
           </button>
@@ -199,10 +198,7 @@ export default function CoCreatePage() {
             <button
               key={tp.id}
               onClick={() => setFilter(tp.id)}
-              className={`pressable rounded-full px-2.5 py-1 text-xs ${
-                filter === tp.id ? "text-white" : "border border-line text-muted"
-              }`}
-              style={filter === tp.id ? { background: tp.color } : undefined}
+              className={`chip ${filter === tp.id ? "chip-accent" : ""}`}
             >
               {tp.name}
             </button>
@@ -212,9 +208,7 @@ export default function CoCreatePage() {
             <button
               key={s}
               onClick={() => setSort(s)}
-              className={`pressable rounded-full px-2.5 py-1 text-xs ${
-                sort === s ? "bg-accent-soft text-accent" : "bg-surface-2 text-faint"
-              }`}
+              className={`chip ${sort === s ? "chip-accent" : ""}`}
             >
               {s === "score" ? t("co.hot", lang) : t("co.latest", lang)}
             </button>
@@ -241,7 +235,7 @@ export default function CoCreatePage() {
                       onClick={() => vote(c.id, 1)}
                       className="pressable text-faint hover:text-accent disabled:opacity-40"
                     >
-                      ▲
+                      <Icon name="chevronDown" size={13} className="rotate-180" />
                     </button>
                     <span className="font-medium text-fg">{c.score}</span>
                     <button
@@ -249,7 +243,7 @@ export default function CoCreatePage() {
                       onClick={() => vote(c.id, -1)}
                       className="pressable text-faint hover:text-accent disabled:opacity-40"
                     >
-                      ▼
+                      <Icon name="chevronDown" size={13} />
                     </button>
                   </div>
                   <div className="flex-1">

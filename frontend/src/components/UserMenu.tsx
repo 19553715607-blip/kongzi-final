@@ -28,7 +28,7 @@ export default function UserMenu() {
     return (
       <Link
         href="/login"
-        className="whitespace-nowrap rounded-full border border-line px-3 py-1 text-xs text-muted hover:bg-surface-2"
+        className="btn btn-outline btn-sm"
       >
         {t("user.login", lang)}
       </Link>

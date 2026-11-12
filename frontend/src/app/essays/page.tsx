@@ -91,7 +91,7 @@ export default function EssaysPage() {
                 </h2>
                 <button
                   onClick={() => void doCitePack(pack)}
-                  className="pressable ms-auto rounded-full border border-line px-3 py-1 text-xs text-muted transition hover:border-accent hover:text-accent"
+                  className="chip pressable ms-auto"
                 >
                   {t("essays.citeAll", lang)}
                 </button>

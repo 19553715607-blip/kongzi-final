@@ -15,6 +15,8 @@ export type PageDef = {
   area: Area;
   /** 作为移动端底部 tab 的落地页（每个 area 至多一个） */
   tab?: boolean;
+  /** 底部 tab 的文案键；缺省取所属栏目名。页面名与栏目名不同时在此覆盖。 */
+  tabLabelKey?: string;
 };
 
 export type NavItem = { href: string; labelKey: string };
@@ -35,19 +37,25 @@ export const AREAS: { id: Area; labelKey: string }[] = [
  *   about   关于 —— 站点信息、共建与长尾工具
  */
 export const SITE_MAP: PageDef[] = [
-  // 探索
+  // 探索：先给平台最独特的入口，再给结构化路线，最后是轻阅读与长尾
   { href: "/graph", labelKey: "nav.graph", area: "explore" },
-  { href: "/journey", labelKey: "nav.journey", area: "explore", tab: true },
+  {
+    href: "/journey",
+    labelKey: "nav.journey",
+    area: "explore",
+    tab: true,
+    tabLabelKey: "nav.journey",
+  },
   { href: "/feed", labelKey: "nav.feed", area: "explore" },
   { href: "/cases", labelKey: "nav.cases", area: "explore" },
 
-  // 学习
-  { href: "/paths", labelKey: "nav.paths", area: "learn", tab: true },
+  // 学习：核心内容优先，其次路径与答疑，最后才是检验、写作与查阅类工具
   { href: "/read", labelKey: "nav.read", area: "learn" },
-  { href: "/essays", labelKey: "essays.title", area: "learn" },
+  { href: "/paths", labelKey: "nav.paths", area: "learn", tab: true },
   { href: "/chat", labelKey: "nav.chat", area: "learn" },
-  { href: "/terms", labelKey: "nav.terms", area: "learn" },
   { href: "/quiz", labelKey: "nav.quiz", area: "learn" },
+  { href: "/essays", labelKey: "essays.title", area: "learn" },
+  { href: "/terms", labelKey: "nav.terms", area: "learn" },
 
   // 关于
   { href: "/about", labelKey: "about.title", area: "about" },
@@ -126,7 +134,9 @@ export function breadcrumbOf(
 export function mobileTabs(): { href: string; labelKey: string; area?: Area }[] {
   const areaTabs = AREAS.map((a) => {
     const page = SITE_MAP.find((p) => p.area === a.id && p.tab);
-    return page ? { href: page.href, labelKey: a.labelKey, area: a.id } : null;
+    return page
+      ? { href: page.href, labelKey: page.tabLabelKey ?? a.labelKey, area: a.id }
+      : null;
   }).filter((x): x is { href: string; labelKey: string; area: Area } => x !== null);
 
   return [

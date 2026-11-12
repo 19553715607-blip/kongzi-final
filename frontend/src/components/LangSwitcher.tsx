@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { LANGS, t, useLang, type Lang } from "@/lib/i18n";
+import Icon from "./ui/Icon";
 
 /**
  * 语言切换：按国际惯例做成「地球图标 + ISO 639-1 语言代码 + 下拉」。
@@ -92,41 +93,19 @@ export default function LangSwitcher() {
         title={current.native}
         onClick={() => setOpen((o) => !o)}
         onKeyDown={onBtnKeyDown}
-        className="flex items-center gap-1.5 whitespace-nowrap rounded-full border border-line bg-surface px-2.5 py-1.5 text-[11px] text-muted transition hover:bg-surface-2 hover:text-fg"
+        className="btn btn-outline btn-sm"
       >
         {/* 地球图标是语言切换的通用标识；不用国旗——国旗代表国家而非语言 */}
-        <svg
-          width="13"
-          height="13"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.8"
-          strokeLinecap="round"
-          aria-hidden="true"
-          className="shrink-0"
-        >
-          <circle cx="12" cy="12" r="9" />
-          <path d="M3 12h18" />
-          <path d="M12 3c2.6 2.7 4 5.7 4 9s-1.4 6.3-4 9c-2.6-2.7-4-5.7-4-9s1.4-6.3 4-9z" />
-        </svg>
+        <Icon name="globe" size={14} />
         <span aria-hidden="true" className="tracking-[0.08em]">
           {current.label}
         </span>
-        <svg
-          width="9"
-          height="9"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          aria-hidden="true"
+        <Icon
+          name="chevronDown"
+          size={11}
+          strokeWidth={2}
           className={`transition-transform ${open ? "rotate-180" : ""}`}
-        >
-          <path d="M6 9l6 6 6-6" />
-        </svg>
+        />
       </button>
 
       {open && (
@@ -160,21 +139,7 @@ export default function LangSwitcher() {
                     {l.native}
                   </span>
                   <span className="text-[10px] tracking-[0.08em] text-faint">{l.label}</span>
-                  {on && (
-                    <svg
-                      width="12"
-                      height="12"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="3"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      aria-hidden="true"
-                    >
-                      <path d="M20 6L9 17l-5-5" />
-                    </svg>
-                  )}
+                  {on && <Icon name="check" size={12} strokeWidth={2.4} />}
                 </button>
               );
             })}

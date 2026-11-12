@@ -7,6 +7,7 @@ import { setToken } from "@/lib/auth";
 import { t, useLang } from "@/lib/i18n";
 import { Reveal } from "@/lib/motion";
 import { TactileButton } from "@/components/museum";
+import BrandGlyph from "@/components/BrandGlyph";
 
 type Mode = "login" | "register";
 
@@ -55,7 +56,7 @@ export default function LoginPage() {
         <section className="rounded-2xl border border-line bg-surface p-6">
           <div className="mb-3 flex items-center gap-2.5">
             <span className="seal inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md font-serif text-xs leading-none">
-              {t("brand.short", lang)}
+              <BrandGlyph className="text-[18px]" />
             </span>
             <span className="text-xs tracking-[0.25em] text-accent">{t("login.kicker", lang)}</span>
           </div>
@@ -73,7 +74,7 @@ export default function LoginPage() {
       <Reveal delay={80}>
         <form onSubmit={submit} className="space-y-3 rounded-2xl border border-line bg-surface p-5">
           {/* 登录 / 注册切换 */}
-          <div className="flex rounded-full bg-surface-2 p-0.5" role="tablist">
+          <div className="flex items-center gap-0.5 rounded-full border border-line p-0.5" role="tablist">
             {(["login", "register"] as Mode[]).map((m) => (
               <button
                 key={m}
@@ -84,8 +85,8 @@ export default function LoginPage() {
                   setMode(m);
                   setErr("");
                 }}
-                className={`flex-1 rounded-full px-3 py-1.5 text-xs transition ${
-                  mode === m ? "bg-accent text-on-accent" : "text-muted hover:text-fg"
+                className={`pressable flex-1 rounded-full px-3 py-1 text-[11px] transition ${
+                  mode === m ? "bg-accent text-bg" : "text-faint hover:text-fg"
                 }`}
               >
                 {t(m === "login" ? "login.tab.login" : "login.tab.register", lang)}

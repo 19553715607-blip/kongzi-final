@@ -291,6 +291,7 @@ def host_result(
     body: HostResultIn,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
+    lang: str = Query("zh"),
 ) -> dict:
     """一局结算：几何平均 → 五品 → 计分入账 + 经典解锁。同场景每日只计一次分。"""
     cfg = HOST_SCENARIOS.get(key)
@@ -345,7 +346,7 @@ def host_result(
     db.commit()
     db.refresh(user)
 
-    ref = _host_ref(db, cfg["ref_id"])
+    ref = _host_ref(db, cfg["ref_id"], lang)
     return {
         "total": total,
         "grade": grade,
@@ -354,7 +355,7 @@ def host_result(
         "qing_delta": qing_delta,
         "li_delta": li_delta,
         "xp_delta": xp_delta,
-        "new_unlocked_refs": [r for r in (_host_ref(db, rid) for rid in new_unlocked) if r],
+        "new_unlocked_refs": [r for r in (_host_ref(db, rid, lang) for rid in new_unlocked) if r],
         "scenario_ref": ref,
         "progress": {
             "ru_score": user.ru_score or 0,
@@ -425,6 +426,7 @@ def host_leaderboard(
 def progress(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
+    lang: str = Query("zh"),
 ) -> dict:
     """用户的礼游戏总进度。"""
     total_played = db.execute(

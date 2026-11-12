@@ -163,7 +163,7 @@ export default function AdminGamesPage() {
             <button
               key={a}
               onClick={() => { setGame(a); setRPage(1); }}
-              className={`pressable rounded-full px-3 py-1 text-xs ${game === a ? "bg-accent text-on-accent" : "border border-line text-muted"}`}
+              className={`chip ${game === a ? "chip-accent" : ""}`}
             >
               {a}
             </button>

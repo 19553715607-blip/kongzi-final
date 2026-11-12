@@ -93,6 +93,7 @@ export interface GraphNode {
   id: string;
   label: string;
   label_en: string | null;
+  label_zh?: string | null;
   type: "person" | "concept" | "passage" | "proposition" | "school";
   color: string;
   meta: Record<string, unknown>;

@@ -19,7 +19,7 @@ const TYPE_KEY: Record<string, string> = {
 };
 const TYPE_COLORS: Record<string, string> = {
   person: "#993C1D",
-  concept: "#0F6E56",
+  concept: "#8A6D2F",
   passage: "#854F0B",
   proposition: "#534AB7",
   school: "#1E5F8E",
@@ -114,7 +114,7 @@ export default function GraphPage() {
 
   useEffect(() => {
     setErr("");
-    getNeighborhood(center, depth)
+    getNeighborhood(center, depth, lang)
       .then((d) => {
         setData(normalizeGraph(d));
         setSelected(center);
@@ -146,9 +146,9 @@ export default function GraphPage() {
       animationDurationUpdate: 600,
       animationEasingUpdate: "cubicOut",
       tooltip: {
-        formatter: (p: { dataType?: string; data?: { label?: string; en?: string } }) =>
+        formatter: (p: { dataType?: string; data?: { label?: string; sub?: string } }) =>
           p.dataType === "node"
-            ? `${p.data?.label ?? ""}${p.data?.en ? `<br/><span style="color:#999">${p.data.en}</span>` : ""}`
+            ? `${p.data?.label ?? ""}${p.data?.sub ? `<br/><span style="color:#999">${p.data.sub}</span>` : ""}`
             : "",
       },
       legend: [
@@ -186,7 +186,7 @@ export default function GraphPage() {
             id: n.id,
             name: n.id,
             label: n.label,
-            en: n.label_en,
+            sub: lang === "zh" ? n.label_en : n.label_zh,
             value: n.type,
             category: Math.max(0, catIndex.indexOf(n.type)),
             symbolSize: n.id === center ? 46 : 30,
@@ -253,9 +253,7 @@ export default function GraphPage() {
           <button
             key={n.id}
             onClick={() => setCenter(n.id)}
-            className={`rounded-full px-2.5 py-1 text-xs transition ${
-              center === n.id ? "bg-accent text-on-accent" : "border border-line text-muted hover:bg-surface-2"
-            }`}
+            className={`chip ${center === n.id ? "chip-accent" : ""}`}
           >
             {t(n.key, lang)}
           </button>
@@ -266,9 +264,7 @@ export default function GraphPage() {
           <button
             key={d}
             onClick={() => setDepth(d)}
-            className={`rounded-full px-2.5 py-1 text-xs transition ${
-              depth === d ? "bg-accent-soft text-accent" : "bg-surface-2 text-faint hover:text-muted"
-            }`}
+            className={`chip ${depth === d ? "chip-accent" : ""}`}
           >
             {d}
           </button>
@@ -296,8 +292,10 @@ export default function GraphPage() {
                 {t(TYPE_KEY[nodeMap[selected].type], lang)}
               </div>
               <div className="font-serif text-lg text-fg">{nodeMap[selected].label}</div>
-              {nodeMap[selected].label_en && (
-                <div className="text-xs italic text-faint">{nodeMap[selected].label_en}</div>
+              {(lang === "zh" ? nodeMap[selected].label_en : nodeMap[selected].label_zh) && (
+                <div className="text-xs italic text-faint">
+                  {lang === "zh" ? nodeMap[selected].label_en : nodeMap[selected].label_zh}
+                </div>
               )}
               <Link
                 href={`/terms?q=${selected}`}

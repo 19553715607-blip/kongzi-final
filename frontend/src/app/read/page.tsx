@@ -18,6 +18,7 @@ import { copyText } from "@/lib/ui";
 import { toast } from "@/components/Toast";
 import { t, useLang } from "@/lib/i18n";
 import { Reveal, Pressable } from "@/lib/motion";
+import Icon from "@/components/ui/Icon";
 import { HorizontalRail, CollectionCard, ProvenanceCaption } from "@/components/museum";
 import Comments from "@/components/Comments";
 import ChineseBackdrop from "@/components/ChineseBackdrop";
@@ -340,9 +341,7 @@ function ReadContent() {
               <button
                 key={l}
                 onClick={() => toggle(l)}
-                className={`pressable rounded-full px-2.5 py-1 text-xs transition ${
-                  layers[l] ? "bg-accent-soft text-accent" : "bg-surface-2 text-faint hover:bg-surface-2/70"
-                }`}
+                className={`chip ${layers[l] ? "chip-accent" : ""}`}
               >
                 {t(`read.layer.${l}`, lang)}
               </button>
@@ -352,9 +351,7 @@ function ReadContent() {
           <button
             onClick={() => setParallel((s) => !s)}
             title={t("read.parallelHint", lang)}
-            className={`pressable rounded-full px-2.5 py-1 text-xs transition ${
-              parallel ? "bg-cel-soft text-cel-ink" : "bg-surface-2 text-faint hover:bg-surface-2/70"
-            }`}
+            className={`chip ${parallel ? "chip-accent" : ""}`}
           >
             {t("read.parallel", lang)}
           </button>
@@ -364,7 +361,7 @@ function ReadContent() {
             <button
               onClick={() => setFontScale((s) => Math.max(FONT_SCALE_MIN, s - FONT_STEP))}
               disabled={fontScale <= FONT_SCALE_MIN}
-              className="pressable rounded-md px-2 py-1 text-xs text-muted transition hover:bg-surface-2 disabled:opacity-30"
+              className="chip"
               title={t("read.fontDown", lang)}
             >
               A−
@@ -372,7 +369,7 @@ function ReadContent() {
             <button
               onClick={() => setFontScale((s) => Math.min(FONT_SCALE_MAX, s + FONT_STEP))}
               disabled={fontScale >= FONT_SCALE_MAX}
-              className="pressable rounded-md px-2 py-1 text-xs text-muted transition hover:bg-surface-2 disabled:opacity-30"
+              className="chip"
               title={t("read.fontUp", lang)}
             >
               A+
@@ -385,17 +382,19 @@ function ReadContent() {
           <button
             onClick={() => go(neighbors.prev?.id ?? null)}
             disabled={!neighbors.prev}
-            className="pressable rounded-full border border-line px-3 py-1 text-muted transition hover:border-accent hover:text-accent disabled:opacity-30"
+            className="chip pressable disabled:opacity-30"
           >
-            ← {t("read.prev", lang)}
+            <Icon name="arrowLeft" size={11} />
+            {t("read.prev", lang)}
           </button>
           <span className="flex-1 text-center">{t("read.kbdHint", lang)}</span>
           <button
             onClick={() => go(neighbors.next?.id ?? null)}
             disabled={!neighbors.next}
-            className="pressable rounded-full border border-line px-3 py-1 text-muted transition hover:border-accent hover:text-accent disabled:opacity-30"
+            className="chip pressable disabled:opacity-30"
           >
-            {t("read.next", lang)} →
+            {t("read.next", lang)}
+            <Icon name="arrowRight" size={11} />
           </button>
         </div>
 
@@ -414,21 +413,14 @@ function ReadContent() {
               <div className="flex items-center gap-1.5">
                 <Pressable
                   onClick={doCopy}
-                  className={`flex items-center gap-1 rounded-full px-3 py-1 text-xs transition ${
-                    faved ? "bg-accent-soft text-accent" : "border border-line text-muted hover:bg-surface-2"
-                  }`}
+                  className={`chip pressable ${faved ? "chip-accent" : ""}`}
                 >
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="9" y="9" width="12" height="12" rx="2" />
-                    <path d="M5 15V5a2 2 0 012-2h10" />
-                  </svg>
+                  <Icon name="copy" size={11} />
                   {t("read.copy", lang)}
                 </Pressable>
                 <Pressable
                   onClick={doFav}
-                  className={`rounded-full px-3 py-1 text-xs transition ${
-                    faved ? "bg-accent-soft text-accent" : "border border-line text-muted hover:bg-surface-2"
-                  }`}
+                  className={`chip pressable ${faved ? "chip-accent" : ""}`}
                 >
                   {faved ? t("read.saved", lang) : t("read.save", lang)}
                 </Pressable>

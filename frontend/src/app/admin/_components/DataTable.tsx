@@ -2,6 +2,7 @@
 
 import { ReactNode, useMemo, useState } from "react";
 import { t, useLang } from "@/lib/i18n";
+import Icon from "@/components/ui/Icon";
 
 // ── 统一管理数据表格：可排序表头 / 行 hover / 批量选择 / 骨架 / 空态 / 分页 ──
 // 泛型化，可复用到 users/games/cases/institutions 等页。
@@ -166,7 +167,14 @@ export default function DataTable<T>({
               >
                 {c.header}
                 {c.sortable && sortKey === c.key && (
-                  <span className="th-arrow">{sortDir === "asc" ? "▲" : "▼"}</span>
+                  <span className="th-arrow">
+                    <Icon
+                      name="chevronDown"
+                      size={9}
+                      strokeWidth={2.4}
+                      className={sortDir === "asc" ? "rotate-180" : ""}
+                    />
+                  </span>
                 )}
               </th>
             ))}
@@ -235,7 +243,7 @@ export default function DataTable<T>({
       {page != null && onPageChange && (
         <div className="flex items-center justify-center gap-3 border-t border-line/60 py-2.5 text-xs">
           <button
-            className="pressable rounded-full border border-line px-3 py-1 text-muted"
+            className="chip pressable"
             onClick={() => onPageChange(Math.max(1, page - 1))}
             disabled={page <= 1}
           >
@@ -249,7 +257,7 @@ export default function DataTable<T>({
               `${page} / ${totalPages}`}
           </span>
           <button
-            className="pressable rounded-full border border-line px-3 py-1 text-muted"
+            className="chip pressable"
             onClick={() => onPageChange(Math.min(totalPages, page + 1))}
             disabled={page >= totalPages}
           >

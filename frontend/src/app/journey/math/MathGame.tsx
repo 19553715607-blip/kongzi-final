@@ -17,6 +17,7 @@ import { useLang } from "@/lib/i18n";
 import { gt } from "@/lib/gameDict";
 import { Reveal, CountUp, Pressable } from "@/lib/motion";
 import { TactileButton, ProvenanceCaption } from "@/components/museum";
+import Icon from "@/components/ui/Icon";
 import { getMathProgress, getMathToday, solveMathScenario, errorHint } from "@/lib/api";
 import type {
   MathProgressResp,
@@ -64,7 +65,7 @@ export default function MathGame() {
 
   const loadAll = useCallback(() => {
     getMathToday(lang).then(setToday).catch((e) => setLoadErr(gt("无法加载数艺题库，请稍后重试", lang) + `（${errorHint(e)}）`));
-    getMathProgress().then(setProgress).catch(() => {});
+    getMathProgress(lang).then(setProgress).catch(() => {});
   }, [lang]);
   useEffect(() => { loadAll(); }, [loadAll]);
 
@@ -109,7 +110,7 @@ export default function MathGame() {
       setResult(res);
       sfx.finish(res.score);
       setPhase("scored");
-      getMathProgress().then(setProgress).catch(() => {});
+      getMathProgress(lang).then(setProgress).catch(() => {});
       getMathToday(lang).then(setToday).catch(() => {});
     } catch {
       say(gt("提交失败 — 请检查登录/网络", lang), false);
@@ -204,7 +205,7 @@ export default function MathGame() {
             {progress && <Stat label={gt("称号", lang)} value={gt(progress.title, lang)} />}
             {progress && <Stat label={gt("数艺", lang)} value={`${progress.liuyi_shu2}`} numeric />}
             {progress && <Stat label={gt("最佳", lang)} value={`${progress.best_score}`} numeric />}
-            <Link href="/journey" className="rounded-full border border-line px-3 py-1.5 text-xs text-muted hover:bg-surface-2">
+            <Link href="/journey" className="chip">
               {gt("← 六艺", lang)}
             </Link>
           </div>
@@ -329,12 +330,16 @@ export default function MathGame() {
               <div className="flex gap-2">
                 <Pressable
                   onClick={() => switchVillage(-1)}
-                  className="flex h-14 w-14 touch-none items-center justify-center rounded-2xl bg-black/50 text-lg text-white shadow-lg backdrop-blur"
-                >◀</Pressable>
+                  className="flex h-14 w-14 touch-none items-center justify-center rounded-2xl bg-black/50 text-white shadow-lg backdrop-blur"
+                >
+                  <Icon name="chevronLeft" size={20} strokeWidth={2} />
+                </Pressable>
                 <Pressable
                   onClick={() => switchVillage(1)}
-                  className="flex h-14 w-14 touch-none items-center justify-center rounded-2xl bg-black/50 text-lg text-white shadow-lg backdrop-blur"
-                >▶</Pressable>
+                  className="flex h-14 w-14 touch-none items-center justify-center rounded-2xl bg-black/50 text-white shadow-lg backdrop-blur"
+                >
+                  <Icon name="chevronRight" size={20} strokeWidth={2} />
+                </Pressable>
               </div>
               <TactileButton
                 variant="accent"

@@ -35,7 +35,7 @@ const DICT: Dict = {
   "nav.graph":   { zh: "图谱", en: "Graph", fr: "Graphe", es: "Grafo", ar: "خريطة المعرفة" },
   "nav.chat":    { zh: "问答", en: "Chat", fr: "Dialogue", es: "Diálogo", ar: "حوار" },
   "nav.cases":   { zh: "案例", en: "Cases", fr: "Cas", es: "Casos", ar: "حالات" },
-  "nav.journey": { zh: "君子路", en: "Path", fr: "Voie", es: "Camino", ar: "السبيل" },
+  "nav.journey": { zh: "君子之路", en: "Path", fr: "Voie", es: "Camino", ar: "السبيل" },
   "nav.me":      { zh: "我", en: "Me", fr: "Compte", es: "Cuenta", ar: "حسابي" },
   "nav.cocreate": { zh: "共创", en: "Co-create", fr: "Co-créer", es: "Co-crear", ar: "إبداع مشترك" },
   "nav.plugins":  { zh: "插件", en: "Plugins", fr: "Modules", es: "Plugins", ar: "إضافات" },
@@ -658,6 +658,7 @@ const DICT: Dict = {
   "feed.copied": { zh: "已复制金句", en: "Quote copied", fr: "Citation copiée", es: "Cita copiada", ar: "تم نسخ الحكمة" },
   "feed.comment": { zh: "评论", en: "Comment", fr: "Commenter", es: "Comentar", ar: "تعليق" },
   "feed.share": { zh: "分享", en: "Share", fr: "Partager", es: "Compartir", ar: "مشاركة" },
+  "feed.back": { zh: "返回", en: "Back", fr: "Retour", es: "Volver", ar: "رجوع" },
   "feed.wallpaper": { zh: "壁纸", en: "Wallpaper", fr: "Fond d'écran", es: "Fondo", ar: "خلفية" },
   "feed.savedShort": { zh: "已藏", en: "Saved", fr: "Enregistré", es: "Guardado", ar: "محفوظ" },
   "feed.save": { zh: "收藏", en: "Save", fr: "Enregistrer", es: "Guardar", ar: "حفظ" },
@@ -708,6 +709,7 @@ const DICT: Dict = {
   // ── 大屏轮播 ─────────────────────────────────────────────────────────
   "kiosk.brand": { zh: "孔子 · 儒家语义平台", en: "Kongzi · Confucian Classics Platform", fr: "Kongzi · Plateforme des classiques confucéens", es: "Kongzi · Plataforma de los clásicos confucianos", ar: "كونغ تسي · المنصة الدلالية للفكر الكونفوشيوسي" },
   "kiosk.brandSuffix": { zh: "儒家语义平台", en: "Confucian Classics Platform", fr: "Plateforme des classiques confucéens", es: "Plataforma de los clásicos confucianos", ar: "المنصة الدلالية للفكر الكونفوشيوسي" },
+  "kiosk.back": { zh: "返回", en: "Back", fr: "Retour", es: "Volver", ar: "رجوع" },
   "kiosk.paused": { zh: "已暂停 · 点击继续", en: "Paused · click to resume", fr: "En pause · cliquez pour reprendre", es: "En pausa · haz clic para continuar", ar: "متوقّف · انقر للمتابعة" },
   "kiosk.playing": { zh: "自动轮播 · 点击暂停", en: "Auto-rotating · click to pause", fr: "Rotation auto · cliquez pour mettre en pause", es: "Rotación automática · haz clic para pausar", ar: "عرض تلقائي · انقر للإيقاف" },
   "kiosk.footer": { zh: "kongzi.platform · 扫码继续阅读", en: "kongzi.platform · scan to keep reading", fr: "kongzi.platform · scannez pour continuer", es: "kongzi.platform · escanea para seguir leyendo", ar: "kongzi.platform · امسح الرمز لمتابعة القراءة" },
@@ -1033,6 +1035,10 @@ const DICT: Dict = {
   "jrn.totalPlayers": { zh: "共 {n} 位君子", en: "{n} junzi in total", fr: "{n} junzi au total", es: "{n} junzi en total", ar: "الإجمالي {n} من الجونزي" },
   "jrn.youRank": { zh: "· 你第 {n} 位", en: "· you, #{n}", fr: "· vous, n° {n}", es: "· tú, n.º {n}", ar: "· أنت، رقم {n}" },
   "jrn.you": { zh: "· 你", en: "· you", fr: "· vous", es: "· tú", ar: "· أنت" },
+  // 榜单前三名（科举鼎甲），非中文界面用名次表示
+  "jrn.rank.first": { zh: "状元", en: "1st", fr: "1er", es: "1.º", ar: "الأول" },
+  "jrn.rank.second": { zh: "榜眼", en: "2nd", fr: "2e", es: "2.º", ar: "الثاني" },
+  "jrn.rank.third": { zh: "探花", en: "3rd", fr: "3e", es: "3.º", ar: "الثالث" },
 
   // 六艺名（礼·乐·射·御·书·数）
   "jrn.art.li": { zh: "礼", en: "Rites", fr: "Rites", es: "Ritos", ar: "الطقوس" },
@@ -1493,7 +1499,7 @@ const DICT: Dict = {
   },
 
   // 首页新增功能入口（六艺 / 跨文明案例）
-  "home.entry.journey": { zh: "君子路", en: "Path", fr: "Voie", es: "Camino", ar: "السبيل" },
+  "home.entry.journey": { zh: "君子之路", en: "Path", fr: "Voie", es: "Camino", ar: "السبيل" },
   "home.entry.cases": { zh: "跨文明案例", en: "Cases", fr: "Cas", es: "Casos", ar: "حالات" },
   // ── The China Room 重构：主导航 / 首页 / 路径 / 小测 / 术语 / 教学 ──
   "nav.lang": {
@@ -1606,7 +1612,7 @@ const DICT: Dict = {
   },
 
   // 首页首屏四主入口（唯一强入口区，其余区块降权）
-  "home.primary.journey": { zh: "君子路 · 六艺", en: "Six Arts Journey", fr: "La Voie des six arts", es: "El Camino de las seis artes", ar: "سبيل الفنون الستة" },
+  "home.primary.journey": { zh: "君子之路 · 六艺", en: "Six Arts Journey", fr: "La Voie des six arts", es: "El Camino de las seis artes", ar: "سبيل الفنون الستة" },
   "home.primary.chat": { zh: "向经典提问", en: "Ask the Classics", fr: "Interroger les classiques", es: "Pregunta a los clásicos", ar: "اسأل النصوص" },
 
 
@@ -1639,6 +1645,8 @@ const DICT: Dict = {
   "quiz.readTitle": { zh: "读经问答", en: "Read & answer", fr: "Lire et répondre", es: "Leer y responder", ar: "اقرأ وأجب" },
   "quiz.readDesc": { zh: "在《论语》章节中边读边问，让智能体溯源作答。", en: "Read the Analects and ask as you go; the agent answers with sources.", fr: "Lisez les Analectes et questionnez : l'agent répond avec sources.", es: "Lee las Analectas y pregunta mientras lees; el agente responde con fuentes.", ar: "اقرأ «مقولات كونفوشيوس» واسأل أثناء القراءة؛ والمساعد الذكي يجيب بالمصادر." },
   "quiz.enter": { zh: "开始", en: "Start", fr: "Commencer", es: "Comenzar", ar: "ابدأ" },
+  // 按钮专用短标签：栏目名过长会把描边 CTA 撑宽
+  "quiz.pathCta": { zh: "君子之路 · 六艺总览", en: "Six Arts overview", fr: "Aperçu des six arts", es: "Seis artes", ar: "نظرة على الفنون الستة" },
 
   "read.parallel": { zh: "平行文本", en: "Parallel text", fr: "Texte parallèle", es: "Texto paralelo", ar: "نص موازٍ" },
   "read.parallelHint": {
@@ -2009,6 +2017,11 @@ export function setLang(l: Lang) {
   } catch {
     /* ignore */
   }
+  try {
+    document.cookie = `${STORAGE_KEY}=${l}; path=/; max-age=31536000; SameSite=Lax`;
+  } catch {
+    /* ignore */
+  }
   setHtmlAttrs(l);
   listeners.forEach((fn) => fn(l));
 }
@@ -2019,7 +2032,18 @@ const LangCtx = createContext<Lang>("en");
  *  SSR 首帧即以正确语言渲染,消除非英文用户的首帧英文闪屏。
  *  挂载后已存偏好(localStorage)优先于服务端推断。 */
 export function I18nProvider({ initialLang, children }: { initialLang: Lang; children: ReactNode }) {
-  const [lang, setLangState] = useState<Lang>(initialLang);
+  // 客户端首次渲染即读取已存偏好：否则首帧用服务端语言发起取数，
+  // 旧语种响应晚到会覆盖新语种，造成整页中文卡住不刷新。
+  const [lang, setLangState] = useState<Lang>(() => {
+    if (typeof window === "undefined") return initialLang;
+    try {
+      const v = localStorage.getItem(STORAGE_KEY);
+      if (v && LANGS.some((l) => l.code === v)) return v as Lang;
+    } catch {
+      /* ignore */
+    }
+    return initialLang;
+  });
   useEffect(() => {
     let stored: Lang | null = null;
     try {

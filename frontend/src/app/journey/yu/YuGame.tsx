@@ -14,12 +14,13 @@
  */
 
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { Canvas } from "@react-three/fiber";
 import { useGT } from "@/lib/gameDict";
 import { useLang } from "@/lib/i18n";
 import { Reveal, CountUp, Pressable } from "@/lib/motion";
 import { TactileButton, ProvenanceCaption } from "@/components/museum";
+import Icon from "@/components/ui/Icon";
 import { driveYuScenario, getYuProgress, getYuToday, errorHint } from "@/lib/api";
 import type {
   YuDriveResp,
@@ -75,7 +76,7 @@ export default function YuGame() {
   const reload = useCallback(() => {
     setLoadErr("");
     getYuToday(lang).then(setToday).catch((e) => setLoadErr(tr("无法加载御艺场景，请稍后重试") + `（${errorHint(e)}）`));
-    getYuProgress().then(setProgress).catch(() => {});
+    getYuProgress(lang).then(setProgress).catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lang]);
 
@@ -147,7 +148,7 @@ export default function YuGame() {
       setResult(res);
       sfx.finish(res.score);
       setPhase("scored");
-      getYuProgress().then(setProgress).catch(() => {});
+      getYuProgress(lang).then(setProgress).catch(() => {});
     } catch {
       say(tr("提交失败 — 请检查登录/网络"), false);
       setPhase("playing");
@@ -212,7 +213,7 @@ export default function YuGame() {
             {progress && <Stat label={tr("称号")} value={tr(progress.title)} />}
             {progress && <Stat label={tr("御艺")} value={`${progress.liuyi_yu}`} numeric />}
             {progress && <Stat label={tr("最佳")} value={`${progress.best_score}`} numeric />}
-            <Link href="/journey" className="rounded-full border border-line px-3 py-1.5 text-xs text-muted hover:bg-surface-2">
+            <Link href="/journey" className="chip">
               {tr("← 六艺")}
             </Link>
           </div>
@@ -326,8 +327,8 @@ export default function YuGame() {
           {phase === "playing" && (
             <div className="absolute inset-x-0 bottom-3 flex items-end justify-between px-3 sm:px-6">
               <div className="flex gap-2">
-                <HoldBtn label="◀" onHold={(v) => { refs.input.left = v; }} />
-                <HoldBtn label="▶" onHold={(v) => { refs.input.right = v; }} />
+                <HoldBtn label={<Icon name="chevronLeft" size={18} strokeWidth={2} />} onHold={(v) => { refs.input.left = v; }} />
+                <HoldBtn label={<Icon name="chevronRight" size={18} strokeWidth={2} />} onHold={(v) => { refs.input.right = v; }} />
               </div>
               <Pressable
                 onClick={() => { refs.input.liPressed = true; }}
@@ -569,7 +570,7 @@ function DimBar({ label, v, color }: { label: string; v: number; color: string }
   );
 }
 
-function HoldBtn({ label, sub, accent, onHold }: { label: string; sub?: string; accent?: boolean; onHold: (v: boolean) => void }) {
+function HoldBtn({ label, sub, accent, onHold }: { label: ReactNode; sub?: string; accent?: boolean; onHold: (v: boolean) => void }) {
   return (
     <Pressable
       onPointerDown={(e) => { e.preventDefault(); onHold(true); }}

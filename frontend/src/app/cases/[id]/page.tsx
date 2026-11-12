@@ -29,9 +29,14 @@ export default function CaseDetailPage({
 
   useEffect(() => {
     // id 兼容 "626-climate-governance" slug 形式,取前导数字
-    getCase(Number.parseInt(id, 10), lang).then(setC).catch(() => setC(null));
-    getTopics(lang).then(setTopics).catch(() => {});
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    let alive = true;
+    getCase(Number.parseInt(id, 10), lang)
+      .then((d) => alive && setC(d))
+      .catch(() => alive && setC(null));
+    getTopics(lang).then((d) => alive && setTopics(d)).catch(() => {});
+    return () => {
+      alive = false;
+    };
   }, [id, lang]);
 
   const topic = topics.find((tp) => tp.id === c?.topic_id);
@@ -101,7 +106,7 @@ export default function CaseDetailPage({
           <TactileButton
             variant="ghost"
             onClick={onShare}
-            className="ms-auto !rounded-full !px-3 !py-1 !text-xs"
+            className="ms-auto !h-6 !px-3 !text-xs"
           >
             {t("case.share", lang)}
           </TactileButton>

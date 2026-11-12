@@ -72,7 +72,7 @@ export default function ShuAssemblePage() {
   // 启动：拉今日卡
   useEffect(() => {
     getShuToday(lang).then((d) => setCards(d.cards)).catch(() => setErr(t("jrn.noBank", lang)));
-    getShuProgress().then(setProgress).catch(() => {});
+    getShuProgress(lang).then(setProgress).catch(() => {});
   }, [lang]);
 
   const current = cards[idx];
@@ -121,9 +121,9 @@ export default function ShuAssemblePage() {
     if (!current || busy || !allFilled) return;
     setBusy(true);
     try {
-      const r = await assembleShuCard(current.id, slots as string[]);
+      const r = await assembleShuCard(current.id, slots as string[], lang);
       setResult(r);
-      getShuProgress().then(setProgress).catch(() => {});
+      getShuProgress(lang).then(setProgress).catch(() => {});
     } catch {
       setErr(t("jrn.submitFail", lang));
     } finally {
@@ -183,7 +183,7 @@ export default function ShuAssemblePage() {
           )}
           <Link
             href="/journey/shu"
-            className="rounded-full border border-line px-3 py-1.5 text-xs text-muted hover:bg-surface-2"
+            className="chip"
           >
             {t("jrn.backToShu", lang)}
           </Link>

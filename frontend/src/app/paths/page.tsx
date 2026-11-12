@@ -4,13 +4,14 @@ import Link from "next/link";
 import { useLang, t } from "@/lib/i18n";
 import { Reveal } from "@/lib/motion";
 import ChineseBackdrop from "@/components/ChineseBackdrop";
+import Icon, { type IconName } from "@/components/ui/Icon";
 
 type Step = { href: string; labelKey: string };
 type Path = {
   key: string;
   titleKey: string;
   descKey: string;
-  glyph: string;
+  icon: IconName;
   steps: Step[];
 };
 
@@ -20,7 +21,7 @@ const PATHS: Path[] = [
     key: "analects",
     titleKey: "paths.analects.title",
     descKey: "paths.analects.desc",
-    glyph: "论",
+    icon: "book",
     steps: [
       { href: "/read", labelKey: "home.entry.read" },
       { href: "/graph", labelKey: "home.entry.graph" },
@@ -31,7 +32,7 @@ const PATHS: Path[] = [
     key: "lineage",
     titleKey: "paths.lineage.title",
     descKey: "paths.lineage.desc",
-    glyph: "儒",
+    icon: "network",
     steps: [
       { href: "/graph", labelKey: "home.entry.graph" },
       { href: "/cases", labelKey: "home.entry.cases" },
@@ -42,7 +43,7 @@ const PATHS: Path[] = [
     key: "arts",
     titleKey: "paths.arts.title",
     descKey: "paths.arts.desc",
-    glyph: "艺",
+    icon: "game",
     steps: [
       { href: "/journey", labelKey: "home.entry.journey" },
       { href: "/journey/shu", labelKey: "jrn.art.shu" },
@@ -53,7 +54,7 @@ const PATHS: Path[] = [
     key: "crossciv",
     titleKey: "paths.crossciv.title",
     descKey: "paths.crossciv.desc",
-    glyph: "对",
+    icon: "globe",
     steps: [
       { href: "/cases", labelKey: "home.entry.cases" },
       { href: "/chat", labelKey: "home.entry.chat" },
@@ -81,13 +82,12 @@ export default function PathsPage() {
             className="rounded-2xl border border-line bg-surface p-5"
           >
             <div className="flex items-start gap-4">
-              <span className="seal inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-md font-serif text-lg">
-                {p.glyph}
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl border border-line bg-surface-2 text-accent">
+                <Icon name={p.icon} size={20} />
               </span>
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-baseline gap-2">
                   <h2 className="font-serif text-lg font-medium text-fg">{t(p.titleKey, lang)}</h2>
-                  {lang !== "zh" && <span className="text-xs text-faint">{p.glyph}</span>}
                 </div>
                 <p className="mt-1 text-sm leading-relaxed text-muted">{t(p.descKey, lang)}</p>
                 <div className="mt-3 flex flex-wrap items-center gap-2">
@@ -95,7 +95,7 @@ export default function PathsPage() {
                     <span key={s.href} className="inline-flex items-center gap-1.5 text-xs">
                       <Link
                         href={s.href}
-                        className="pressable rounded-full border border-line bg-bg px-3 py-1.5 text-muted transition hover:border-accent hover:text-accent"
+                        className="btn btn-outline btn-sm"
                       >
                         <span className="me-1 text-faint">{j + 1}.</span>
                         {t(s.labelKey, lang)}
@@ -118,7 +118,9 @@ export default function PathsPage() {
             href="/essays"
             className="pressable flex items-center gap-4 rounded-2xl border border-accent/30 bg-accent-soft/40 p-5 transition hover:border-accent/60"
           >
-            <span className="seal flex h-11 w-11 shrink-0 items-center justify-center rounded-md font-serif text-lg">文</span>
+            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl border border-line bg-surface text-accent">
+              <Icon name="doc" size={20} />
+            </span>
             <span className="min-w-0 flex-1">
               <span className="block font-serif text-base font-medium text-fg">{t("essays.title", lang)}</span>
               <span className="mt-0.5 block text-xs leading-relaxed text-muted">{t("paths.essays.banner", lang)}</span>

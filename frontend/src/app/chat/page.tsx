@@ -5,6 +5,7 @@ import { getTopics, streamChat } from "@/lib/api";
 import { copyText } from "@/lib/ui";
 import { toast } from "@/components/Toast";
 import { t, useLang } from "@/lib/i18n";
+import Icon from "@/components/ui/Icon";
 import type {
   CitationEvent,
   CrossCivView,
@@ -224,12 +225,10 @@ export default function ChatPage() {
           {messages.length > 0 && (
             <button
               onClick={clearAll}
-              className="flex shrink-0 items-center gap-1 rounded-full border border-line px-2.5 py-1 text-[11px] text-muted transition hover:bg-surface-2 hover:text-accent"
+              className="chip chip-quiet shrink-0"
               title={t("chat.clear", lang)}
             >
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6" />
-              </svg>
+              <Icon name="trash" size={11} />
               {t("chat.clear", lang)}
             </button>
           )}
@@ -241,9 +240,7 @@ export default function ChatPage() {
             <span className="shrink-0 text-[11px] text-faint">{t("chat.topicPrefix", lang)}</span>
             <button
               onClick={() => setTopicHint(null)}
-              className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] ${
-                topicHint === null ? "bg-accent text-on-accent" : "border border-line text-muted"
-              }`}
+              className={`chip shrink-0 ${topicHint === null ? "chip-accent" : ""}`}
             >
               {t("chat.auto", lang)}
             </button>
@@ -251,10 +248,7 @@ export default function ChatPage() {
               <button
                 key={tp.id}
                 onClick={() => setTopicHint(tp.id)}
-                className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] ${
-                  topicHint === tp.id ? "text-white" : "border border-line text-muted"
-                }`}
-                style={topicHint === tp.id ? { background: tp.color } : undefined}
+                className={`chip shrink-0 ${topicHint === tp.id ? "chip-accent" : ""}`}
               >
                 {tp.name}
               </button>
@@ -283,7 +277,7 @@ export default function ChatPage() {
                         setTopicHint(tp.id);
                         taRef.current?.focus();
                       }}
-                      className="rounded-full border border-line bg-surface px-3 py-1.5 text-xs text-muted transition hover:border-accent hover:text-accent"
+                      className="chip"
                     >
                       {tp.name}
                     </button>
@@ -315,7 +309,7 @@ export default function ChatPage() {
               <button
                 key={f}
                 onClick={() => send(f)}
-                className="rounded-full border border-line bg-surface px-3 py-1.5 text-xs text-muted transition hover:border-accent hover:text-accent"
+                className="chip"
               >
                 {f}
               </button>
@@ -356,10 +350,10 @@ export default function ChatPage() {
                 <button
                   type="button"
                   onClick={stop}
-                  className="flex h-8 items-center gap-1.5 rounded-full border border-line px-3 text-xs text-muted transition hover:border-accent hover:text-accent"
+                  className="btn btn-outline btn-sm"
                   title={t("chat.stop", lang)}
                 >
-                  <span className="h-2.5 w-2.5 rounded-[2px] bg-current" />
+                  <Icon name="stop" size={11} strokeWidth={2} />
                   {t("chat.stop", lang)}
                 </button>
               ) : (
@@ -368,11 +362,9 @@ export default function ChatPage() {
                   disabled={!input.trim()}
                   aria-label={t("chat.send", lang)}
                   title={t("chat.send", lang)}
-                  className="flex h-8 w-8 items-center justify-center rounded-full bg-accent text-on-accent transition hover:opacity-90 disabled:opacity-30"
+                  className="btn btn-primary btn-icon"
                 >
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M12 19V5M5 12l7-7 7 7" />
-                  </svg>
+                  <Icon name="arrowUp" size={15} strokeWidth={2.2} />
                 </button>
               )}
             </div>
@@ -446,9 +438,7 @@ function AssistantBubble({ msg, onCopy }: { msg: AssistantMsg; onCopy: (m: Assis
       {msg.citations.length > 0 && (
         <div className="overflow-hidden rounded-xl border border-line bg-surface-2/40">
           <div className="flex items-center gap-1.5 border-b border-line/60 px-3 py-1.5 text-[10px] tracking-wide text-faint">
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="M4 19.5A2.5 2.5 0 016.5 17H20M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" />
-            </svg>
+            <Icon name="book" size={11} />
             {t("chat.citeLabel", lang)} · {msg.citations.length}
           </div>
           <ol className="divide-y divide-line/50">
@@ -486,8 +476,9 @@ function AssistantBubble({ msg, onCopy }: { msg: AssistantMsg; onCopy: (m: Assis
               <button
                 onClick={() => onCopy(msg)}
                 title={t("chat.copy", lang)}
-                className="rounded-md px-1.5 py-1 text-[11px] text-faint opacity-0 transition hover:bg-surface-2 hover:text-accent group-hover:opacity-100 focus:opacity-100"
+                className="chip chip-quiet opacity-0 transition group-hover:opacity-100 focus:opacity-100"
               >
+                <Icon name="copy" size={11} />
                 {t("chat.copy", lang)}
               </button>
             </div>

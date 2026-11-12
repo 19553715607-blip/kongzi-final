@@ -1,22 +1,26 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { getFeed } from "@/lib/api";
 import { t, useLang } from "@/lib/i18n";
+import BrandGlyph from "@/components/BrandGlyph";
+import Icon from "@/components/ui/Icon";
 import { track } from "@/lib/track";
 import type { FeedItem } from "@/lib/types";
 
 const AUTO_MS = 8000;
 
 export default function KioskPage() {
+  const router = useRouter();
   const [lang] = useLang();
   const [items, setItems] = useState<FeedItem[]>([]);
   const [idx, setIdx] = useState(0);
   const [paused, setPaused] = useState(false);
   const [showControls, setShowControls] = useState(false);
   const [campus, setCampus] = useState<string | null>(null);
-  const timer = useRef<ReturnType<typeof setInterval> | null>(null);
   const hideTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const wheelLock = useRef(0);
 
   // 从 query 读取校园（埋点 + 显示）
   useEffect(() => {
@@ -43,23 +47,36 @@ export default function KioskPage() {
     };
   }, [lang]);
 
-  // 自动轮播
+  // 自动轮播：每次切页都重新计时，手动翻页（滚轮/按钮）后不会紧接着被自动推进
   useEffect(() => {
     if (paused || items.length === 0) return;
-    timer.current = setInterval(() => {
-      setIdx((i) => (i + 1) % items.length);
-    }, AUTO_MS);
-    return () => {
-      if (timer.current) clearInterval(timer.current);
-    };
-  }, [paused, items.length]);
+    const id = setTimeout(() => setIdx((i) => (i + 1) % items.length), AUTO_MS);
+    return () => clearTimeout(id);
+  }, [paused, items.length, idx]);
 
   // 控制栏自动隐藏
-  const wake = () => {
+  const wake = useCallback(() => {
     setShowControls(true);
     if (hideTimer.current) clearTimeout(hideTimer.current);
     hideTimer.current = setTimeout(() => setShowControls(false), 4000);
-  };
+  }, []);
+
+  // 桌面端滚轮上下切换；触屏交给原生交互
+  useEffect(() => {
+    if (items.length === 0) return;
+    if (window.matchMedia("(hover: none)").matches) return;
+    const onWheel = (e: WheelEvent) => {
+      if (Math.abs(e.deltaY) < 4 || e.ctrlKey) return;
+      e.preventDefault();
+      const now = Date.now();
+      if (now < wheelLock.current) return;
+      wheelLock.current = now + 480;
+      setIdx((i) => (i + (e.deltaY > 0 ? 1 : -1) + items.length) % items.length);
+      wake();
+    };
+    window.addEventListener("wheel", onWheel, { passive: false });
+    return () => window.removeEventListener("wheel", onWheel);
+  }, [items.length, wake]);
 
   const goPrev = () => {
     setIdx((i) => (i - 1 + items.length) % items.length);
@@ -72,6 +89,10 @@ export default function KioskPage() {
   const togglePlay = () => {
     setPaused((p) => !p);
     wake();
+  };
+  const goBack = () => {
+    if (window.history.length > 1) router.back();
+    else router.push("/");
   };
 
   const cur = items[idx];
@@ -93,9 +114,19 @@ export default function KioskPage() {
       <div className="pointer-events-none absolute -right-20 -top-24 h-[60vh] w-[60vh] rounded-full bg-[#712B13] opacity-25 blur-[80px]" />
       <div className="pointer-events-none absolute -left-20 bottom-12 h-[40vh] w-[40vh] rounded-full bg-[#085041] opacity-30 blur-[80px]" />
 
-      {/* 校园 / 平台标 */}
+      {/* 校园 / 平台标 + 返回 */}
       <div className="absolute start-8 top-6 flex items-center gap-3">
-        <span className="seal flex h-9 w-9 items-center justify-center rounded-md text-xl">孔</span>
+        <button
+          type="button"
+          onClick={goBack}
+          className="flex h-9 items-center gap-1.5 rounded-full bg-white/10 px-3 text-xs text-white/80 transition hover:bg-white/20 hover:text-white"
+        >
+          <Icon name="chevronLeft" size={14} />
+          {t("kiosk.back", lang)}
+        </button>
+        <span className="seal flex h-9 w-9 items-center justify-center rounded-md text-xl">
+          <BrandGlyph className="text-[20px]" />
+        </span>
         <div className="font-serif text-base">
           {campus ? `${campus} · ${t("kiosk.brandSuffix", lang)}` : t("kiosk.brand", lang)}
         </div>
@@ -151,9 +182,7 @@ export default function KioskPage() {
           aria-label={t("kiosk.prev", lang)}
           className="flex h-10 w-10 items-center justify-center rounded-full text-white/80 transition hover:bg-white/15 hover:text-white"
         >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M15.5 4.5L7.5 12l8 7.5V4.5z" />
-          </svg>
+          <Icon name="chevronLeft" size={20} strokeWidth={2} />
         </button>
         <button
           onClick={togglePlay}
@@ -161,14 +190,9 @@ export default function KioskPage() {
           className="flex h-12 w-12 items-center justify-center rounded-full bg-[#993C1D] text-white transition hover:bg-[#B34A24]"
         >
           {paused ? (
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M8 5v14l11-7L8 5z" />
-            </svg>
+            <Icon name="play" size={22} strokeWidth={2} />
           ) : (
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-              <rect x="6" y="5" width="4" height="14" rx="1" />
-              <rect x="14" y="5" width="4" height="14" rx="1" />
-            </svg>
+            <Icon name="pause" size={22} strokeWidth={2} />
           )}
         </button>
         <button
@@ -176,9 +200,7 @@ export default function KioskPage() {
           aria-label={t("kiosk.next", lang)}
           className="flex h-10 w-10 items-center justify-center rounded-full text-white/80 transition hover:bg-white/15 hover:text-white"
         >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M8.5 4.5l8 7.5-8 7.5V4.5z" />
-          </svg>
+          <Icon name="chevronRight" size={20} strokeWidth={2} />
         </button>
       </div>
 

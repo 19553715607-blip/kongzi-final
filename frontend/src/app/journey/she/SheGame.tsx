@@ -22,6 +22,7 @@ import { useLang } from "@/lib/i18n";
 import { gt } from "@/lib/gameDict";
 import { Reveal, CountUp, Pressable } from "@/lib/motion";
 import { TactileButton, ProvenanceCaption } from "@/components/museum";
+import Icon from "@/components/ui/Icon";
 import { getSheProgress, startSheRound, submitSheResult } from "@/lib/api";
 import type {
   SheProgressResp,
@@ -96,7 +97,7 @@ export default function SheGame() {
   // ── 开局信息（风 / 连击 / 主皮警告）。失败 → 离线练习 ──
   const prefetchRound = useCallback(async () => {
     try {
-      const r = await startSheRound();
+      const r = await startSheRound(lang);
       setRound(r);
       g.wind = r.wind;
       setOffline(false);
@@ -113,10 +114,10 @@ export default function SheGame() {
       g.wind = local.wind;
       setOffline(true);
     }
-  }, [g, streakLocal]);
+  }, [g, streakLocal, lang]);
 
   useEffect(() => {
-    getSheProgress().then(setProgress).catch(() => setOffline(true));
+    getSheProgress(lang).then(setProgress).catch(() => setOffline(true));
     void prefetchRound();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -186,7 +187,7 @@ export default function SheGame() {
           reflection_note: note?.trim() || null,
           streak_before: r.streak,
           zhupi_warned: r.zhupi_warning,
-        });
+        }, lang);
         const msg =
           reflection === "abstain"
             ? `${gt("克己 · 射不主皮", lang)} · ${gt("射艺", lang)} +${res.she_delta}`
@@ -194,7 +195,7 @@ export default function SheGame() {
               ? `${imp.score} ${gt("环", lang)} · ${scoreVerdict(imp.score)} · ${gt("射艺", lang)} +${res.she_delta}`
               : `${gt("未中 · 反求诸己", lang)} · ${gt("射艺", lang)} +${res.she_delta}`;
         finish(msg, res.new_unlocked_refs);
-        const next = await getSheProgress().catch(() => null);
+        const next = await getSheProgress(lang).catch(() => null);
         if (next) setProgress(next);
       } catch {
         setOffline(true);
@@ -361,7 +362,7 @@ export default function SheGame() {
             )}
             <Link
               href="/journey"
-              className="rounded-full border border-line px-3 py-1.5 text-xs text-muted hover:bg-surface-2"
+              className="chip"
             >
               {gt("← 六艺", lang)}
             </Link>
@@ -577,8 +578,9 @@ export default function SheGame() {
                     : "border-line bg-surface-2/40 text-faint"
                 }`}
               >
-                <div className="text-[10px] uppercase tracking-widest">
-                  {r.unlocked ? gt("✓ 已解锁", lang) : gt("🔒 未解锁", lang)}
+                <div className="flex items-center gap-1 text-[10px] uppercase tracking-widest">
+                  <Icon name={r.unlocked ? "check" : "lock"} size={11} strokeWidth={2.2} />
+                  {r.unlocked ? gt("已解锁", lang) : gt("未解锁", lang)}
                 </div>
                 <div className="mt-0.5 font-medium">{r.ref_label || r.ref_id}</div>
                 {r.unlocked && r.text && <div className="mt-1 font-serif text-fg">{r.text}</div>}

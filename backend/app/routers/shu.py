@@ -30,6 +30,28 @@ METHOD_LABELS = {
     "xiangxing": "象形", "zhishi": "指事", "huiyi": "会意",
     "xingsheng": "形声", "zhuanzhu": "转注", "jiajie": "假借",
 }
+CATEGORY_I18N = {
+    "wuchang": {"en": "Five Constant Virtues", "fr": "Cinq vertus constantes", "es": "Cinco virtudes constantes", "ar": "الفضائل الخمس الثابتة"},
+    "lunli": {"en": "Ethics", "fr": "Éthique", "es": "Ética", "ar": "الأخلاق"},
+    "xiushen": {"en": "Self-cultivation", "fr": "Cultivation de soi", "es": "Cultivo personal", "ar": "تهذيب الذات"},
+    "zhixue": {"en": "Scholarship", "fr": "Étude", "es": "Estudio", "ar": "التحصيل العلمي"},
+    "zhexue": {"en": "Philosophy", "fr": "Philosophie", "es": "Filosofía", "ar": "الفلسفة"},
+}
+METHOD_I18N = {
+    "xiangxing": {"en": "Pictographic", "fr": "Pictogramme", "es": "Pictográfico", "ar": "تصويري"},
+    "zhishi": {"en": "Indicative", "fr": "Indicatif", "es": "Indicativo", "ar": "إشاري"},
+    "huiyi": {"en": "Compound ideograph", "fr": "Idéo-composé", "es": "Ideográfico compuesto", "ar": "تركيبي دلالي"},
+    "xingsheng": {"en": "Phono-semantic", "fr": "Phono-sémantique", "es": "Fonosémico", "ar": "صوتي دلالي"},
+    "zhuanzhu": {"en": "Mutually glossing", "fr": "Glose mutuelle", "es": "Glosa mutua", "ar": "تبادل دلالي"},
+    "jiajie": {"en": "Loan character", "fr": "Emprunt", "es": "Préstamo fonético", "ar": "استعارة صوتية"},
+}
+
+
+def _label(mapping: dict[str, str], i18n: dict[str, dict], key: str, lang: str) -> str:
+    zh = mapping.get(key, key)
+    if lang in ("zh", "all"):
+        return zh
+    return (i18n.get(key) or {}).get(lang) or zh
 
 
 def _card_brief(c: ShuCard, lang: str = "zh") -> dict:
@@ -41,7 +63,7 @@ def _card_brief(c: ShuCard, lang: str = "zh") -> dict:
         "pinyin": c.pinyin,
         "components": c.components,
         "category": c.category,
-        "category_label": CATEGORY_LABELS.get(c.category, c.category),
+        "category_label": _label(CATEGORY_LABELS, CATEGORY_I18N, c.category, lang),
         "difficulty": c.difficulty,
         "options": [
             {
@@ -73,7 +95,7 @@ def _card_full(db: Session, c: ShuCard, lang: str = "zh") -> dict:
         "jinyi": pick_i18n(c.jinyi, c.jinyi_i18n, lang),
         "story": pick_i18n(c.story, c.story_i18n, lang),
         "method": c.method,
-        "method_label": METHOD_LABELS.get(c.method, c.method),
+        "method_label": _label(METHOD_LABELS, METHOD_I18N, c.method, lang),
         "refs": [r for r in (_ref_full(db, rid, lang) for rid in (c.refs or [])) if r],
     }
 
@@ -368,6 +390,7 @@ def trace(
 def progress(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
+    lang: str = Query("zh"),
 ) -> dict:
     answers = db.execute(
         select(ShuAnswer).where(ShuAnswer.user_id == user.id)
@@ -384,8 +407,8 @@ def progress(
         if c.id in correct_card_ids:
             learned_chars.append({
                 "id": c.id, "char": c.char, "pinyin": c.pinyin,
-                "benyi": c.benyi, "category": c.category,
-                "category_label": CATEGORY_LABELS.get(c.category, c.category),
+                "benyi": pick_i18n(c.benyi, c.benyi_i18n, lang), "category": c.category,
+                "category_label": _label(CATEGORY_LABELS, CATEGORY_I18N, c.category, lang),
             })
     shu_score = (user.liuyi or {}).get("shu", 0)
     title = "习书者"
@@ -395,7 +418,9 @@ def progress(
 
     # 类别覆盖率
     by_category: dict[str, dict] = {}
-    for cat, label in CATEGORY_LABELS.items():
+    for cat, label in (
+        (cat, _label(CATEGORY_LABELS, CATEGORY_I18N, cat, lang)) for cat in CATEGORY_LABELS
+    ):
         total_cat = db.execute(
             select(func.count()).select_from(ShuCard).where(ShuCard.category == cat)
         ).scalar_one() or 0

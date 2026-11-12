@@ -3,7 +3,7 @@
 import { ButtonHTMLAttributes, ReactNode } from "react";
 import { useReducedMotion } from "@/lib/motion";
 
-/** 立体按压按钮（Duolingo 触觉机制，品牌配色）。底部 4px 实色阴影，按下下移 4px。 */
+/** 旧博物馆按钮门面：几何已并入全站 .btn 基线（扁平胶囊，见 globals.css）。 */
 export function TactileButton({
   children,
   variant = "accent",

@@ -3,36 +3,42 @@
 import Link from "next/link";
 import { useLang, t } from "@/lib/i18n";
 import { Reveal } from "@/lib/motion";
-import { TactileButton } from "@/components/museum";
+import Icon, { type IconName } from "@/components/ui/Icon";
 
-const BLOCKS = [
+const BLOCKS: {
+  titleKey: string;
+  descKey: string;
+  actionKey: string;
+  href: string;
+  icon: IconName;
+}[] = [
   {
     titleKey: "teach.toolkit.title",
     descKey: "teach.toolkit.desc",
     actionKey: "teach.openToolkit",
     href: "/plugins",
-    glyph: "包",
+    icon: "grid",
   },
   {
     titleKey: "teach.lesson.title",
     descKey: "teach.lesson.desc",
     actionKey: "teach.openPaths",
     href: "/paths",
-    glyph: "课",
+    icon: "book",
   },
   {
     titleKey: "teach.classroom.title",
     descKey: "teach.classroom.desc",
     actionKey: "teach.openKiosk",
     href: "/kiosk",
-    glyph: "堂",
+    icon: "institution",
   },
   {
     titleKey: "teach.assessment.title",
     descKey: "teach.assessment.desc",
     actionKey: "teach.openQuiz",
     href: "/quiz",
-    glyph: "评",
+    icon: "review",
   },
 ];
 
@@ -53,14 +59,14 @@ export default function TeachPage() {
             delay={i * 80}
             className="flex flex-col rounded-2xl border border-line bg-surface p-5"
           >
-            <span className="seal mb-3 inline-flex h-10 w-10 items-center justify-center rounded-md font-serif">
-              {b.glyph}
+            <span className="mb-3 grid h-10 w-10 place-items-center rounded-xl border border-line bg-surface-2 text-accent">
+              <Icon name={b.icon} size={19} />
             </span>
             <h2 className="font-serif text-lg font-medium text-fg">{t(b.titleKey, lang)}</h2>
             <p className="mt-1.5 flex-1 text-sm leading-relaxed text-muted">{t(b.descKey, lang)}</p>
             <div className="mt-4">
-              <Link href={b.href}>
-                <TactileButton variant="accent">{t(b.actionKey, lang)} →</TactileButton>
+              <Link href={b.href} className="nz-btn">
+                {t(b.actionKey, lang)} →
               </Link>
             </div>
           </Reveal>
@@ -72,8 +78,8 @@ export default function TeachPage() {
           {t("teach.classroom.desc", lang)}
         </p>
         <div className="mt-3">
-          <Link href="/kiosk">
-            <TactileButton variant="gold">{t("teach.openKiosk", lang)} →</TactileButton>
+          <Link href="/kiosk" className="nz-btn">
+            {t("teach.openKiosk", lang)} →
           </Link>
         </div>
       </Reveal>

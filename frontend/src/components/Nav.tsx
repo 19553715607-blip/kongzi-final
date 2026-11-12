@@ -7,18 +7,18 @@ import LangSwitcher from "./LangSwitcher";
 import ThemeToggle from "./ThemeToggle";
 import UserMenu from "./UserMenu";
 import NavDropdown from "./NavDropdown";
+import Icon, { type IconName } from "./ui/Icon";
 import { t, useLang } from "@/lib/i18n";
 import { areaOf, isActive, mobileTabs, navGroups } from "@/lib/nav";
 
-// 移动端底部 tab 的图标。href 与 lib/nav.ts 的 mobileTabs() 对应；
+// 移动端底部 tab 的图标，与 lib/nav.ts 的 mobileTabs() 对应；
 // 新增 tab 时在这里补图标，缺省回落为圆点。
-const TAB_ICONS: Record<string, string> = {
-  "/": "M3 11l9-8 9 8M5 10v10h14V10",
-  "/journey": "M12 2a10 10 0 100 20 10 10 0 000-20zM16.2 7.8l-2.4 6-6 2.4 2.4-6 6-2.4z",
-  "/paths": "M4 5a2 2 0 012-2h12v18H6a2 2 0 01-2-2V5zM8 7h8M8 11h6",
-  "/me": "M12 12a4 4 0 100-8 4 4 0 000 8zM4 21a8 8 0 0116 0",
+const TAB_ICONS: Record<string, IconName> = {
+  "/": "home",
+  "/journey": "compass",
+  "/paths": "book",
+  "/me": "user",
 };
-const TAB_ICON_FALLBACK = "M12 8a4 4 0 100 8 4 4 0 000-8z";
 
 export default function Nav({ ghost = false }: { ghost?: boolean }) {
   const path = usePathname();
@@ -57,22 +57,13 @@ export default function Nav({ ghost = false }: { ghost?: boolean }) {
   return (
     <>
       <header
-        className={`sticky top-0 z-20 border-b border-line bg-bg/80 backdrop-blur transition-colors ${
+        className={`site-header sticky top-0 z-20 border-b border-line transition-colors ${
           ghost && !solid ? "nav-ghost" : ""
         }`}
       >
         <div className={`mx-auto flex h-14 items-center gap-3 px-4 md:px-6 ${ghost ? "max-w-6xl" : "max-w-4xl"}`}>
-          <Link href="/" className="flex items-center gap-2">
-            <span className="seal flex h-8 w-8 items-center justify-center rounded-md text-lg">
-              孔
-            </span>
-            <span className="font-serif text-base font-medium text-fg">
-              {/* 品牌全称到 lg 才显示：768–1023 区间里法语/西语的
-                  「Kongzi · Plateforme des classiques confucéens」会把页头顶出视口
-                  （实测 768px 下溢出 56–59px，右侧「Connexion」被裁掉） */}
-              <span className="hidden lg:inline">{t("brand.title", lang)}</span>
-              <span className="lg:hidden">{t("brand.short", lang)}</span>
-            </span>
+          <Link href="/" className="flex items-center gap-2" aria-label={t("brand.title", lang)}>
+            <span className="seal-brand" aria-hidden="true" />
           </Link>
 
           {/* 桌面：首页 + 3 个一级下拉 */}
@@ -103,7 +94,7 @@ export default function Nav({ ghost = false }: { ghost?: boolean }) {
 
       {/* 移动端底部 tab：首页 / 探索 / 学习 / 我 + 更多 */}
       <nav
-        className="fixed bottom-0 start-0 end-0 z-20 flex h-14 border-t border-line bg-bg/95 backdrop-blur md:hidden"
+        className="site-tabbar fixed bottom-0 start-0 end-0 z-20 flex h-14 border-t border-line backdrop-blur md:hidden"
         aria-label="mobile"
       >
         {tabs.map((l) => {
@@ -119,18 +110,7 @@ export default function Nav({ ghost = false }: { ghost?: boolean }) {
                 on ? "text-accent" : "text-faint"
               }`}
             >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d={TAB_ICONS[l.href] ?? TAB_ICON_FALLBACK} />
-              </svg>
+              <Icon name={TAB_ICONS[l.href] ?? "compass"} size={20} />
               {t(l.labelKey, lang)}
             </Link>
           );
@@ -145,21 +125,7 @@ export default function Nav({ ghost = false }: { ghost?: boolean }) {
             drawer ? "text-accent" : "text-faint"
           }`}
         >
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <rect x="3" y="3" width="7" height="7" rx="1" />
-            <rect x="14" y="3" width="7" height="7" rx="1" />
-            <rect x="3" y="14" width="7" height="7" rx="1" />
-            <rect x="14" y="14" width="7" height="7" rx="1" />
-          </svg>
+          <Icon name="grid" size={20} />
           {t("nav.menu", lang)}
         </button>
       </nav>
@@ -178,11 +144,9 @@ export default function Nav({ ghost = false }: { ghost?: boolean }) {
                 type="button"
                 onClick={() => setDrawer(false)}
                 aria-label={t("nav.close", lang)}
-                className="rounded-full p-1 text-muted hover:bg-surface-2"
+                className="btn btn-quiet btn-icon"
               >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M6 6l12 12M18 6L6 18" />
-                </svg>
+                <Icon name="close" size={20} />
               </button>
             </div>
 

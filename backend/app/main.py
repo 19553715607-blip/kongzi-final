@@ -78,7 +78,7 @@ async def lifespan(app: FastAPI):
         _db = SessionLocal()
         try:
             _counts = apply_annotation_i18n(_db)
-            if _counts["updated"]:
+            if _counts["updated"] or _counts.get("sources"):
                 print(f"[startup] annotation i18n applied: {_counts}")
         finally:
             _db.close()

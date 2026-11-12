@@ -30,6 +30,11 @@
   --seal-a: #A8863F;
   --seal-b: #7A5F26;
 
+  /* 顶栏玻璃底：留足透光，靠 blur 保证可读 */
+  --nav-bg: rgba(250, 247, 240, 0.42);
+  /* 底部 tab 栏压在正文上，需要更实 */
+  --nav-bg-strong: rgba(250, 247, 240, 0.90);
+
   --cel: #2F6F62;
   --cel-soft: #E4EFE7;
   --cel-ink: #0B332B;
@@ -70,6 +75,9 @@
   --seal-a: #C9A86A;
   --seal-b: #8A6D3B;
 
+  --nav-bg: rgba(10, 15, 26, 0.38);
+  --nav-bg-strong: rgba(10, 15, 26, 0.86);
+
   --cel: #8FB8A8;
   --cel-soft: rgba(143, 184, 168, 0.10);
   --cel-ink: #CFE8DD;
@@ -101,6 +109,26 @@ html, body {
   background: linear-gradient(135deg, var(--seal-a) 0%, var(--seal-b) 100%);
   color: #FAECE7;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 1px 3px rgba(58, 47, 20, 0.35);
+}
+
+/* 品牌标记：隶书「孔」已固化为矢量路径，用遮罩着色，不依赖本机字体 */
+.seal-brand {
+  display: block;
+  width: 34px;
+  height: 34px;
+  background-color: var(--accent);
+  -webkit-mask: url("/brand/kong.svg") center / contain no-repeat;
+  mask: url("/brand/kong.svg") center / contain no-repeat;
+}
+
+/* 印章内的品牌字：同一矢量遮罩，尺寸随字号 */
+.brand-glyph {
+  display: block;
+  width: 1.05em;
+  height: 1.05em;
+  background-color: currentColor;
+  -webkit-mask: url("/brand/kong.svg") center / contain no-repeat;
+  mask: url("/brand/kong.svg") center / contain no-repeat;
 }
 
 /* 打字省略号动效 */
@@ -174,6 +202,67 @@ html, body {
 .pressable { transition: transform 0.12s ease, box-shadow 0.2s ease, background-color 0.2s ease; }
 .pressable:active { transform: scale(0.97); }
 .pressable.no-motion, .pressable.no-motion:active { transform: none; }
+
+/* ── 控件基线：全站按钮与图标的唯一几何来源 ──────────────────────────────
+   胶囊按钮 .btn / 紧凑胶囊 .chip / 图标 .icon。
+   各处不再手写 px、py、radius，改由尺寸档位决定，避免同一种按钮出现多种高度。 */
+.icon { flex: none; }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  height: 32px; padding: 0 14px;
+  border: 1px solid transparent; border-radius: 999px;
+  font-size: 12px; font-weight: 500; line-height: 1; letter-spacing: 0.02em;
+  white-space: nowrap; cursor: pointer; text-decoration: none;
+  transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease, transform 0.12s ease;
+}
+.btn:active { transform: scale(0.97); }
+.btn:disabled, .btn[aria-disabled="true"] { opacity: 0.5; pointer-events: none; }
+
+.btn-primary { background: var(--accent); color: var(--on-accent); }
+.btn-primary:hover { filter: brightness(1.06); }
+.btn-outline { background: var(--surface); border-color: var(--line); color: var(--muted); }
+.btn-outline:hover {
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--line));
+  color: var(--accent);
+}
+.btn-quiet { background: transparent; color: var(--muted); }
+.btn-quiet:hover { background: var(--surface-2); color: var(--fg); }
+.btn.is-active {
+  background: var(--accent-soft);
+  border-color: color-mix(in srgb, var(--accent) 50%, transparent);
+  color: var(--accent);
+}
+
+.btn-icon { width: 32px; padding: 0; }
+.btn-sm { height: 26px; padding: 0 10px; font-size: 11px; }
+.btn-sm.btn-icon { width: 26px; }
+.btn-lg { height: 40px; padding: 0 22px; font-size: 13px; }
+.btn-lg.btn-icon { width: 40px; }
+
+.chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  height: 24px; padding: 0 10px;
+  border: 1px solid var(--line); border-radius: 999px;
+  font-size: 11px; line-height: 1; color: var(--muted);
+  background: transparent; cursor: pointer; text-decoration: none;
+  transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease, transform 0.12s ease;
+}
+.chip:active { transform: scale(0.97); }
+.chip:disabled, .chip[aria-disabled="true"] { opacity: 0.5; pointer-events: none; }
+.chip:hover {
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--line));
+  color: var(--accent);
+}
+.chip-quiet { border-color: transparent; padding: 0 8px; }
+.chip-quiet:hover { background: var(--surface-2); color: var(--accent); }
+.chip-accent {
+  border-color: color-mix(in srgb, var(--accent) 50%, transparent);
+  color: var(--accent);
+}
+.chip-accent:hover { background: var(--accent-soft); }
+.chip-gold { border-color: color-mix(in srgb, var(--gold) 55%, transparent); color: var(--gold); }
+.chip-gold:hover { background: color-mix(in srgb, var(--gold) 16%, transparent); }
 
 /* ── 管理端精修 ─────────────────────────────────────────────────────── */
 /* 状态徽章：朱砂=待审/管理，青绿=通过/已发布，鎏金=游客/审定，灰=中性/拒绝 */
@@ -299,14 +388,22 @@ body > * { position: relative; z-index: 1; }
 .error-state .state-sub { font-size: 12px; line-height: 1.7; opacity: 0.85; }
 .error-state button.retry-btn,
 button.retry-btn {
+  display: inline-flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 18px;
   border-radius: 999px;
-  padding: 6px 18px;
   font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
   background: var(--accent);
   color: var(--on-accent);
+  transition: filter 0.18s ease, transform 0.12s ease;
 }
 .error-state button.retry-btn:hover,
 button.retry-btn:hover { filter: brightness(1.06); }
+.error-state button.retry-btn:active,
+button.retry-btn:active { transform: scale(0.97); }
 
 /* reduced-motion：彻底降级一切过渡/动画 */
 @media (prefers-reduced-motion: reduce) {
@@ -391,27 +488,37 @@ button.retry-btn:hover { filter: brightness(1.06); }
 .timeline .tl-labels span { cursor: pointer; }
 .timeline .tl-labels span:hover { color: var(--accent); }
 
-/* 立体按压按钮（Duolingo 触觉机制，品牌配色） */
+/* 通用按钮：与首页同一条几何基线（.btn 家族），页面里走 TactileButton 的按钮自动继承。
+   cel 视为次要动作、ghost 视为安静动作，均落在描边胶囊上；gold 与 accent 同为实心主按钮。 */
 .tactile-btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-  padding: 11px 22px; border-radius: var(--radius-lg);
-  font-size: 13px; font-weight: 700; letter-spacing: 0.04em;
+  height: 32px; padding: 0 14px;
+  border: 1px solid transparent; border-radius: 999px;
+  font-size: 12px; font-weight: 500; line-height: 1; letter-spacing: 0.02em;
+  white-space: nowrap; cursor: pointer; text-decoration: none;
   background: var(--accent); color: var(--on-accent);
-  box-shadow: 0 4px 0 var(--accent-deep);
-  border: none; cursor: pointer;
-  transition: transform 0.08s ease, box-shadow 0.08s ease, filter 0.2s ease;
-  text-decoration: none;
+  transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease, transform 0.12s ease, filter 0.18s ease;
 }
-.tactile-btn:hover { filter: brightness(1.05); }
-.tactile-btn:active { transform: translateY(4px); box-shadow: 0 0 0 var(--accent-deep); }
-.tactile-btn.cel { background: var(--cel); box-shadow: 0 4px 0 var(--cel-deep); }
-.tactile-btn.gold { background: var(--gold); color: #1A1408; box-shadow: 0 4px 0 var(--gold-deep); }
-.tactile-btn.ghost { background: var(--surface); color: var(--fg); border: 2px solid var(--line); box-shadow: 0 4px 0 var(--line); }
-.tactile-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-.tactile-btn.no-tactile, .tactile-btn.no-tactile:active { transform: none; box-shadow: none; }
+.tactile-btn:hover { filter: brightness(1.06); }
+.tactile-btn:active { transform: scale(0.97); }
+.tactile-btn.cel {
+  background: var(--surface); border-color: var(--line); color: var(--muted);
+}
+.tactile-btn.cel:hover {
+  filter: none;
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--line));
+  color: var(--accent);
+}
+.tactile-btn.gold { background: var(--accent); color: var(--on-accent); }
+.tactile-btn.ghost {
+  background: transparent; border-color: var(--line); color: var(--muted);
+}
+.tactile-btn.ghost:hover { filter: none; background: var(--surface-2); color: var(--fg); }
+.tactile-btn:disabled { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
 /* 工具台紧凑尺寸：管理端分页/审批/发 Key 等小按钮 */
-.tactile-btn.sm { padding: 7px 14px; font-size: 12px; }
-.tactile-btn.xs { padding: 5px 12px; font-size: 11px; border-radius: 999px; }
+.tactile-btn.sm, .tactile-btn.xs { height: 26px; padding: 0 10px; font-size: 11px; }
+/* 游戏 HUD 保留大触控目标：调用处显式写 h-14 时不被基线的 32px 压回 */
+.tactile-btn.h-14 { height: 3.5rem; padding: 0 22px; font-size: 14px; }
 
 /* 顶部公告条（Met 风格，墨底 + 朱砂新展标识） */
 .announcement-bar {
@@ -467,7 +574,7 @@ button.retry-btn:hover { filter: brightness(1.06); }
 }
 .gp-node.node-done { background: var(--cel-soft); color: var(--cel-ink); border: 2px solid var(--cel); box-shadow: none; }
 .gp-node.node-cur { background: var(--surface); border: 3px solid var(--accent); color: var(--accent); animation: node-breathe 2s ease-in-out infinite; }
-.gp-node.node-lock { background: var(--surface-2); color: var(--faint); box-shadow: 0 4px 0 var(--line); cursor: pointer; }
+.gp-node.node-lock { background: var(--surface-2); color: var(--faint); border: 2px solid var(--line); cursor: pointer; }
 @keyframes node-breathe { 0%,100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 45%, transparent); } 50% { box-shadow: 0 0 0 8px color-mix(in srgb, var(--accent) 0%, transparent); } }
 .gp-link { flex: 1; height: 3px; background: var(--line); margin: 0 8px; border-radius: 2px; }
 /* 窄屏：六个 56px 节点 + 连接线在 390px 下会顶出视口（实测 67px），
@@ -614,7 +721,7 @@ button.retry-btn:hover { filter: brightness(1.06); }
 /* ── 可排序表头 / 批量选择 ── */
 .th-sort { cursor: pointer; user-select: none; white-space: nowrap; }
 .th-sort:hover { color: var(--fg); }
-.th-sort .th-arrow { display: inline-block; margin-inline-start: 4px; color: var(--accent); font-size: 9px; }
+.th-sort .th-arrow { display: inline-block; margin-inline-start: 4px; color: var(--accent); font-size: 9px; vertical-align: -1px; }
 .th-check { width: 34px; padding-inline-start: 10px !important; }
 tbody tr.row-selected { background: color-mix(in srgb, var(--accent) 7%, transparent) !important; }
 .bulk-bar {
@@ -721,16 +828,25 @@ body::after {
 /* 首页使用全站主题色；海报跟随 html.dark 切换。 */
 .kz-night { color: var(--fg); }
 
-/* 首页透明导航：页面顶部时压在 Hero 上，滚动后恢复实底 */
+/* 顶部导航：页面顶部压在 Hero 上时完全透明 */
 .nav-ghost {
   background: transparent !important;
   border-color: transparent !important;
+  -webkit-backdrop-filter: none !important;
   backdrop-filter: none !important;
 }
 
-/* 作用域内滚动后的实底导航（bg-bg/80 对 var 色不产出 alpha，这里兜底） */
-html:not(.dark) .kz-night header:not(.nav-ghost) { background: rgba(250, 247, 240, 0.86); }
-.dark .kz-night header:not(.nav-ghost) { background: rgba(10, 15, 26, 0.82); }
+/* 滚动后保留玻璃感：底色只给到四成多，靠模糊保证可读
+   （Tailwind 的 bg-bg/80 对十六进制变量不产出 alpha，这里统一兜底） */
+.site-header {
+  background: var(--nav-bg);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  backdrop-filter: blur(16px) saturate(160%);
+}
+
+.site-tabbar {
+  background: var(--nav-bg-strong);
+}
 
 /* 海报首尾淡出到透明，让全站的纸色、纹理和导航自然透出来。 */
 .nz-hero {
@@ -849,13 +965,14 @@ html:lang(zh) .nz-subtitle { letter-spacing: 0.2em; }
 .nz-btn {
   display: inline-flex; align-items: center; gap: 0.5rem;
   font-family: var(--font-serif, inherit); font-size: 0.8125rem; letter-spacing: 0.3em;
-  padding: 0.8rem 1.9rem; border-radius: 2px; cursor: pointer;
+  padding: 0.8rem 1.9rem; border-radius: 999px; cursor: pointer;
   color: var(--accent-bright);
   background: color-mix(in srgb, var(--accent) 9%, transparent);
   border: 1px solid color-mix(in srgb, var(--accent) 55%, transparent);
-  transition: background 0.25s ease, border-color 0.25s ease;
+  transition: background 0.25s ease, border-color 0.25s ease, transform 0.12s ease;
 }
 .nz-btn:hover { background: color-mix(in srgb, var(--accent) 18%, transparent); border-color: var(--accent); }
+.nz-btn:active { transform: scale(0.97); }
 html:not(.dark) .nz-btn { color: var(--accent-deep); }
 
 /* ── 底部入口行：金点分隔的安静链接（令牌驱动）── */

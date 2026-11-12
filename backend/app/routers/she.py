@@ -64,6 +64,7 @@ def _user_streak(db: Session, user_id: str) -> int:
 def start_round(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
+    lang: str = Query("zh"),
 ) -> dict:
     """开局：返回风速、距离、当前连击数、是否到了「不主皮」提示。"""
     streak = _user_streak(db, user.id)
@@ -83,7 +84,7 @@ def start_round(
         "distance_m": distance,
         "streak": streak,
         "zhupi_warning": zhupi_warning,
-        "zhupi_ref": _ref(db, REF_ZHUPI) if zhupi_warning else None,
+        "zhupi_ref": _ref(db, REF_ZHUPI, lang) if zhupi_warning else None,
         "total_rounds": total,
     }
 
@@ -110,6 +111,7 @@ def submit_result(
     body: ResultIn,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
+    lang: str = Query("zh"),
 ) -> dict:
     hit = body.score > 0
     reflection = body.reflection_choice
@@ -204,7 +206,7 @@ def submit_result(
         "she_delta": she_delta,
         "xp_delta": xp_delta,
         "abstain_after_warning": abstain_after_warning,
-        "new_unlocked_refs": [_ref(db, r) for r in new_unlocked if _ref(db, r)],
+        "new_unlocked_refs": [_ref(db, r, lang) for r in new_unlocked if _ref(db, r, lang)],
         "progress": {
             "liuyi_she": liuyi["she"],
             "xp": user.xp,
@@ -218,6 +220,7 @@ def submit_result(
 def progress(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
+    lang: str = Query("zh"),
 ) -> dict:
     rounds = db.execute(
         select(ShootRound).where(ShootRound.user_id == user.id).order_by(ShootRound.id.desc())
@@ -242,7 +245,7 @@ def progress(
     # 解锁的「射」相关经典
     she_refs = [REF_FIRST_HIT, REF_FIRST_REFLECT, REF_ZHUPI, REF_DEEP]
     unlocked_pool = set(user.li_unlocked_refs or [])
-    unlocked = [_ref(db, r) for r in she_refs if r in unlocked_pool]
+    unlocked = [_ref(db, r, lang) for r in she_refs if r in unlocked_pool]
 
     return {
         "liuyi_she": she,
@@ -255,7 +258,7 @@ def progress(
         "deep_reflect_count": notes,
         "attribution": attribution,
         "unlocked_refs": [u for u in unlocked if u],
-        "all_she_refs": [{**(_ref(db, r) or {"ref_id": r}), "unlocked": r in unlocked_pool} for r in she_refs],
+        "all_she_refs": [{**(_ref(db, r, lang) or {"ref_id": r}), "unlocked": r in unlocked_pool} for r in she_refs],
     }
 
 

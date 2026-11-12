@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { addFavorite, getFeed, getFavorites, removeFavorite, isAuthError } from "@/lib/api";
 import { getApiBase } from "@/lib/apiBase";
 import { visitorHeaders } from "@/lib/visitor";
@@ -8,6 +9,7 @@ import { t, useLang } from "@/lib/i18n";
 import { toast } from "@/components/Toast";
 import { Reveal } from "@/lib/motion";
 import ChineseBackdrop from "@/components/ChineseBackdrop";
+import Icon from "@/components/ui/Icon";
 import CommentSheet from "./_components/CommentSheet";
 import WallpaperSheet from "./_components/WallpaperSheet";
 import { renderCardImage } from "./_components/renderCard";
@@ -17,6 +19,7 @@ type LikeState = { liked: boolean; count: number };
 
 export default function FeedPage() {
   const [lang] = useLang();
+  const router = useRouter();
   const [items, setItems] = useState<FeedItem[]>([]);
   const [err, setErr] = useState("");
   const [ready, setReady] = useState(false);
@@ -32,6 +35,9 @@ export default function FeedPage() {
   const feedSeq = useRef(0);
   // 当前打开的评论抽屉
   const [sheet, setSheet] = useState<{ targetId: string; title: string } | null>(null);
+  // 滚动容器 + 滚轮节流锁
+  const scrollerRef = useRef<HTMLDivElement>(null);
+  const wheelLock = useRef(0);
 
   useEffect(() => {
     const seq = ++feedSeq.current;
@@ -177,6 +183,42 @@ export default function FeedPage() {
     [sheetTargetId],
   );
 
+  // 一张卡片的高度即一屏，滚轮一格切一张
+  const stepCard = useCallback(
+    (dir: 1 | -1) => {
+      const el = scrollerRef.current;
+      if (!el) return;
+      const h = el.clientHeight;
+      if (!h || !items.length) return;
+      const cur = Math.round(el.scrollTop / h);
+      const next = Math.min(items.length - 1, Math.max(0, cur + dir));
+      if (next === cur) return;
+      el.scrollTo({ top: next * h, behavior: "smooth" });
+    },
+    [items.length],
+  );
+
+  useEffect(() => {
+    // 触屏与无滚轮设备交给原生滑动
+    if (window.matchMedia("(hover: none)").matches) return;
+    const onWheel = (e: WheelEvent) => {
+      if (sheet || wall) return; // 抽屉 / 壁纸面板自己滚动
+      if (Math.abs(e.deltaY) < 4 || e.ctrlKey) return;
+      e.preventDefault();
+      const now = Date.now();
+      if (now < wheelLock.current) return;
+      wheelLock.current = now + 480;
+      stepCard(e.deltaY > 0 ? 1 : -1);
+    };
+    window.addEventListener("wheel", onWheel, { passive: false });
+    return () => window.removeEventListener("wheel", onWheel);
+  }, [sheet, wall, stepCard]);
+
+  const goBack = useCallback(() => {
+    if (window.history.length > 1) router.back();
+    else router.push("/");
+  }, [router]);
+
   if (err)
     return (
       <div className="error-state">
@@ -191,7 +233,19 @@ export default function FeedPage() {
 
   return (
     <div className="relative mx-auto max-w-md">
-      <div className="h-[calc(100dvh-8rem)] snap-y snap-mandatory overflow-y-auto rounded-3xl">
+      <button
+        type="button"
+        onClick={goBack}
+        className="btn btn-outline btn-sm absolute start-3 top-3 z-20 bg-surface/85 backdrop-blur"
+      >
+        <Icon name="chevronLeft" size={14} />
+        {t("feed.back", lang)}
+      </button>
+
+      <div
+        ref={scrollerRef}
+        className="h-[calc(100dvh-8rem)] snap-y snap-mandatory overflow-y-auto rounded-3xl"
+      >
         {!ready ? (
           <div className="flex h-full flex-col gap-3 p-6">
             <div className="skeleton h-24 w-full" />
@@ -375,21 +429,18 @@ function Action({
   active?: boolean;
 }) {
   return (
-    <div className="flex flex-col items-center gap-0.5 text-fg">
+    <div className="flex flex-col items-center text-fg">
       <button
         onClick={onClick}
         aria-label={ariaLabel}
-        className={`pressable flex h-10 w-10 items-center justify-center rounded-lg border bg-surface/90 transition hover:border-accent hover:text-accent ${
-          active ? "border-accent bg-accent-soft text-accent" : "border-line text-muted"
-        }`}
+        className={`btn btn-lg btn-icon pressable btn-outline ${active ? "is-active" : ""}`}
       >
         {children}
       </button>
-      {badge ? (
-        <span className="text-[10px] tabular-nums leading-none">{badge}</span>
-      ) : label ? (
-        <span className="text-[10px]">{label}</span>
-      ) : null}
+      {/* 固定高度的说明槽：有无副标题都占同样行高，动作列才不会忽宽忽窄 */}
+      <span className="mt-1 h-3 text-[10px] leading-none text-faint">
+        {badge ?? label}
+      </span>
     </div>
   );
 }

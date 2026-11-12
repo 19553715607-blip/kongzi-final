@@ -31,6 +31,15 @@ function termDef(c: Concept, lang: Lang): string {
   if (lang === "zh") return c.definition?.zh || "";
   return c.definition?.[lang] || c.definition?.en || "";
 }
+const SCHOOL_LABELS: Record<string, Record<Lang, string>> = {
+  "儒家": { zh: "儒家", en: "Confucian", fr: "Confucéen", es: "Confuciano", ar: "كونفوشيوسي" },
+  ru: { zh: "儒家", en: "Confucian", fr: "Confucéen", es: "Confuciano", ar: "كونفوشيوسي" },
+  "道家": { zh: "道家", en: "Daoist", fr: "Taoïste", es: "Taoísta", ar: "طاوي" },
+  dao: { zh: "道家", en: "Daoist", fr: "Taoïste", es: "Taoísta", ar: "طاوي" },
+};
+function schoolLabel(s: string, lang: Lang): string {
+  return SCHOOL_LABELS[s]?.[lang] ?? s;
+}
 
 export default function TermsPage() {
   const [lang] = useLang();
@@ -143,13 +152,9 @@ export default function TermsPage() {
             <button
               key={s || "all"}
               onClick={() => setSchool(s)}
-              className={`pressable rounded-full px-3 py-1.5 text-xs transition ${
-                school === s
-                  ? "bg-accent text-on-accent"
-                  : "border border-line text-muted hover:bg-surface-2"
-              }`}
+              className={`chip ${school === s ? "chip-accent" : ""}`}
             >
-              {s || t("terms.all", lang)}
+              {s ? schoolLabel(s, lang) : t("terms.all", lang)}
             </button>
           ))}
         </div>
@@ -178,11 +183,11 @@ export default function TermsPage() {
                 <p className="mt-1.5 text-sm leading-relaxed text-muted">{termDef(c, lang)}</p>
               )}
               <div className="mt-2 flex items-center gap-2 text-[10px] text-faint">
-                {c.school && <span className="rounded bg-surface-2 px-2 py-0.5">{c.school}</span>}
+                {c.school && <span className="rounded bg-surface-2 px-2 py-0.5">{schoolLabel(c.school, lang)}</span>}
                 <span>{t("terms.source", lang)} · {c.id}</span>
                 <Link
                   href={`/graph?concept=${c.id}`}
-                  className="ms-auto pressable rounded-full border border-line px-2 py-0.5 text-[10px] text-faint transition hover:border-accent hover:text-accent"
+                  className="chip ms-auto"
                 >
                   {t("terms.viewGraph", lang)}
                 </Link>

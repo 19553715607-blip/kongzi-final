@@ -52,7 +52,7 @@ _CHAPTER_PINYIN: dict[str, str] = {
     "子罕": "Zi Han", "颜渊": "Yan Yuan", "宪问": "Xian Wen", "季氏": "Ji Shi",
     "乐记": "Yue Ji", "乘马": "Cheng Ma", "均输": "Jun Shu", "衰分": "Cui Fen",
     "地官·保氏": "Diguan · Baoshi", "君道": "Jun Dao", "滕文公下": "Teng Wen Gong II",
-    "天官·均人": "Tianguan · Junren",
+    "天官·均人": "Tianguan · Junren", "均人": "Junren",
 }
 
 _CHAPTER_AR: dict[str, str] = {
@@ -62,7 +62,7 @@ _CHAPTER_AR: dict[str, str] = {
     "Cheng Ma": "تشينغ ما", "Jun Shu": "جون شو", "Cui Fen": "تسوي فن",
     "Gongye Chang": "غونغيه تشانغ", "Jun Dao": "جون داو",
     "Teng Wen Gong II": "تنغ ون غونغ ٢", "Diguan · Baoshi": "ديغوان · باوشي",
-    "Tianguan · Junren": "تيانغوان · جونرن",
+    "Tianguan · Junren": "تيانغوان · جونرن", "Junren": "جونرن",
 }
 
 

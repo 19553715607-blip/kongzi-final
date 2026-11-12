@@ -152,7 +152,7 @@ export default function AdminCasesPage() {
           {me.is_guest ? (
             <Link
               href="/login"
-              className="mt-3 inline-block rounded-lg bg-accent px-4 py-2 text-sm text-on-accent hover:opacity-90"
+              className="btn btn-primary mt-3"
             >
               {t("adm.loginAsAdmin", lang)}
             </Link>
@@ -270,9 +270,7 @@ export default function AdminCasesPage() {
                 setTopicId(null);
                 setPage(1);
               }}
-              className={`pressable rounded-full px-2.5 py-1 text-xs ${
-                topicId === null ? "bg-accent text-on-accent" : "border border-line text-muted"
-              }`}
+              className={`chip ${topicId === null ? "chip-accent" : ""}`}
             >
               {t("adm.all", lang)}
             </button>
@@ -283,10 +281,7 @@ export default function AdminCasesPage() {
                   setTopicId(tp.id);
                   setPage(1);
                 }}
-                className={`pressable rounded-full px-2.5 py-1 text-xs ${
-                  topicId === tp.id ? "text-on-accent" : "border border-line text-muted"
-                }`}
-                style={topicId === tp.id ? { background: tp.color } : undefined}
+                className={`chip ${topicId === tp.id ? "chip-accent" : ""}`}
               >
                 {tp.name}
               </button>
@@ -300,9 +295,7 @@ export default function AdminCasesPage() {
                   setStatus(s);
                   setPage(1);
                 }}
-                className={`pressable rounded-full px-2.5 py-1 text-xs ${
-                  status === s ? "bg-accent-soft text-accent" : "bg-surface-2 text-faint"
-                }`}
+                className={`chip ${status === s ? "chip-accent" : ""}`}
               >
                 {t(STATUS_KEYS[s], lang)}
               </button>
@@ -322,9 +315,7 @@ export default function AdminCasesPage() {
                   setReview(r.v);
                   setPage(1);
                 }}
-                className={`pressable rounded-full px-2.5 py-1 text-xs ${
-                  review === r.v ? "bg-accent text-on-accent" : "border border-line text-muted"
-                }`}
+                className={`chip ${review === r.v ? "chip-accent" : ""}`}
               >
                 {t(r.key, lang)}
               </button>

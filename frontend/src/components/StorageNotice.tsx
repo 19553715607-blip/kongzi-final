@@ -69,7 +69,7 @@ export default function StorageNotice() {
       </p>
       <button
         onClick={dismiss}
-        className="pressable rounded-full border border-accent/50 px-3.5 py-1.5 text-xs text-accent transition hover:bg-accent-soft"
+        className="btn btn-outline btn-sm"
       >
         {t("privacy.cookie.ok", lang)}
       </button>

@@ -459,4 +459,10 @@ export const SHU: Record<string, E> = {
   '试笔': { en: 'Practice strokes', fr: "Coup d'essai", es: 'Trazo de prueba', ar: 'تجربة الحبر' },
   '竹简挥毫 · 提按转折': { en: 'Brush on bamboo slips — press, lift, turn, pause', fr: 'Pinceau sur bambou : presser, relever, tourner, marquer', es: 'Trazo en bamboo: presionar, levantar, girar, pausar', ar: 'الخط على اللوحات: ضغط ورفع والتواء وإيقاف' },
   '执笔写大字 · 墨入宣纸 · 交卷定品第': { en: 'Write large characters — ink on rice paper, submit for a grade', fr: 'Grands caractères : encre sur papier de riz, rendu pour un grade', es: 'Escribe caracteres grandes: tinta sobre arroz, entrégalo para calificar', ar: 'اكتب الحروف الكبيرة: حبر على ورق الأرز، ثم سلّم للتقييم' },
+  '🎖 新解锁经典': { en: '🎖 New classic unlocked', fr: '🎖 Nouveau classique débloqué', es: '🎖 Nuevo clásico desbloqueado', ar: '🎖 نصّ كلاسيكي جديد مفتوح' },
+  // 称号（后端 progress.title）
+  '习书者': { en: 'Learner of writing', fr: 'Apprenti de l’écriture', es: 'Aprendiz de escritura', ar: 'متعلّم الكتابة' },
+  '通文达诂': { en: 'Master of text and meaning', fr: 'Maître du texte et du sens', es: 'Maestro del texto y su sentido', ar: 'بارع في النصّ ومعانيه' },
+  '识字明义': { en: 'Knowing characters, clear on meaning', fr: 'Caractères connus, sens éclairé', es: 'Caracteres sabidos, sentido claro', ar: 'يعرف الحروف ويفهم المعاني' },
+  '积学之士': { en: 'Accomplished scholar', fr: 'Savant accompli', es: 'Erudito consumado', ar: 'عالم مثابر' },
 };

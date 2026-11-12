@@ -93,7 +93,7 @@ export default function YueGame() {
 
   const loadAll = useCallback(() => {
     getYueToday(lang).then(setToday).catch((e) => setLoadErr(tr("无法加载乐艺题库，请稍后重试") + `（${errorHint(e)}）`));
-    getYueProgress().then(setProgress).catch(() => {});
+    getYueProgress(lang).then(setProgress).catch(() => {});
   }, [lang]);
   useEffect(() => { loadAll(); }, [loadAll]);
 
@@ -212,7 +212,7 @@ export default function YueGame() {
       setResult(res);
       sfx.finish(res.score);
       setPhase("scored");
-      getYueProgress().then(setProgress).catch(() => {});
+      getYueProgress(lang).then(setProgress).catch(() => {});
       getYueToday(lang).then(setToday).catch(() => {});
     } catch {
       say(tr("提交失败 — 请检查登录/网络"), false);
@@ -296,7 +296,7 @@ export default function YueGame() {
             {progress && <Stat label={tr("称号")} value={tr(progress.title)} />}
             {progress && <Stat label={tr("乐艺")} value={`${progress.liuyi_yue}`} numeric />}
             {progress && <Stat label={tr("最佳")} value={`${progress.best_score}`} numeric />}
-            <Link href="/journey" className="rounded-full border border-line px-3 py-1.5 text-xs text-muted hover:bg-surface-2">
+            <Link href="/journey" className="chip">
               {tr("← 六艺")}
             </Link>
           </div>

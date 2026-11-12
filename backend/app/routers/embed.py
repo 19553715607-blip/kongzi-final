@@ -14,6 +14,7 @@ from sqlalchemy import select
 
 from ..db import get_db
 from ..models import Passage
+from ..services.i18n import pick_i18n
 
 router = APIRouter(prefix="/api/v1/embed", tags=["embed"])
 
@@ -205,6 +206,67 @@ PLUGINS = [
 ]
 
 
+# 插件名/说明译表（name/summary/snippet_alt），缺译回落中文
+PLUGIN_I18N = {
+    "wp": {
+        "name": {"en": "WordPress embed", "fr": "Intégration WordPress", "es": "Inserción en WordPress", "ar": "تضمين WordPress"},
+        "summary": {"en": "Paste the iframe into WordPress / Squarespace / a school site and it works", "fr": "Collez l’iframe dans WordPress / Squarespace / un site d’école et c’est prêt", "es": "Pega el iframe en WordPress / Squarespace / la web del centro y listo", "ar": "الصق إطار iframe في WordPress أو Squarespace أو موقع المدرسة ويعمل فورًا"},
+    },
+    "notion": {
+        "name": {"en": "Notion embed", "fr": "Intégration Notion", "es": "Inserción en Notion", "ar": "تضمين Notion"},
+        "summary": {"en": "Paste the URL after /embed in Notion", "fr": "Collez l’URL après /embed dans Notion", "es": "Pega la URL tras /embed en Notion", "ar": "الصق الرابط بعد أمر /embed في Notion"},
+    },
+    "obsidian": {
+        "summary": {"en": "Reference the quote-card SVG directly in Markdown notes", "fr": "Référencez la carte-citation SVG directement dans vos notes Markdown", "es": "Cita la tarjeta SVG directamente en notas Markdown", "ar": "أدرج بطاقة الاقتباس SVG مباشرة في ملاحظات Markdown"},
+        "snippet_alt": {"en": "Quote", "fr": "Citation", "es": "Cita", "ar": "اقتباس"},
+    },
+    "twitter-card": {
+        "name": {"en": "Twitter/X quote poster", "fr": "Affiche-citation Twitter/X", "es": "Póster de cita para Twitter/X", "ar": "ملصق اقتباس لـ Twitter/X"},
+        "summary": {"en": "Download a 1200×630 SVG, convert to PNG, and post", "fr": "Téléchargez un SVG 1200×630, convertissez en PNG et publiez", "es": "Descarga un SVG de 1200×630, conviértelo a PNG y publica", "ar": "نزّل ملف SVG بمقاس 1200×630 ثم حوّله إلى PNG وانشره"},
+    },
+    "discord-bot": {
+        "name": {"en": "Discord bot endpoint", "fr": "Point d’accès bot Discord", "es": "Endpoint para bot de Discord", "ar": "نقطة اتصال بوت Discord"},
+        "summary": {"en": "Wire the open API into a Discord/Slack bot", "fr": "Branchez l’API ouverte sur un bot Discord/Slack", "es": "Conecta la API abierta a un bot de Discord/Slack", "ar": "اربط الواجهة المفتوحة ببوت Discord/Slack"},
+    },
+    "wechat-mp": {
+        "name": {"en": "WeChat Mini Program", "fr": "Mini-programme WeChat", "es": "Mini programa de WeChat", "ar": "برنامج WeChat المصغّر"},
+        "summary": {"en": "Wrap the responsive web app with a web-view component", "fr": "Enveloppez l’application web responsive dans un composant web-view", "es": "Envuelve la web responsive con un componente web-view", "ar": "غلّف تطبيق الويب المتجاوب بمكوّن web-view"},
+    },
+    "browser-ext": {
+        "name": {"en": "Browser selection extension", "fr": "Extension de sélection navigateur", "es": "Extensión de selección del navegador", "ar": "إضافة تحديد النص في المتصفح"},
+        "summary": {"en": "Select text to query /public/search; show the reading in a popup", "fr": "Sélectionnez du texte pour interroger /public/search ; le commentaire s’affiche en popup", "es": "Selecciona texto para consultar /public/search; la lectura aparece en una ventana", "ar": "حدّد نصًا لاستعلام /public/search ويظهر الشرح في نافذة منبثقة"},
+        "snippet": {"en": "manifest: kongzi-extension/manifest.json (provided in the code repository)", "fr": "manifest : kongzi-extension/manifest.json (fourni dans le dépôt de code)", "es": "manifest: kongzi-extension/manifest.json (incluido en el repositorio de código)", "ar": "manifest: kongzi-extension/manifest.json (متوفر في مستودع الشيفرة)"},
+    },
+    "rss": {
+        "name": {"en": "Daily quote RSS", "fr": "RSS de la citation du jour", "es": "RSS de la cita diaria", "ar": "RSS لاقتباس اليوم"},
+        "summary": {"en": "Embed the daily quote in Outlook / Apple News subscriptions", "fr": "Intégrez la citation du jour dans vos abonnements Outlook / Apple News", "es": "Incorpora la cita diaria en tus suscripciones de Outlook / Apple News", "ar": "ضمّن اقتباس اليوم في اشتراكات Outlook / Apple News"},
+    },
+    "lms": {
+        "name": {"en": "LMS teaching embed (Moodle/Canvas)", "fr": "Intégration pédagogique LMS (Moodle/Canvas)", "es": "Inserción docente en LMS (Moodle/Canvas)", "ar": "تضمين تعليمي في أنظمة LMS (Moodle/Canvas)"},
+        "summary": {"en": "Institutions embed via LTI", "fr": "Les établissements intègrent via LTI", "es": "Las instituciones insertan vía LTI", "ar": "تضمّن المؤسسات المحتوى عبر LTI"},
+    },
+    "qr-poster": {
+        "name": {"en": "QR poster (offline/campus)", "fr": "Affiche QR (hors ligne / campus)", "es": "Póster QR (presencial/campus)", "ar": "ملصق رمز QR (حضوري/الحرم)"},
+        "summary": {"en": "Scan the QR at events to open campus kiosk mode", "fr": "Scannez le QR lors d’événements pour ouvrir le mode borne du campus", "es": "Escanea el QR en eventos para abrir el modo kiosco del campus", "ar": "امسح رمز QR في الفعاليات لفتح وضع كشك الحرم"},
+    },
+}
+
+
 @router.get("/plugins")
-def list_plugins() -> dict:
-    return {"total": len(PLUGINS), "items": PLUGINS}
+def list_plugins(lang: str = Query("zh")) -> dict:
+    items = []
+    for p in PLUGINS:
+        entry = PLUGIN_I18N.get(p["id"], {})
+        loc = {
+            **p,
+            "name": pick_i18n(p["name"], entry.get("name"), lang),
+            "summary": pick_i18n(p["summary"], entry.get("summary"), lang),
+            "snippet": pick_i18n(p["snippet"], entry.get("snippet"), lang),
+        }
+        if entry.get("snippet_alt"):
+            alt = pick_i18n("金句", entry["snippet_alt"], lang)
+            loc["snippet"] = p["snippet"].replace("![金句]", f"![{alt}]")
+        if lang not in ("zh", "all"):
+            loc["snippet"] = loc["snippet"].replace("lang=zh", f"lang={lang}")
+        items.append(loc)
+    return {"total": len(items), "items": items}

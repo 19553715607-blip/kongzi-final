@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { t, useLang } from "@/lib/i18n";
 import { toast } from "@/components/Toast";
 import { useReducedMotion } from "@/lib/motion";
+import Icon from "@/components/ui/Icon";
 
 type Props = {
   open: boolean;
@@ -112,11 +113,9 @@ export default function WallpaperSheet({ open, dataUrl, filename, onClose }: Pro
           <button
             onClick={onClose}
             aria-label={t("feed.sheet.close", lang)}
-            className="pressable flex h-8 w-8 items-center justify-center rounded-full text-faint hover:bg-surface-2"
+            className="btn btn-quiet btn-sm btn-icon text-faint"
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-              <path d="M6 6l12 12M18 6L6 18" />
-            </svg>
+            <Icon name="close" size={18} />
           </button>
         </div>
 
@@ -132,10 +131,8 @@ export default function WallpaperSheet({ open, dataUrl, filename, onClose }: Pro
         {/* 操作按钮 */}
         <div className="shrink-0 grid grid-cols-2 gap-3 border-t border-line p-4">
           <button onClick={() => void download()} className="tactile-btn">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14" />
-            </svg>
-            {saved ? "✓" : t("feed.downloadImage", lang)}
+            <Icon name={saved ? "check" : "download"} size={16} />
+            {t("feed.downloadImage", lang)}
           </button>
           <button
             onClick={() => void copy()}
@@ -143,11 +140,8 @@ export default function WallpaperSheet({ open, dataUrl, filename, onClose }: Pro
             className={`tactile-btn ${copyOk ? "cel" : ""}`}
             title={copyOk ? "" : t("feed.copyUnsupported", lang)}
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="9" y="9" width="11" height="11" rx="2" />
-              <path d="M5 15V5a2 2 0 012-2h10" />
-            </svg>
-            {busy ? "…" : copied ? "✓" : t("feed.copyImage", lang)}
+            <Icon name={copied ? "check" : "copy"} size={16} />
+            {busy ? "…" : t("feed.copyImage", lang)}
           </button>
         </div>
       </div>

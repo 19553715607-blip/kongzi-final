@@ -28,7 +28,7 @@ settings = get_settings()
 
 NODE_COLORS = {
     "person": "#993C1D",
-    "concept": "#0F6E56",
+    "concept": "#8A6D2F",
     "passage": "#854F0B",
     "proposition": "#534AB7",
     "school": "#1E5F8E",
@@ -43,7 +43,7 @@ class GraphStore:
     def node(self, node_id: str) -> Optional[dict]:
         raise NotImplementedError
 
-    def neighborhood(self, node_id: str, depth: int = 2) -> dict:
+    def neighborhood(self, node_id: str, depth: int = 2, lang: str = "zh") -> dict:
         raise NotImplementedError
 
     def path(self, a: str, b: str) -> dict:
@@ -58,11 +58,12 @@ class MemoryGraphStore(GraphStore):
         self.adj: Dict[str, List[Tuple[str, str]]] = {}  # id -> [(neighbor, label)]
         self._build(db)
 
-    def _add_node(self, nid, label, label_en, ntype, meta=None):
+    def _add_node(self, nid, label, label_en, ntype, meta=None, label_i18n=None):
         self.nodes[nid] = {
             "id": nid,
             "label": label,
             "label_en": label_en,
+            "label_i18n": label_i18n or {},
             "type": ntype,
             "color": NODE_COLORS.get(ntype, "#888"),
             "meta": meta or {},
@@ -71,18 +72,21 @@ class MemoryGraphStore(GraphStore):
     def _build(self, db: Session) -> None:
         for c in db.execute(select(Concept)).scalars():
             self._add_node(c.id, c.zh, (c.i18n or {}).get("en"), "concept",
-                           {"pinyin": c.pinyin, "rarity": c.rarity, "school": c.school})
+                           {"pinyin": c.pinyin, "rarity": c.rarity, "school": c.school},
+                           label_i18n=c.i18n)
         for p in db.execute(select(Passage)).scalars():
             self._add_node(p.id, _truncate(p.original_text), None, "passage",
                            {"ref_label": p.ref_label})
         for pe in db.execute(select(Person)).scalars():
             self._add_node(pe.id, pe.name_zh, (pe.name_i18n or {}).get("en"), "person",
-                           {"era": pe.era, "bio": pe.bio})
+                           {"era": pe.era, "bio": pe.bio}, label_i18n=pe.name_i18n)
         for pr in db.execute(select(Proposition)).scalars():
             self._add_node(pr.id, _truncate(pr.text_zh), (pr.text_i18n or {}).get("en"),
-                           "proposition", {"passage_ref": pr.passage_ref})
+                           "proposition", {"passage_ref": pr.passage_ref},
+                           label_i18n=pr.text_i18n)
         for s in db.execute(select(School)).scalars():
-            self._add_node(s.id, s.name_zh, (s.name_i18n or {}).get("en"), "school", {})
+            self._add_node(s.id, s.name_zh, (s.name_i18n or {}).get("en"), "school", {},
+                           label_i18n=s.name_i18n)
 
         for e in db.execute(select(GraphEdge)).scalars():
             if e.source_id not in self.nodes or e.target_id not in self.nodes:
@@ -105,7 +109,21 @@ class MemoryGraphStore(GraphStore):
     def node(self, node_id: str) -> Optional[dict]:
         return self.nodes.get(node_id)
 
-    def neighborhood(self, node_id: str, depth: int = 2) -> dict:
+    def _out(self, nodes: List[dict], lang: str) -> List[dict]:
+        """按 lang 取节点译名；非 zh 时保留 label_zh 供前端作原字副标。"""
+        out = []
+        for n in nodes:
+            m = {k: v for k, v in n.items() if k != "label_i18n"}
+            m["label_zh"] = None
+            if lang not in ("zh", "all"):
+                val = (n.get("label_i18n") or {}).get(lang)
+                if val:
+                    m["label"] = _truncate(val, 30)
+                    m["label_zh"] = n["label"]
+            out.append(m)
+        return out
+
+    def neighborhood(self, node_id: str, depth: int = 2, lang: str = "zh") -> dict:
         if node_id not in self.nodes:
             return {"nodes": [], "edges": []}
         visited = {node_id}
@@ -119,6 +137,7 @@ class MemoryGraphStore(GraphStore):
                     visited.add(nb)
                     frontier.append((nb, d + 1))
         sub = self._subgraph(visited)
+        sub["nodes"] = self._out(sub["nodes"], lang)
         sub["center"] = node_id
         return sub
 
@@ -177,7 +196,7 @@ class Neo4jGraphStore(GraphStore):
             "meta": {},
         }
 
-    def neighborhood(self, node_id: str, depth: int = 2) -> dict:
+    def neighborhood(self, node_id: str, depth: int = 2, lang: str = "zh") -> dict:
         # 变长路径深度不能参数化，故内联（depth 已转 int，无注入风险）
         cy = (
             f"MATCH (c {{id:$id}}) "

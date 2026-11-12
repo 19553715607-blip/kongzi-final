@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 import { t, useLang } from "@/lib/i18n";
+import BrandGlyph from "@/components/BrandGlyph";
 
 type Props = {
   open: boolean;
@@ -53,7 +54,7 @@ export default function LoginGate({ open, onClose, titleKey = "gate.title" }: Pr
       <div className="nav-drop relative w-full max-w-sm rounded-2xl border border-line bg-surface p-5 shadow-xl">
         <div className="flex items-start gap-3">
           <span className="seal inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md font-serif text-xs leading-none">
-            孔
+            <BrandGlyph className="text-[18px]" />
           </span>
           <div className="min-w-0">
             <h2 id="login-gate-title" className="font-serif text-base text-fg">
@@ -65,14 +66,14 @@ export default function LoginGate({ open, onClose, titleKey = "gate.title" }: Pr
         <div className="mt-4 flex items-center gap-2">
           <Link
             href={`/login?next=${next}`}
-            className="pressable flex-1 rounded-full bg-accent px-4 py-2.5 text-center text-sm text-on-accent transition hover:brightness-110"
+            className="btn btn-primary btn-lg flex-1"
           >
             {t("gate.login", lang)}
           </Link>
           <button
             type="button"
             onClick={onClose}
-            className="pressable rounded-full border border-line px-4 py-2.5 text-sm text-muted transition hover:bg-surface-2"
+            className="btn btn-outline btn-lg"
           >
             {t("gate.later", lang)}
           </button>

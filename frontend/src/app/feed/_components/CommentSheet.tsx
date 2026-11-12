@@ -7,6 +7,7 @@ import { toast } from "@/components/Toast";
 import { getApiBase } from "@/lib/apiBase";
 import { getVisitorId, visitorHeaders } from "@/lib/visitor";
 import { useReducedMotion } from "@/lib/motion";
+import Icon from "@/components/ui/Icon";
 
 // ── 数据契约（与 /api/v1/comments 对齐）──────────────────────────────────
 type CommentNode = {
@@ -121,30 +122,28 @@ function SheetItem({
       <div className="mt-1.5 flex flex-wrap items-center gap-1 ps-[42px] text-[11px]">
         <button
           onClick={() => onLike(node.id)}
-          className="pressable inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-muted transition hover:bg-surface-2 hover:text-accent"
+          className="chip chip-quiet"
         >
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M7 10v12" /><path d="M15 5.88L14 10h5.6a2 2 0 011.96 2.4l-1.9 8A2 2 0 0117.7 22H7" />
-          </svg>
+          <Icon name="heart" size={12} />
           {t("comments.like", lang)}
           {node.likes > 0 && <span className="tabular-nums">{node.likes}</span>}
         </button>
         <button
           onClick={() => setReplying((s) => !s)}
-          className="pressable rounded-full px-2 py-0.5 text-muted transition hover:bg-surface-2 hover:text-accent"
+          className="chip chip-quiet"
         >
           {t("comments.reply", lang)}
         </button>
         <button
           onClick={() => onReport(node.id)}
-          className="pressable rounded-full px-2 py-0.5 text-faint transition hover:bg-surface-2 hover:text-accent"
+          className="chip chip-quiet text-faint"
         >
           {t("comments.report", lang)}
         </button>
         {isMine && (
           <button
             onClick={() => onDelete(node.id)}
-            className="pressable rounded-full px-2 py-0.5 text-faint transition hover:bg-accent-soft hover:text-accent"
+            className="chip chip-quiet text-faint hover:text-accent"
           >
             {t("comments.delete", lang)}
           </button>
@@ -167,7 +166,7 @@ function SheetItem({
             </button>
             <button
               onClick={() => { setReplying(false); setDraft(""); }}
-              className="pressable rounded-full px-3 py-1 text-xs text-faint hover:bg-surface-2"
+              className="chip chip-quiet text-faint"
             >
               {t("comments.cancel", lang)}
             </button>
@@ -179,7 +178,7 @@ function SheetItem({
       {replies.length > 0 && isDeep && !deepOpen && (
         <button
           onClick={() => setDeepOpen(true)}
-          className="pressable mt-2 ms-[42px] inline-flex items-center gap-1.5 rounded-full border border-line px-3 py-1 text-[11px] text-muted transition hover:border-accent hover:text-accent"
+          className="chip mt-2 ms-[42px]"
         >
           <span className="h-px w-4 bg-current opacity-50" />
           {t("comments.viewReplies", lang).replace("{n}", String(flattenCount(replies)))}
@@ -189,7 +188,7 @@ function SheetItem({
       {replies.length > 0 && (!isDeep || deepOpen) && (
         <div className="mt-2 border-s-2 border-line ps-3 md:ps-4">
           {isDeep && (
-            <button onClick={() => setDeepOpen(false)} className="pressable mb-1 text-[11px] text-faint hover:text-accent">
+            <button onClick={() => setDeepOpen(false)} className="chip chip-quiet mb-1 text-faint">
               {t("comments.hideReplies", lang)}
             </button>
           )}
@@ -422,11 +421,9 @@ export default function CommentSheet({ open, targetType, targetId, title, onClos
             <button
               onClick={onClose}
               aria-label={t("feed.sheet.close", lang)}
-              className="pressable flex h-8 w-8 items-center justify-center rounded-full text-faint transition hover:bg-surface-2 hover:text-fg"
+              className="btn btn-quiet btn-sm btn-icon text-faint"
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                <path d="M6 6l12 12M18 6L6 18" />
-              </svg>
+              <Icon name="close" size={18} />
             </button>
           </div>
         </div>

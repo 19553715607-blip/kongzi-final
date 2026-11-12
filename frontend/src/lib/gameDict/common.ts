@@ -49,6 +49,7 @@ export const COMMON: Record<string, E> = {
   "上报中…": { en: "Reporting…", fr: "Envoi…", es: "Enviando…", ar: "جارٍ الإبلاغ…" },
   "上报中": { en: "Reporting", fr: "Envoi", es: "Enviando", ar: "جارٍ الإبلاغ" },
   新解锁: { en: "New", fr: "Nouveau", es: "Nuevo", ar: "جديد" },
+  已解锁: { en: "Unlocked", fr: "Débloqué", es: "Desbloqueado", ar: "فُتح" },
   未解锁: { en: "Locked", fr: "Verrouillé", es: "Bloqueado", ar: "مقفل" },
   已完成: { en: "Completed", fr: "Terminé", es: "Completado", ar: "مكتمل" },
   未完成: { en: "Incomplete", fr: "Inachevé", es: "Incompleto", ar: "غير مكتمل" },

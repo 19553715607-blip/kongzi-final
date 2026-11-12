@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { headers } from "next/headers";
+import { headers, cookies } from "next/headers";
 import "@fontsource/noto-serif-sc/400.css";
 import "@fontsource/noto-serif-sc/600.css";
 import "@fontsource/noto-serif-sc/700.css";
@@ -49,6 +49,9 @@ export const viewport: Viewport = {
 // 挂载后已存偏好 localStorage 优先)。
 const SUPPORTED: Lang[] = ["zh", "en", "fr", "es", "ar"];
 function detectLangFromHeaders(): Lang {
+  // 优先用切换语言时写入的 cookie，保证 SSR 与 localStorage 一致（避免注水回退）
+  const c = cookies().get("kongzi_lang")?.value;
+  if (c && SUPPORTED.includes(c as Lang)) return c as Lang;
   const al = headers().get("accept-language") ?? "";
   const parts = al
     .split(",")
@@ -77,7 +80,7 @@ const langScript = `(function(){try{var T=${JSON.stringify(META_TITLE)},D=${JSON
   META_DESCRIPTION,
 )},K=${JSON.stringify(
   META_KEYWORDS,
-)};var l=localStorage.getItem('kongzi_lang');if(!l||!T[l]){l='en';var ls=[].concat(navigator.languages||[],navigator.language||'');for(var i=0;i<ls.length;i++){var c=(ls[i]||'').slice(0,2).toLowerCase();if(T[c]){l=c;break;}}try{localStorage.setItem('kongzi_lang',l);}catch(e){}}document.title=T[l];var m=document.querySelector('meta[name="description"]');if(m)m.setAttribute('content',D[l]);var k=document.querySelector('meta[name="keywords"]');if(k)k.setAttribute('content',K[l]);document.documentElement.lang=l;document.documentElement.dir=(l==='ar')?'rtl':'ltr';var ogT=document.querySelector('meta[property="og:title"]');if(ogT)ogT.setAttribute('content',T[l]);var ogD=document.querySelector('meta[property="og:description"]');if(ogD)ogD.setAttribute('content',D[l]);var twT=document.querySelector('meta[name="twitter:title"]');if(twT)twT.setAttribute('content',T[l]);var twD=document.querySelector('meta[name="twitter:description"]');if(twD)twD.setAttribute('content',D[l]);}catch(e){}})();`;
+)};var l=localStorage.getItem('kongzi_lang');if(!l||!T[l]){var m=document.cookie.match(/(?:^|;\\s*)kongzi_lang=([^;]+)/);l=(m&&T[m[1]])?m[1]:'';}if(!l){l='en';var ls=[].concat(navigator.languages||[],navigator.language||'');for(var i=0;i<ls.length;i++){var c=(ls[i]||'').slice(0,2).toLowerCase();if(T[c]){l=c;break;}}}try{localStorage.setItem('kongzi_lang',l);}catch(e){}try{document.cookie='kongzi_lang='+l+'; path=/; max-age=31536000; SameSite=Lax';}catch(e){}document.title=T[l];var m=document.querySelector('meta[name="description"]');if(m)m.setAttribute('content',D[l]);var k=document.querySelector('meta[name="keywords"]');if(k)k.setAttribute('content',K[l]);document.documentElement.lang=l;document.documentElement.dir=(l==='ar')?'rtl':'ltr';var ogT=document.querySelector('meta[property="og:title"]');if(ogT)ogT.setAttribute('content',T[l]);var ogD=document.querySelector('meta[property="og:description"]');if(ogD)ogD.setAttribute('content',D[l]);var twT=document.querySelector('meta[name="twitter:title"]');if(twT)twT.setAttribute('content',T[l]);var twD=document.querySelector('meta[name="twitter:description"]');if(twD)twD.setAttribute('content',D[l]);}catch(e){}})();`;
 
 export default function RootLayout({
   children,
