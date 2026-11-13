@@ -18,10 +18,10 @@ export default function QuizPage() {
   const [lang] = useLang();
   return (
     <div className="space-y-6">
-      <Reveal as="section" className="py-4">
-        <p className="text-xs tracking-[0.25em] text-accent">{t("quiz.kicker", lang)}</p>
-        <h1 className="mt-2 font-serif text-3xl leading-tight text-fg">{t("quiz.title", lang)}</h1>
-        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted">{t("quiz.desc", lang)}</p>
+      <Reveal as="section" className="page-head">
+        <p className="page-kicker">{t("quiz.kicker", lang)}</p>
+        <h1 className="page-title font-serif">{t("quiz.title", lang)}</h1>
+        <p className="page-lede">{t("quiz.desc", lang)}</p>
       </Reveal>
 
       <Reveal as="section" delay={80} className="rounded-2xl border border-line bg-surface p-5">

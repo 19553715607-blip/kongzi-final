@@ -18,20 +18,14 @@ const SECTIONS: { titleKey: string; bodyKey: string }[] = [
 export default function AboutPage() {
   const [lang] = useLang();
   return (
-    <div className="mx-auto max-w-3xl px-5 py-14 md:px-8">
-      <Reveal>
-        <p className="nz-kicker font-garamond text-[0.7rem] uppercase">
-          {t("about.kicker", lang)}
-        </p>
-        <h1 className="mt-4 font-serif text-3xl font-bold tracking-wide text-fg">
-          {t("about.title", lang)}
-        </h1>
-        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted">
-          {t("about.lead", lang)}
-        </p>
+    <div className="mx-auto max-w-3xl">
+      <Reveal className="page-head">
+        <p className="page-kicker">{t("about.kicker", lang)}</p>
+        <h1 className="page-title font-serif">{t("about.title", lang)}</h1>
+        <p className="page-lede">{t("about.lead", lang)}</p>
       </Reveal>
 
-      <div className="mt-10 space-y-8">
+      <div className="mt-8 space-y-8">
         {SECTIONS.map((s, i) => (
           <Reveal key={s.titleKey} delay={i * 60}>
             <section className="rounded-2xl border border-line bg-surface p-5 md:p-6">

@@ -94,7 +94,7 @@ export default function Nav({ ghost = false }: { ghost?: boolean }) {
 
       {/* 移动端底部 tab：首页 / 探索 / 学习 / 我 + 更多 */}
       <nav
-        className="site-tabbar fixed bottom-0 start-0 end-0 z-20 flex h-14 border-t border-line backdrop-blur md:hidden"
+        className="site-tabbar fixed bottom-0 start-0 end-0 z-20 flex border-t border-line backdrop-blur md:hidden"
         aria-label="mobile"
       >
         {tabs.map((l) => {
@@ -132,12 +132,12 @@ export default function Nav({ ghost = false }: { ghost?: boolean }) {
 
       {/* 移动端全屏抽屉：按一级栏目分组列出全部入口，与桌面下拉同源 */}
       {drawer && (
-        <div className="fixed inset-0 z-40 md:hidden" role="dialog" aria-modal="true" aria-label={t("nav.menu", lang)}>
+        <div className="fixed inset-0 z-50 md:hidden" role="dialog" aria-modal="true" aria-label={t("nav.menu", lang)}>
           <div
             className="absolute inset-0 bg-black/40 backdrop-blur-sm"
             onClick={() => setDrawer(false)}
           />
-          <div className="nav-drop absolute bottom-0 start-0 end-0 max-h-[82vh] overflow-y-auto rounded-t-2xl border-t border-line bg-surface p-4 pb-8">
+          <div className="nav-drop absolute bottom-0 start-0 end-0 max-h-[82vh] overflow-y-auto rounded-t-2xl border-t border-line bg-surface p-4 pb-[calc(2rem+var(--safe-b,0px))]">
             <div className="mb-3 flex items-center justify-between">
               <span className="font-serif text-sm text-fg">{t("nav.menu", lang)}</span>
               <button

@@ -235,20 +235,16 @@ export default function Home() {
     <div className="nz-glass p-5 md:p-6">
       <div className="mb-3 flex items-center gap-2.5">
         <span className="text-[0.65rem] tracking-[0.4em] text-accent">{t("home.quote", lang)}</span>
-        <span className="ms-auto flex items-center gap-0.5 rounded-full border border-line p-0.5">
+        <span className="segmented ms-auto">
           <button
             onClick={() => switchMode("daily")}
-            className={`pressable rounded-full px-2.5 py-1 text-[11px] transition ${
-              mode === "daily" ? "bg-accent text-bg" : "text-faint hover:text-fg"
-            }`}
+            className={`segmented-item ${mode === "daily" ? "is-on" : ""}`}
           >
             {t("home.quote.daily", lang)}
           </button>
           <button
             onClick={() => switchMode("random")}
-            className={`pressable rounded-full px-2.5 py-1 text-[11px] transition ${
-              mode === "random" ? "bg-accent text-bg" : "text-faint hover:text-fg"
-            }`}
+            className={`segmented-item ${mode === "random" ? "is-on" : ""}`}
           >
             {t("home.quote.random", lang)}
           </button>

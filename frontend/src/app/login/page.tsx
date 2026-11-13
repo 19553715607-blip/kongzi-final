@@ -74,7 +74,7 @@ export default function LoginPage() {
       <Reveal delay={80}>
         <form onSubmit={submit} className="space-y-3 rounded-2xl border border-line bg-surface p-5">
           {/* 登录 / 注册切换 */}
-          <div className="flex items-center gap-0.5 rounded-full border border-line p-0.5" role="tablist">
+          <div className="segmented w-full" role="tablist">
             {(["login", "register"] as Mode[]).map((m) => (
               <button
                 key={m}
@@ -85,9 +85,7 @@ export default function LoginPage() {
                   setMode(m);
                   setErr("");
                 }}
-                className={`pressable flex-1 rounded-full px-3 py-1 text-[11px] transition ${
-                  mode === m ? "bg-accent text-bg" : "text-faint hover:text-fg"
-                }`}
+                className={`segmented-item flex-1 ${mode === m ? "is-on" : ""}`}
               >
                 {t(m === "login" ? "login.tab.login" : "login.tab.register", lang)}
               </button>

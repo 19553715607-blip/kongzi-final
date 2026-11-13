@@ -20,7 +20,7 @@ export default function ScrollTopButton() {
     <button
       onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
       aria-label="back to top"
-      className="btn btn-outline btn-lg btn-icon fixed bottom-20 end-4 z-40 bg-surface/90 backdrop-blur md:bottom-8 md:end-6"
+      className="btn btn-outline btn-lg btn-icon to-top fixed end-4 z-40 bg-surface/90 backdrop-blur md:end-6"
     >
       <Icon name="arrowUp" size={18} />
     </button>

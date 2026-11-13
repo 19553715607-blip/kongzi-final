@@ -59,7 +59,7 @@ export default function StorageNotice() {
     <div
       ref={boxRef}
       role="note"
-      className="fixed inset-x-3 bottom-[4.25rem] z-40 mx-auto flex max-w-xl flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border border-line bg-surface px-4 py-3 shadow-lg md:inset-x-auto md:bottom-3 md:left-1/2 md:-translate-x-1/2"
+      className="fixed inset-x-3 bottom-[calc(4.25rem+var(--safe-b,0px))] z-40 mx-auto flex max-w-xl flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border border-line bg-surface px-4 py-3 shadow-lg md:inset-x-auto md:bottom-3 md:left-1/2 md:-translate-x-1/2"
     >
       <p className="min-w-0 flex-1 text-xs leading-relaxed text-muted">
         {t("privacy.cookie.text", lang)}{" "}

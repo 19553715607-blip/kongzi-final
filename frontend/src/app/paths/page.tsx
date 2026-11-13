@@ -68,10 +68,10 @@ export default function PathsPage() {
   return (
     <div className="relative space-y-6">
       <ChineseBackdrop variant="clouds" />
-      <Reveal as="section" className="py-4">
-        <p className="text-xs tracking-[0.25em] text-accent">{t("paths.kicker", lang)}</p>
-        <h1 className="mt-2 font-serif text-3xl leading-tight text-fg">{t("paths.title", lang)}</h1>
-        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted">{t("paths.desc", lang)}</p>
+      <Reveal as="section" className="page-head">
+        <p className="page-kicker">{t("paths.kicker", lang)}</p>
+        <h1 className="page-title font-serif">{t("paths.title", lang)}</h1>
+        <p className="page-lede">{t("paths.desc", lang)}</p>
       </Reveal>
 
       <div className="grid gap-4">

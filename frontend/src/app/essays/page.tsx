@@ -65,23 +65,17 @@ export default function EssaysPage() {
   };
 
   return (
-    <div className="mx-auto max-w-4xl px-5 py-12 md:px-8">
-      <Reveal>
-        <p className="nz-kicker font-garamond text-[0.7rem] uppercase">
-          {t("essays.kicker", lang)}
-        </p>
-        <h1 className="mt-4 font-serif text-3xl font-bold tracking-wide text-fg">
-          {t("essays.title", lang)}
-        </h1>
-        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted">
-          {t("essays.lead", lang)}
-        </p>
+    <div className="mx-auto max-w-4xl">
+      <Reveal className="page-head">
+        <p className="page-kicker">{t("essays.kicker", lang)}</p>
+        <h1 className="page-title font-serif">{t("essays.title", lang)}</h1>
+        <p className="page-lede">{t("essays.lead", lang)}</p>
         <Link href="/paths" className="mt-2 inline-block text-xs text-accent underline underline-offset-4">
           {t("essays.allPaths", lang)}
         </Link>
       </Reveal>
 
-      <div className="mt-10 space-y-12">
+      <div className="mt-8 space-y-12">
         {PACKS.map((pack, pi) => (
           <Reveal key={pack.key} delay={pi * 50}>
             <section>

@@ -104,7 +104,7 @@ export default function PluginsPage() {
       ) : (
         <section className="grid gap-3 md:grid-cols-2">
           {items.map((p, i) => (
-            <Reveal key={p.id} delay={i * 60}>
+            <Reveal key={p.id} delay={i * 60} className="min-w-0">
               <div className="collection-card h-full p-4">
                 <div className="mb-2 flex items-start gap-2">
                   <span
@@ -113,7 +113,7 @@ export default function PluginsPage() {
                   >
                     {p.type}
                   </span>
-                  <div className="flex-1">
+                  <div className="min-w-0 flex-1">
                     <div className="font-serif text-base text-fg">{p.name}</div>
                     <div className="mt-0.5 text-xs text-faint">{p.summary}</div>
                   </div>

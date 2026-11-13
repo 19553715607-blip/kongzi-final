@@ -208,7 +208,7 @@ export default function ChatPage() {
   };
 
   return (
-    <div className="flex h-[calc(100dvh-11rem-var(--notice-h,0px))] flex-col md:h-[calc(100dvh-7.5rem-var(--notice-h,0px))]">
+    <div className="flex h-[calc(100dvh-11rem-var(--notice-h,0px)-var(--safe-b,0px))] flex-col md:h-[calc(100dvh-7.5rem-var(--notice-h,0px))]">
       {/* 会话头：人格 + 议题筛选。横向居中，与对话列同宽 */}
       <header className="mx-auto flex w-full max-w-3xl shrink-0 flex-col gap-2.5 border-b border-line/60 pb-3">
         <div className="flex items-center gap-3">

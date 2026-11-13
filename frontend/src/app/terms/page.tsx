@@ -109,10 +109,10 @@ export default function TermsPage() {
 
   return (
     <div className="space-y-6">
-      <Reveal as="section" className="py-4">
-        <p className="text-xs tracking-[0.25em] text-accent">{t("terms.kicker", lang)}</p>
-        <h1 className="mt-2 font-serif text-3xl leading-tight text-fg">{t("terms.title", lang)}</h1>
-        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted">{t("terms.desc", lang)}</p>
+      <Reveal as="section" className="page-head">
+        <p className="page-kicker">{t("terms.kicker", lang)}</p>
+        <h1 className="page-title font-serif">{t("terms.title", lang)}</h1>
+        <p className="page-lede">{t("terms.desc", lang)}</p>
       </Reveal>
 
       {/* 新读者速览:五个核心概念先建立直觉,再看术语表 */}

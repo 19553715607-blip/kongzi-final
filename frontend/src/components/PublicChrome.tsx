@@ -28,10 +28,11 @@ export default function PublicChrome({ children }: { children: React.ReactNode }
   // 内容不再约束 max-w-4xl，由页面自分节控制宽度。
   if (path === "/") {
     return (
-      <div className="kz-night flex min-h-screen flex-col pb-14 md:pb-0">
+      <div className="kz-night flex min-h-screen flex-col">
         <Nav ghost />
         <main className="flex-1">{children}</main>
         <Footer />
+        <div className="site-tabbar-spacer" aria-hidden="true" />
         <ScrollTopButton />
         <StorageNotice />
       </div>
@@ -41,11 +42,12 @@ export default function PublicChrome({ children }: { children: React.ReactNode }
   return (
     <>
       {!isKiosk && <Nav />}
-      <main className={isKiosk ? "" : "mx-auto max-w-4xl px-4 py-6 pb-20 md:pb-6"}>
+      <main className={isKiosk ? "" : "mx-auto max-w-4xl px-4 py-6 pb-8 md:pb-6"}>
         {!isKiosk && <Breadcrumb />}
         {children}
       </main>
       {!isKiosk && <Footer />}
+      {!isKiosk && <div className="site-tabbar-spacer" aria-hidden="true" />}
       {!isKiosk && <ScrollTopButton />}
       {!isKiosk && <StorageNotice />}
     </>

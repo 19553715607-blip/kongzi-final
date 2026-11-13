@@ -232,7 +232,7 @@ export default function FeedPage() {
     );
 
   return (
-    <div className="relative mx-auto max-w-md">
+    <div className="relative mx-auto max-w-md md:max-w-lg">
       <button
         type="button"
         onClick={goBack}
@@ -244,7 +244,7 @@ export default function FeedPage() {
 
       <div
         ref={scrollerRef}
-        className="h-[calc(100dvh-8rem)] snap-y snap-mandatory overflow-y-auto rounded-3xl"
+        className="h-[calc(100dvh-9rem-var(--safe-b,0px))] snap-y snap-mandatory overflow-y-auto rounded-3xl md:h-[calc(100dvh-8rem)]"
       >
         {!ready ? (
           <div className="flex h-full flex-col gap-3 p-6">
@@ -343,45 +343,48 @@ function Card({
   }, [burstSignal]);
 
   return (
-    <section className="card-hover relative flex h-full snap-start flex-col justify-center overflow-hidden rounded-2xl border border-line bg-surface px-7 text-center">
+    <section className="feed-card card-hover relative flex h-full snap-start overflow-hidden rounded-2xl border border-line bg-surface">
       <ChineseBackdrop variant="mountains clouds" />
 
-      {/* 原文大字（双击点赞区） */}
-      <div onDoubleClick={onDoubleLike} className="relative select-none">
-        <p className="relative font-serif text-[28px] font-medium leading-[1.7] tracking-[0.18em] text-fg">
-          {it.original_text}
-        </p>
-        {it.translation && (
-          <p className="relative mt-5 font-serif text-xs italic leading-relaxed text-muted">
-            {it.translation}
+      {/* 正文列：动作栏独立成列，正文永远不被压字 */}
+      <div className="feed-body relative flex min-w-0 flex-1 flex-col justify-center px-6 pb-24 pt-10 text-center">
+        {/* 原文大字（双击点赞区） */}
+        <div onDoubleClick={onDoubleLike} className="relative select-none">
+          <p className="feed-quote relative font-serif font-medium text-fg">
+            {it.original_text}
           </p>
-        )}
-        <span className="relative mx-auto mt-5 inline-block rounded-full border border-line bg-surface-2 px-3 py-1 text-[11px] text-muted">
-          {it.ref_label}
-        </span>
+          {it.translation && (
+            <p className="feed-trans relative font-serif italic text-muted">
+              {it.translation}
+            </p>
+          )}
+          <span className="feed-ref relative mx-auto inline-block rounded-full border border-line bg-surface-2 text-muted">
+            {it.ref_label}
+          </span>
 
-        {/* 双击点赞：朱砂印章「赞」 */}
-        {showBurst && (
-          <div className="like-stamp" aria-hidden>
-            <span className="stamp-ring" />
-            <span className="stamp-seal">赞</span>
-          </div>
-        )}
+          {/* 双击点赞：朱砂印章「赞」 */}
+          {showBurst && (
+            <div className="like-stamp" aria-hidden>
+              <span className="stamp-ring" />
+              <span className="stamp-seal">赞</span>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* 署名 + 标签（左下） */}
-      <div className="absolute bottom-7 start-6 end-20 text-start">
+      <div className="feed-sign absolute bottom-7 start-6 end-24 text-start">
         <div className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-fg">
           <span className="seal flex h-6 w-6 items-center justify-center rounded-full font-serif text-[10px]">
             {it.persona[0]}
           </span>
           {it.persona}
         </div>
-        <div className="text-[11px] text-faint">{it.tags.join("  ")}</div>
+        <div className="feed-tags text-[11px] text-faint">{it.tags.join("  ")}</div>
       </div>
 
-      {/* 右侧动作栏：印章字（赞 / 评 / 转 / 纸 / 藏） */}
-      <div className="absolute bottom-7 end-4 flex flex-col items-center gap-3.5">
+      {/* 动作栏：印章字（赞 / 评 / 转 / 纸 / 藏） */}
+      <div className="feed-rail relative z-10 flex w-16 shrink-0 flex-col items-center justify-end gap-3.5 pb-7">
         <Action
           label=""
           badge={likeCount > 0 ? String(likeCount) : ""}
@@ -438,7 +441,7 @@ function Action({
         {children}
       </button>
       {/* 固定高度的说明槽：有无副标题都占同样行高，动作列才不会忽宽忽窄 */}
-      <span className="mt-1 h-3 text-[10px] leading-none text-faint">
+      <span className="rail-label mt-1 h-3 text-[10px] leading-none text-faint">
         {badge ?? label}
       </span>
     </div>

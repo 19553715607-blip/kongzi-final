@@ -232,7 +232,7 @@ topics = r.json()`} />
           ].map(([m, ep, d], i) => {
             const fullUrl = `${apiBase}/api/v1${ep}`;
             return (
-              <Reveal key={ep} delay={i * 60}>
+              <Reveal key={ep} delay={i * 60} className="min-w-0">
                 <div className="overflow-hidden rounded-xl border border-line bg-surface-2/30 transition hover:border-accent/40">
                   <div className="flex items-stretch">
                     <span className="flex w-20 shrink-0 items-center justify-center bg-accent-soft font-serif text-xs tracking-[0.2em] text-accent">

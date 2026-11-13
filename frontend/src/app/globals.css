@@ -49,6 +49,9 @@
 
   --shadow-card: 0 1px 2px rgba(64, 54, 28, 0.05), 0 4px 14px rgba(64, 54, 28, 0.07);
   --shadow-card-hover: 0 2px 4px rgba(64, 54, 28, 0.06), 0 10px 26px rgba(64, 54, 28, 0.12);
+
+  /* 底部安全区（全面屏手势条）：固定 tabbar、占位与悬浮件统一读取 */
+  --safe-b: env(safe-area-inset-bottom, 0px);
 }
 
 .dark {
@@ -263,6 +266,32 @@ html, body {
 .chip-accent:hover { background: var(--accent-soft); }
 .chip-gold { border-color: color-mix(in srgb, var(--gold) 55%, transparent); color: var(--gold); }
 .chip-gold:hover { background: color-mix(in srgb, var(--gold) 16%, transparent); }
+
+/* 触屏/窄屏：桌面级的紧凑档位抬到可点按高度，几何口径仍来自同一套 token */
+@media (pointer: coarse), (max-width: 767.98px) {
+  .btn-sm { height: 32px; padding: 0 12px; font-size: 12px; }
+  .btn-sm.btn-icon { width: 32px; }
+  .chip { height: 30px; padding: 0 12px; }
+}
+
+/* 分段选择器（登录/注册、每日/随机等）：胶囊容器 + 等高档位 */
+.segmented {
+  display: inline-flex; align-items: center; gap: 2px;
+  padding: 2px; border: 1px solid var(--line); border-radius: 999px;
+}
+.segmented-item {
+  display: inline-flex; align-items: center; justify-content: center;
+  height: 26px; padding: 0 10px;
+  border-radius: 999px; font-size: 11px; line-height: 1;
+  color: var(--faint); background: transparent; white-space: nowrap; cursor: pointer;
+  transition: background-color 0.18s ease, color 0.18s ease, transform 0.12s ease;
+}
+.segmented-item:hover { color: var(--fg); }
+.segmented-item:active { transform: scale(0.97); }
+.segmented-item.is-on { background: var(--accent); color: var(--on-accent); }
+@media (pointer: coarse), (max-width: 767.98px) {
+  .segmented-item { height: 32px; }
+}
 
 /* ── 管理端精修 ─────────────────────────────────────────────────────── */
 /* 状态徽章：朱砂=待审/管理，青绿=通过/已发布，鎏金=游客/审定，灰=中性/拒绝 */
@@ -517,6 +546,10 @@ button.retry-btn:active { transform: scale(0.97); }
 .tactile-btn:disabled { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
 /* 工具台紧凑尺寸：管理端分页/审批/发 Key 等小按钮 */
 .tactile-btn.sm, .tactile-btn.xs { height: 26px; padding: 0 10px; font-size: 11px; }
+/* 触屏/窄屏抬到可点按高度（须紧跟紧凑档位，否则被同权重规则覆盖） */
+@media (pointer: coarse), (max-width: 767.98px) {
+  .tactile-btn.sm, .tactile-btn.xs { height: 32px; padding: 0 12px; font-size: 12px; }
+}
 /* 游戏 HUD 保留大触控目标：调用处显式写 h-14 时不被基线的 32px 压回 */
 .tactile-btn.h-14 { height: 3.5rem; padding: 0 22px; font-size: 14px; }
 
@@ -660,6 +693,31 @@ button.retry-btn:active { transform: scale(0.97); }
 .crumb .crumb-sep { color: var(--line); }
 .crumb .crumb-here { color: var(--fg); font-weight: 500; }
 .crumb a, .crumb .crumb-here { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* ── 内容页页头基线：金线眉题 / 衬线大标题 / 导语 ─────────────────────────
+   所有「标题 + 说明」型页面共用这一套排版，尺寸与间距不再各页手写。 */
+.page-head { padding-block: 0.75rem 0.25rem; }
+.page-kicker {
+  display: flex; align-items: center; gap: 0.75rem;
+  font-size: 0.6875rem; letter-spacing: 0.32em; text-transform: uppercase;
+  color: var(--accent);
+}
+.page-kicker::before {
+  content: ""; flex: none; width: 26px; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent));
+}
+[dir="rtl"] .page-kicker::before {
+  background: linear-gradient(270deg, transparent, var(--accent));
+}
+.page-title {
+  margin-top: 0.75rem;
+  font-size: clamp(1.6rem, 1.4rem + 1vw, 1.875rem);
+  line-height: 1.25; color: var(--fg);
+}
+.page-lede {
+  margin-top: 0.75rem; max-width: 42rem;
+  font-size: 0.875rem; line-height: 1.7; color: var(--muted);
+}
 
 /* ── 命令面板（⌘K） ── */
 .cmd-overlay {
@@ -825,6 +883,47 @@ body::after {
   .like-stamp .stamp-seal { opacity: 0; }
 }
 
+/* ── Feed 卡片：正文/动作栏分栏；矮屏与窄屏改为紧凑横排 ─────────────────── */
+.feed-quote {
+  font-size: clamp(1.5rem, 1.1rem + 1.1vw, 1.75rem);
+  line-height: 1.7;
+  letter-spacing: 0.18em;
+}
+.feed-trans { margin-top: 1.25rem; font-size: 0.75rem; line-height: 1.625; }
+.feed-ref { margin-top: 1.25rem; padding: 0.25rem 0.75rem; font-size: 0.6875rem; }
+
+/* 窄屏：动作栏仍竖排，收紧字号并让出返回键高度 */
+@media (max-width: 379.98px) {
+  .feed-body { padding-inline: 1rem; padding-top: 3.5rem; }
+  .feed-quote { font-size: 1.125rem; letter-spacing: 0.12em; }
+  .feed-trans { font-size: 0.6875rem; }
+}
+@media (max-height: 520px) {
+  .feed-card { flex-direction: column; }
+  .feed-body { flex: 1 1 auto; padding: 0.75rem 1.25rem 3.5rem; }
+  .feed-rail {
+    position: absolute; inset-inline-end: 0.75rem; bottom: 0.5rem;
+    width: auto; flex-direction: row; align-items: flex-end;
+    gap: 0.25rem; padding: 0;
+  }
+  .feed-rail .btn { width: 32px; height: 32px; padding: 0; min-width: 0; }
+  .feed-rail .rail-label { display: none; }
+  .feed-sign { bottom: 0.75rem; }
+  .feed-tags { display: none; }
+  .feed-quote { font-size: 1.125rem; line-height: 1.6; letter-spacing: 0.12em; }
+  .feed-trans {
+    margin-top: 0.5rem; font-size: 0.625rem; line-height: 1.5;
+    display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;
+    overflow: hidden;
+  }
+  .feed-ref { margin-top: 0.5rem; padding: 0.125rem 0.625rem; font-size: 0.625rem; }
+}
+@media (max-height: 380px) {
+  .feed-body { padding-block: 0.5rem 2.75rem; }
+  .feed-quote { font-size: 1rem; line-height: 1.6; letter-spacing: 0.08em; }
+  .feed-trans { margin-top: 0.375rem; -webkit-line-clamp: 1; }
+}
+
 /* 首页使用全站主题色；海报跟随 html.dark 切换。 */
 .kz-night { color: var(--fg); }
 
@@ -846,6 +945,25 @@ body::after {
 
 .site-tabbar {
   background: var(--nav-bg-strong);
+  height: calc(3.5rem + var(--safe-b, 0px));
+  padding-bottom: var(--safe-b, 0px);
+}
+
+/* 移动端页脚之后的等高空位：固定 tabbar 压在视口底部，
+   必须在文档末尾让出同高空间，否则页脚末行会被遮住 */
+.site-tabbar-spacer { display: none; }
+@media (max-width: 767.98px) {
+  .site-tabbar-spacer { display: block; height: calc(3.5rem + var(--safe-b, 0px)); }
+}
+
+/* 回到顶部：移动端抬到 tabbar 与安全区之上；首次访问的存储提示条在场时让位，
+   避免两个固定悬浮件叠在一起 */
+.to-top { bottom: calc(5rem + var(--safe-b, 0px)); }
+@media (min-width: 768px) {
+  .to-top { bottom: 2rem; }
+}
+@media (max-width: 767.98px) {
+  body[data-storage-notice] .to-top { display: none; }
 }
 
 /* 海报首尾淡出到透明，让全站的纸色、纹理和导航自然透出来。 */
